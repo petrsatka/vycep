@@ -15,61 +15,61 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-table {
+.page-content table {
   width:100%;
   border:none;
   margin-top:2mm;
   border-spacing:0;
 }
 
-thead {
+.page-content thead {
   position:sticky;
   top:0;
 }
 
-table td {
+.page-content table td {
   font-size:4mm;
 }
 
-table th {
+.page-content table th {
   font-size:4mm;
   background-color:grey;
 }
 
-table td input {
+.page-content table td input {
  font-size:4mm;
  margin:0;
  width:auto;
 }
 
-table td:first-child {
+.page-content table td:first-child {
   width:100%;
 }
 
-table th {
+.page-content table th {
   text-align:left;
 }
 
-table tr:nth-child(even) td {
+.page-content table tr:nth-child(even) td {
   text-align:right;
   padding-top:2mm;
   padding-bottom:2mm;
   padding-right:1mm;
 }
 
-table tr:nth-child(odd) td {
+.page-content table tr:nth-child(odd) td {
   padding-top:2mm;
 }
 
-table tr:nth-child(4n), tr:nth-child(4n-1) {
+.page-content table tr:nth-child(4n), tr:nth-child(4n-1) {
     background-color:lightgrey;
 }
 
-table tr:nth-child(4n-2), tr:nth-child(4n-3) {
+.page-content table tr:nth-child(4n-2), tr:nth-child(4n-3) {
     
 }
 
-.registration-link {
+.page-content .registration-link {
     font-size: 4.5mm;
     margin-top: 7mm;
     display: block;
@@ -91,9 +91,14 @@ table tr:nth-child(4n-2), tr:nth-child(4n-3) {
 
 .main-header {
   width:100%;
-  line-height: 18mm;
   background-color:lightblue;
+  position:relative;
+}
+
+.main-header .title {
+  line-height: 18mm;
   text-align:center;
+  width:100%;
 }
 
 .page-wrapper {
@@ -121,52 +126,52 @@ table tr:nth-child(4n-2), tr:nth-child(4n-3) {
   color: red;
 }
 
-.green {
+.page-content .green {
   color: green;
 }
 
-label, .label {
+.page-content label, .label {
   display: block;
   font-size: 4mm;
   font-weight: bold;
   margin-top:4mm;
 }
 
-label.large, .label.large {
+.page-content label.large, .label.large {
   font-size:8mm;
   margin-top:4mm;
   font-weight: normal;
 }
 
-.inline {
+.page-content .inline {
   display: inline;
 }
 
-.value {
+.page-content .value {
   display: block;
   font-size: 12mm;
   margin-top:1mm;
 }
 
-.value.large {
+.page-content .value.large {
   font-size:15mm;
 }
 
-.center {
+.page-content .center {
   text-align:center;
 }
 
-input {
+.page-content input {
   width:100%;
   font-size: 6mm;
   margin-top:2mm;
 }
 
-input[type=checkbox] {
+.page-content input[type=checkbox] {
    width:auto;
 }
 
-.button-large {
+.page-content .button-large {
   background: lightgray;
   color: black;
   display: block;
@@ -179,6 +184,6 @@ input[type=checkbox] {
   margin-top:4mm;
 }
 
-.button-large:hover {
+.page-content .button-large:hover {
     background: lightslategray;
 }
