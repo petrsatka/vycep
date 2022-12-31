@@ -19,6 +19,7 @@ table {
   width:100%;
   border:none;
   margin-top:2mm;
+  border-spacing:0;
 }
 
 thead {
