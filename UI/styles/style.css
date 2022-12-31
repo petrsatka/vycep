@@ -1,0 +1,115 @@
+html {
+  box-sizing: border-box;
+}
+
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.registration-link {
+    font-size: 4.5mm;
+    margin-top: 7mm;
+    display: block;
+}
+
+.main-header span {
+  font-size: 6mm;
+  display: inline-block;
+  vertical-align: middle;
+  line-height: normal;
+  font-weight: bold;
+}
+
+@media screen and (orientation: landscape) {
+  .page-wrapper {
+    width: 60vw;
+  }
+}
+
+.main-header {
+  width:100%;
+  line-height: 18mm;
+  background-color:lightblue;
+  text-align:center;
+}
+
+.page-wrapper {
+  margin:auto;
+  padding:10px;
+  height:100%;
+}
+
+.page-content {
+  margin-top:4mm;
+}
+
+.message-holder {
+  color: green;
+  font-size: 5mm;
+  height: 12mm;
+  font-weight: bold;
+  margin-top:2mm;
+  text-align:center;
+}
+
+.error-message {
+  color: red;
+}
+
+.green {
+  color: green;
+}
+
+label, .label {
+  display: block;
+  font-size: 4mm;
+  font-weight: bold;
+  margin-top:4mm;
+}
+
+label.large, .label.large {
+  font-size:8mm;
+  margin-top:4mm;
+  font-weight: normal;
+}
+
+.value {
+  display: block;
+  font-size: 12mm;
+  margin-top:1mm;
+}
+
+.value.large {
+  font-size:15mm;
+}
+
+.center {
+  text-align:center;
+}
+
+input {
+  width:100%;
+  font-size: 6mm;
+  margin-top:2mm;
+}
+
+.button-large {
+  background: lightgray;
+  color: black;
+  display: block;
+  text-align: center;
+  text-decoration: none;
+  border-radius: 8px;
+  padding-top:4mm;
+  padding-bottom:4mm;
+  font-size:5mm;
+  margin-top:4mm;
+}
+
+.button-large:hover {
+    background: lightslategray;
+}
