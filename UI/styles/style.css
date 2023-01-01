@@ -143,6 +143,16 @@ body {
   font-weight: normal;
 }
 
+.page-content label.header, .label.header {
+  background-color:#e0f7fa;
+}
+
+.page-content .description {
+  margin-top: 3mm;
+  font-size: 3mm;
+  display: block;
+}
+
 .page-content .inline {
   display: inline;
 }
@@ -157,6 +167,10 @@ body {
   font-size:15mm;
 }
 
+.page-content .value.small {
+  font-size:4mm;
+}
+
 .page-content .center {
   text-align:center;
 }
@@ -167,7 +181,7 @@ body {
   margin-top:2mm;
 }
 
-.page-content input[type=checkbox] {
+.page-content input[type=checkbox], .page-content input[type=radio]{
    width:auto;
 }
 
@@ -177,6 +191,8 @@ body {
   display: block;
   text-align: center;
   text-decoration: none;
+  border-color:gray;
+  border-style:solid;
   border-radius: 8px;
   padding-top:4mm;
   padding-bottom:4mm;
@@ -184,6 +200,6 @@ body {
   margin-top:4mm;
 }
 
-.page-content .button-large:hover {
-    background: lightslategray;
+.page-content .button-large:active {
+    background: #BDBDBD;
 }
