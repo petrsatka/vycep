@@ -1,13 +1,13 @@
 #hamnav {
   width: 100%;
-  /*background: #000;*/
   position:absolute;
   top:0;
   left:0;
 }
 
 #hamitems {
-  background: #000;
+  background: black;
+  margin-top: 1mm;
 }
 
 #hamitems a:hover { background: #af0d0d; }
@@ -15,7 +15,7 @@
 #hamnav label, #hamburger { display: none; }
 
 #hamitems a {
-  padding: 10px;
+  padding: 3mm;
   color: white;
   text-decoration: none;
   text-align: center;
@@ -23,6 +23,7 @@
   display: block;
   width: 100%;
   border-top: 1px solid #333;
+  font-size:5mm;
 }
 
 #hamnav label { 
@@ -30,8 +31,10 @@
   color: white;
   /*background: #a02620;*/
   font-style: normal;
-  font-size: 1.2em;
-  padding: 10px;
+  font-size: 6mm;
+  padding: 0;
+  padding-left:4mm;
+  line-height:18mm;
 }
 
 #hamitems { display: none; }
