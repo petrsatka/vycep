@@ -1,4 +1,8 @@
 export const menuContent = [
-{link:'#', title:'První'},
-{link:'#', title:'Druhá'},
+{link:'orders.html', title:'Objednávky'},
+{link:'payment.html', title:'Platba'},
+{link:'users.html', title:'Uživatelé'},
+{link:'settings.html', title:'Nastavení'},
+{link:'password-change.html', title:'Změna hesla'},
+{link:'login.html', title:'Odhlásit'},
 ]

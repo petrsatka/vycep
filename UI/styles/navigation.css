@@ -3,6 +3,7 @@
   position:absolute;
   top:0;
   left:0;
+  z-index:2;
 }
 
 #hamitems {
@@ -28,8 +29,7 @@
 
 #hamnav label { 
   display: inline-block; 
-  color: white;
-  /*background: #a02620;*/
+  color: black;
   font-style: normal;
   font-size: 6mm;
   padding: 0;

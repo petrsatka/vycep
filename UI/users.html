@@ -4,18 +4,18 @@
     <meta charset="UTF-8">                   
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Uživatelé</title>                  
-    <link rel="stylesheet" href="styles/style.css">               
-    <script src="scripts/utils.js"></script>              
+    <link rel="stylesheet" href="styles/style.css">
+    <link rel="stylesheet" href="styles/navigation.css">               
+    <script src="scripts/jquery-3.6.3.min.js"></script>
+    <script src="scripts/utils.js"></script>
+    <script src="scripts/navigation.js" type="module" defer></script>              
   </head>           
-  <body>                   
+  <body onload='setTimeout(() => {alert("Takto bude vypadat chyba.")}, 2000);'>                   
     <div class=page-wrapper>                           
       <div class="main-header">                                   
         <span class="title">Uživatelé</span>                           
       </div>                           
-      <div class="page-content">
-        <div class="message-holder">                                           
-          <span class="error-message">Případná chyba bude zobrazena v messageboxu</span>                                   
-        </div>                                    
+      <div class="page-content">                               
         <input type="checkbox" id="allow-payment" name="allow-payment">                                   
         <label class="inline" for="allow-payment">Povolit platbu novým uživatelům                           
         </label>                                   
