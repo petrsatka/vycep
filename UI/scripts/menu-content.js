@@ -1,3 +1,4 @@
+/*export const menuContent = [];*/
 export const menuContent = [
 {link:'orders.html', title:'Objednávky'},
 {link:'payment.html', title:'Platba'},
@@ -5,4 +6,4 @@ export const menuContent = [
 {link:'settings.html', title:'Nastavení'},
 {link:'password-change.html', title:'Změna hesla'},
 {link:'login.html', title:'Odhlásit'},
-]
+];
