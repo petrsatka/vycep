@@ -12,10 +12,14 @@ import { menuContent } from './menu-content.js';
   $(".main-header").append(`
   <nav id="hamnav">
     <label for="hamburger">&#9776;</label>
-    <input type="checkbox" id="hamburger"/>
+    <input type="checkbox" id="hamburger" autocomplete="off"/>
     <div id="hamitems">
       ${menuItemString}
     </div>
   </nav>
   `);
 }());
+
+window.onpageshow = function() {  
+  $("#hamburger").prop('checked', false)
+};

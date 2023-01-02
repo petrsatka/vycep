@@ -24,7 +24,7 @@ body {
 
 .page-content thead {
   position:sticky;
-  top:0;
+  top:0px;
 }
 
 .page-content table td {
@@ -103,11 +103,13 @@ body {
 
 .page-wrapper {
   margin:auto;
-  padding:10px;
   height:100%;
 }
 
 .page-content {
+  padding-left:10px;
+  padding-right:10px;
+  padding-bottom:10px;
   margin-top:4mm;
   height:calc(100% - 4mm - 18mm);
   overflow-y:auto;
