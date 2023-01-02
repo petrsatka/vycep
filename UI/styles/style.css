@@ -1,4 +1,4 @@
-html, body, page-wrapper {
+html, body, .page-wrapper {
   height:100%;
   margin:0;
 }
@@ -15,6 +15,10 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+.page-content {
+  width:100%;
+}
+
 .page-content table {
   width:100%;
   border:none;
@@ -24,7 +28,7 @@ body {
 
 .page-content thead {
   position:sticky;
-  top:0px;
+  top:0;
 }
 
 .page-content table td {
@@ -103,7 +107,11 @@ body {
 
 .page-wrapper {
   margin:auto;
-  height:100%;
+  position: relative;
+}
+
+.page-wrapper .jconfirm {
+  position: absolute;
 }
 
 .page-content {
