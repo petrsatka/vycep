@@ -15,10 +15,6 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-.page-content {
-  width:100%;
-}
-
 .page-content table {
   width:100%;
   border:none;
@@ -121,15 +117,22 @@ body {
   margin-top:4mm;
   height:calc(100% - 4mm - 18mm);
   overflow-y:auto;
+  width:100%;
 }
 
 .message-holder {
   color: green;
   font-size: 5mm;
   height: 12mm;
+  line-height: 12mm;
   font-weight: bold;
   margin-top:2mm;
   text-align:center;
+}
+
+.message-holder span {
+  display: inline-block;
+  line-height: normal;
 }
 
 .error-message {
