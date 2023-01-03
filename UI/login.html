@@ -10,7 +10,7 @@
     <script src="scripts/jquery-confirm.min.js"></script>
     <script src="scripts/utils.js"></script>
   </head>
-  <body>
+  <body onload="setTimeout(() => {notify.message('Takto bude vypadat chyba ověření', true);}, 2000);">
     <div class=page-wrapper>
       <div class="main-header">
         <span class="title">Přihlášení</span>
@@ -20,9 +20,7 @@
         <input type="text" id="name" name="name">
         <label for="password">Heslo</label>
         <input type="password" id="password" name="password">
-        <div class="message-holder">
-          <span class="error-message">Chyba ověření</span>
-        </div>
+        <div class="message-holder"></div>
         <input class="button-large" type="button" value="Přihlásit se">
         <a class="registration-link" href="registration.html">Zaregistrovat se </a>
       </div>
