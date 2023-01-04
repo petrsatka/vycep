@@ -24,7 +24,7 @@ body {
 
 .page-content thead {
   position:sticky;
-  top:0;
+  top:-0.4px;/*Oprava mezery mezi headery v mobilním Chromiu*/
 }
 
 .page-content table td {

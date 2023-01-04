@@ -5,5 +5,4 @@ export const menuContent = [
 {link:'users.html', title:'Uživatelé'},
 {link:'settings.html', title:'Nastavení'},
 {link:'password-change.html', title:'Změna hesla'},
-{link:'login.html', title:'Odhlásit'},
 ];

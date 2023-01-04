@@ -9,6 +9,9 @@ import { menuContent } from './menu-content.js';
     return;
   }
   
+  //Logout
+  menuItemString += '<a href="#" onclick="login.logout();return false;">Odhlásit</a>';
+
   $(".main-header").append(`
   <nav id="hamnav">
     <label for="hamburger">&#9776;</label>
