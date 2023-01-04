@@ -53,8 +53,8 @@ api.createAdmin = function(username, password, callback) {
   //Test existujícího jména
   //Test chyby HTTP
   //Test neplatné návratové hodnty
-  //setTimeout(callback(username,"user_exists", null));
   //setTimeout(callback(null, null, "500 - bad request"));
+  //setTimeout(callback(username,"user_exists", null));
   setTimeout(callback(username,"ok", null));
 }
 
@@ -66,7 +66,11 @@ api.createUser = function(username, password, callback) {
   //setTimeout(callback(username,"user_exists", null));
   //setTimeout(callback(null, null, "500 - bad request"));
   //setTimeout(callback(username,"unknown_error", null));
-  setTimeout(callback(username,"ok", null));
+  if (username.toLowerCase() == 'franta') {
+     setTimeout(callback(username,"user_exists", null));
+  } else {
+    setTimeout(callback(username,"ok", null));
+  }
 }
 
 api.resetPassword = function(username, callback) {
@@ -81,9 +85,11 @@ api.deleteUser = function(username, callback) {
   Přihlášení
 */
 api.login = function(username, password, callback) {
-  //setTimeout(callback(username,"bad_username_or_password", null));
-  //setTimeout(callback(null, null, "500 - bad request"));
-  setTimeout(callback(username,"ok", null));
+  if (!username || !password) {
+    setTimeout(callback(username,"bad_username_or_password", null));
+  } else {
+    setTimeout(callback(username,"ok", null));
+  }
 }
 
 /*
@@ -269,5 +275,5 @@ login.logout = function() {
 
 //DEBUG
 //Přihlášeného uživatel vždy místo login page směrovat na orders - vyřešit asi rovnou na serveru?
-
-
+//Zbrazovat někde username přihlášeného uživatele
+//favicon
