@@ -48,6 +48,7 @@ var api = {};
 */
 api.createAdmin = function(username, password, callback) {
   //DEBUG
+  //Validace délek na serveru? - alespoň username
   //Odladit speciállní znaky v hesle
   //Omezit volání pouze při inicializaci
   //Test existujícího jména
@@ -71,6 +72,19 @@ api.createUser = function(username, password, callback) {
   } else {
     setTimeout(callback(username,"ok", null));
   }
+}
+
+/*
+  Změna hesla
+*/
+api.changePassword = function(oldPassword, password, callback) {
+  if (oldPassword == '') {
+    setTimeout(callback(false,"invalid_password", null));
+  } else {
+    //setTimeout(callback(null, null, "500 - bad request"));
+    setTimeout(callback(true,"ok", null)); 
+    //setTimeout(callback(false,"ok", null));
+  }  
 }
 
 api.resetPassword = function(username, callback) {
@@ -108,6 +122,18 @@ api.getValue = function(name, value, callback) {
 }
 
 /*
+Správa cookies
+*/
+var cookies = {};
+
+/*
+Vrátí jmnéno aktuálně přihlášeného uživatele
+*/
+cookies.getUsername = function() {
+  return "Franta"; 
+}
+
+/*
   Vrstva nad voláním api
   Řeší validaci vstupů a obsluhu chyb
 */
@@ -118,6 +144,20 @@ var gui = {};
 */
 gui.navigate = function(target) {
   window.location.href = target;
+}
+
+/*
+  Vrací předchozí stránku, pokud neeexistuje vracíme se do objednávek
+*/
+gui.getReferrer = function() {
+  return document.referrer || 'orders.html';
+}
+
+/*
+  Naviguje na předchozí stránku
+*/
+gui.navigateToReferrer = function() {
+  gui.navigate(gui.getReferrer());
 }
 
 /*
@@ -139,7 +179,7 @@ gui.validate = function(isOK, errorMessage, okMessage = "", timeout = 0){
 */
 gui.validateUsername = function(username) {
   var regEx = /^[0-9a-zA-Z]+$/;
-  var minLen = 6;
+  var minLen = 5;
   var maxLen = 15;
   return gui.validate(username, "Není vyplněno jméno.") && 
   gui.validate(username.length >= minLen, `Minimální délka jména je ${minLen} znaků.`) &&
@@ -188,6 +228,9 @@ gui.handleError = function(resultCode, errorMessage, popupWindow = false) {
     case 'bad_username_or_password':
       message = 'Neplatné jméno nebo heslo.';
       break;
+    case 'invalid_password':
+      message = 'Neplatné heslo'
+      break
   }
   
   if (message) {
@@ -230,7 +273,19 @@ gui.createUser = function(username, password, passwordVerification, navigationTa
     }  
   });
 }
-
+ /*
+  Změna hesla
+ */
+gui.changePassword = function(oldPassword, password, passwordVerification) {
+  gui.validatePassword(password) &&
+  gui.verifyPassword(password, passwordVerification) &&
+  api.changePassword(oldPassword, password, (value, resultCode, errorMessage) => {
+    if (gui.handleError(resultCode, errorMessage)) {
+      gui.validate(value, "Heslo nelze změnit.", "Heslo bylo změněno");
+    }
+  });  
+}
+ 
 /*
   Přihlášení
 */
@@ -253,6 +308,16 @@ gui.logout = function(navigationTarget) {
   });
 }
 
+/*
+  Maže citlivé položky
+*/
+gui.clearSensitiveInputs = function() {
+  $('input#old-password').val("");
+  $('input#name').val("");
+  $('input#password').val("");
+  $('input#password-verification').val("");
+}
+
 ///////////Metody jednotlivých stránek. Získají vstupní hodnoty a volají metody gui//////////////////////////
 var firstRegistration = {};
 firstRegistration.createAdmin = function() {
@@ -273,7 +338,27 @@ login.logout = function() {
   gui.logout('login.html');
 }
 
+var passwordChange = {};
+passwordChange.clearValues = function() {
+   gui.clearSensitiveInputs();
+}
+
+passwordChange.changePassword = function() {
+   gui.changePassword($('#old-password').val(), $('#password').val(), $('#password-verification').val());
+   passwordChange.clearValues();  
+}
+
+passwordChange.cancel = function() {
+  passwordChange.clearValues();
+  gui.navigateToReferrer();
+}
+
+
+////Global Events////
+$(window).on("pageshow",function(){
+  gui.clearSensitiveInputs(); 
+})
+
 //DEBUG
 //Přihlášeného uživatel vždy místo login page směrovat na orders - vyřešit asi rovnou na serveru?
-//Zbrazovat někde username přihlášeného uživatele
 //favicon

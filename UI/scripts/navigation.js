@@ -10,7 +10,7 @@ import { menuContent } from './menu-content.js';
   }
   
   //Logout
-  menuItemString += '<a href="#" onclick="login.logout();return false;">Odhlásit</a>';
+  menuItemString += `<a href="#" onclick="login.logout();return false;">Odhlásit (${cookies.getUsername()})</a>`;
 
   $(".main-header").append(`
   <nav id="hamnav">
@@ -23,6 +23,6 @@ import { menuContent } from './menu-content.js';
   `);
 }());
 
-window.onpageshow = function() {  
+$(window).on("pageshow",function(){
   $("#hamburger").prop('checked', false)
-};
+});
