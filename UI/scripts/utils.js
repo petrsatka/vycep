@@ -108,18 +108,27 @@ api.login = function(username, password, callback) {
 
 api.qCountDEBUG = 5;
 api.billCountDEBUG = 20;
+/*
+  Získá aktuální počet nápojů ve frontě zařízení
+*/
 api.getQueueCount = function(callback) {
   setTimeout(() => callback(api.qCountDEBUG,"ok", null),500);
   //setTimeout(() => callback(-1,"unable_to_get_qcount", null), 500);
   //setTimeout(() => callback(null, null, "500 - bad request"), 500); 
 }
 
+/*
+  Získá aktuální počet nápojů na účtě přihlášeného uživatele
+*/
 api.getUserBillCount = function(callback) {
   setTimeout(() => callback(api.billCountDEBUG,"ok", null),500);
   //setTimeout(() => callback(-1,"unable_to_get_bcount", null),500);
   //setTimeout(() => callback(null, null, "500 - bad request"),500);
 }
 
+/*
+  Vytvoří objednávků a vrátí aktuální počet nápojů ve frontě a na účtě přihlášeného uživatele
+*/
 api.makeOrder = function(callback) {
   setTimeout(() => callback({
    queueCount: ++api.qCountDEBUG,
@@ -309,6 +318,7 @@ gui.createUser = function(username, password, passwordVerification, navigationTa
     }  
   });
 }
+
  /*
   Změna hesla
  */
@@ -350,6 +360,9 @@ gui.logout = function(navigationTarget) {
   });
 }
 
+/*
+  Načtení hodnoty pomocí apiMethod a vložení do targetElementSelector
+*/
 gui.loadValue = function(apiMethod, targetElementSelector, callback) {
   apiMethod((value, resultCode, errorMessage) => {
     var isError = true;
@@ -374,6 +387,9 @@ gui.loadValue = function(apiMethod, targetElementSelector, callback) {
   });
 }
 
+/*
+  Vytvoří objednávku a hdnoty fronty a počtu nápůjů na účtu nastaví do qCountTargetSelector, bCountTargetSelector
+*/
 gui.makeOrder = function(qCountTargetSelector, bCountTargetSelector) {
   notify.message();
   gui.setInProgress(true);
