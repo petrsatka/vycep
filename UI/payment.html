@@ -12,7 +12,7 @@
     <script src="scripts/utils.js"></script>
     <script src="scripts/navigation.js" type="module" defer></script>
   </head>
-  <body>
+  <body onload="payment.loadValues()">
     <div class=page-wrapper>
       <div class="main-header">
       <span class="title">Platba</span>
@@ -20,17 +20,21 @@
       <div class="page-content">
         <div class="center">
           <span class="label">Plátce</span>
-          <span class="value">Franta</span>
-          <label for="count">K zaplacení</label>
-          <input type="number" id="count" name="count" value="20" min="1" max="20">
-          <span class="label large green">ZAPLACENO</span>
-          <span class="value large green">20</span>
+          <div id="payment-form">
+            <span class="value" id="username"></span>
+            <label for="count">K zaplacení</label>
+            <input type="number" id="count" value="0" name="count" min="0" step="1">
+          </div>
+          <div id="confirmation-message" class="not-displayed">
+            <span class="label large green">ZAPLACENO</span>
+            <span class="value large green">20</span>
+          </div>
         </div>
         <div class="message-holder">
           <span class="error-message">Uživateská chyba placení</span>
         </div>
         <input class="button-large" type="button" onclick="payment.pay()" value="Zaplatit">
-        <input class="button-large" type="button" onclick="payment.goBack()" value="Zrušit/OK">
+        <input class="button-large" type="button" onclick="payment.goBack()" value="Zrušit">
       </div>
     </div>
   </body>

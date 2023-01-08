@@ -15,6 +15,10 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+.not-displayed {
+  display:none;
+}
+
 .page-content table {
   width:100%;
   border:none;

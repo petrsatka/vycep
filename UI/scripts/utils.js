@@ -350,13 +350,27 @@ gui.logout = function(navigationTarget) {
   });
 }
 
-gui.loadValue = function(apiMethod, targetElementSelector) {
+gui.loadValue = function(apiMethod, targetElementSelector, callback) {
   apiMethod((value, resultCode, errorMessage) => {
+    var isError = true;
     if (gui.handleError(resultCode, errorMessage, true)) {
-      $(targetElementSelector).text(value);
+      isError = false;
+      if ($(targetElementSelector).is(':input')) { 
+        $(targetElementSelector).val(value);
+      } else {
+        $(targetElementSelector).text(value);
+      }
     } else {
-       $(targetElementSelector).text('-');
-    }  
+      if ($(targetElementSelector).is(':input')) { 
+         $(targetElementSelector).val(""); 
+      } else {
+        $(targetElementSelector).text('-');
+      }
+    }
+    
+    if (callback) {
+      callback(value, isError);
+    }
   });
 }
 
@@ -453,6 +467,17 @@ payment.pay = function() {
 payment.goBack = function() {
   passwordChange.clearValues();
   gui.navigateToReferrer();
+}
+
+payment.loadBCount = function() {
+  gui.loadValue(api.getUserBillCount, "#count", (val, isError) => {
+    $("#count").prop('max', val || 0);
+  });
+}
+
+payment.loadValues = function() {
+  $("#username").text(cookies.getUsername());
+  payment.loadBCount();
 }
 
 ////Global Events////
