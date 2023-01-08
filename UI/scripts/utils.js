@@ -442,6 +442,10 @@ orders.makeOrder = function() {
   gui.makeOrder("#q-count", "#b-count");
 }
 
+orders.navigateToPayment = function() {
+  gui.navigate("payment.html");
+}
+
 ////Global Events////
 $(window).on("pageshow",function(){
   gui.clearSensitiveInputs(); 
