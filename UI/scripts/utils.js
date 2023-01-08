@@ -54,9 +54,9 @@ api.createAdmin = function(username, password, callback) {
   //Test existujícího jména
   //Test chyby HTTP
   //Test neplatné návratové hodnty
-  //setTimeout(callback(null, null, "500 - bad request"));
-  //setTimeout(callback(username,"user_exists", null));
-  setTimeout(callback(username,"ok", null));
+  //setTimeout(() => callback(null, null, "500 - bad request"), 500);
+  //setTimeout(() => callback(username,"user_exists", null),500);
+  setTimeout(() => callback(username,"ok", null),500);
 }
 
 /*
@@ -64,13 +64,13 @@ api.createAdmin = function(username, password, callback) {
 */
 api.createUser = function(username, password, callback) {
   //DEBUG Omezit volání pouze adminovi
-  //setTimeout(callback(username,"user_exists", null));
-  //setTimeout(callback(null, null, "500 - bad request"));
-  //setTimeout(callback(username,"unknown_error", null));
+  //setTimeout(() => callback(username,"user_exists", null), 500);
+  //setTimeout(() => callback(null, null, "500 - bad request"), 500);
+  //setTimeout(() => callback(username,"unknown_error", null), 500);
   if (username.toLowerCase() == 'franta') {
-     setTimeout(callback(username,"user_exists", null));
+     setTimeout(() => callback(username,"user_exists", null),500);
   } else {
-    setTimeout(callback(username,"ok", null));
+    setTimeout(() => callback(username,"ok", null),500);
   }
 }
 
@@ -79,11 +79,11 @@ api.createUser = function(username, password, callback) {
 */
 api.changePassword = function(oldPassword, password, callback) {
   if (oldPassword == '') {
-    setTimeout(callback(false,"invalid_password", null));
+    setTimeout(() => callback(false,"invalid_password", null),500);
   } else {
-    //setTimeout(callback(null, null, "500 - bad request"));
-    setTimeout(callback(true,"ok", null)); 
-    //setTimeout(callback(false,"ok", null));
+    //setTimeout(() => callback(null, null, "500 - bad request"),500);
+    setTimeout(() => callback(true,"ok", null),500); 
+    //setTimeout(() => callback(false,"ok", null),500);
   }  
 }
 
@@ -100,17 +100,44 @@ api.deleteUser = function(username, callback) {
 */
 api.login = function(username, password, callback) {
   if (!username || !password) {
-    setTimeout(callback(username,"bad_username_or_password", null));
+    setTimeout(() => callback(username,"bad_username_or_password", null),500);
   } else {
-    setTimeout(callback(username,"ok", null));
+    setTimeout(() => callback(username,"ok", null),500);
   }
+}
+
+api.qCountDEBUG = 5;
+api.billCountDEBUG = 20;
+api.getQueueCount = function(callback) {
+  setTimeout(() => callback(api.qCountDEBUG,"ok", null),500);
+  //setTimeout(() => callback(-1,"unable_to_get_qcount", null), 500);
+  //setTimeout(() => callback(null, null, "500 - bad request"), 500); 
+}
+
+api.getUserBillCount = function(callback) {
+  setTimeout(() => callback(api.billCountDEBUG,"ok", null),500);
+  //setTimeout(() => callback(-1,"unable_to_get_bcount", null),500);
+  //setTimeout(() => callback(null, null, "500 - bad request"),500);
+}
+
+api.makeOrder = function(callback) {
+  setTimeout(() => callback({
+   queueCount: ++api.qCountDEBUG,
+   billCount: ++api.billCountDEBUG, 
+  },"ok", null), 1000);
+  
+  /*setTimeout(() => callback({
+    queueCount: api.qCountDEBUG,
+    billCount: api.billCountDEBUG, 
+  },"unable_to_make_order", null),5000); */
+  //setTimeout(() => callback(null, null, "500 - bad request"), 500); 
 }
 
 /*
   Odhlášení
 */
 api.logout = function(callback) {
-  setTimeout(callback(true,"ok", null));
+  setTimeout(() => callback(true,"ok", null), 500);
 }
 
 api.setValue = function(name, value, callback) {
@@ -246,6 +273,11 @@ gui.handleError = function(resultCode, errorMessage, popupWindow = false) {
   return false;
 }
 
+gui.setInProgress = function(inProgress) {
+   $(':button.button-large').prop("disabled", inProgress);
+   return true;  
+}
+
 /*
   Vytvoření administrátorského účtu
 */
@@ -253,7 +285,9 @@ gui.createAdmin = function(username, password, passwordVerification, navigationT
   gui.validateUsername(username) &&
   gui.validatePassword(password) &&
   gui.verifyPassword(password, passwordVerification) &&
+  gui.setInProgress(true) &&
   api.createAdmin(username, password, (value, resultCode, errorMessage) => {
+    gui.setInProgress(false);
     if (gui.handleError(resultCode, errorMessage)) {
       gui.navigate(navigationTarget);
     }  
@@ -267,7 +301,9 @@ gui.createUser = function(username, password, passwordVerification, navigationTa
   gui.validateUsername(username) &&
   gui.validatePassword(password) &&
   gui.verifyPassword(password, passwordVerification) &&
+  gui.setInProgress(true) &&
   api.createUser(username, password, (value, resultCode, errorMessage) => {
+    gui.setInProgress(false);
     if (gui.handleError(resultCode, errorMessage)) {
       gui.navigate(navigationTarget);
     }  
@@ -279,7 +315,9 @@ gui.createUser = function(username, password, passwordVerification, navigationTa
 gui.changePassword = function(oldPassword, password, passwordVerification) {
   gui.validatePassword(password) &&
   gui.verifyPassword(password, passwordVerification) &&
+  gui.setInProgress(true) &&
   api.changePassword(oldPassword, password, (value, resultCode, errorMessage) => {
+    gui.setInProgress(false);
     if (gui.handleError(resultCode, errorMessage)) {
       gui.validate(value, "Heslo nelze změnit.", "Heslo bylo změněno");
     }
@@ -290,7 +328,9 @@ gui.changePassword = function(oldPassword, password, passwordVerification) {
   Přihlášení
 */
 gui.login = function(username, password, navigationTarget) {
+  gui.setInProgress(true);
   api.login(username, password, (value, resultCode, errorMessage) => {
+    gui.setInProgress(false);
     if (gui.handleError(resultCode, errorMessage)) {
       gui.navigate(navigationTarget);
     }  
@@ -301,10 +341,41 @@ gui.login = function(username, password, navigationTarget) {
   Odhlášení
 */
 gui.logout = function(navigationTarget) {
+  gui.setInProgress(true);
   api.logout((value, resultCode, errorMessage) => {
+    gui.setInProgress(false);
     if (gui.handleError(resultCode, errorMessage, true)) {
       gui.navigate(navigationTarget);
     }  
+  });
+}
+
+gui.loadValue = function(apiMethod, targetElementSelector) {
+  apiMethod((value, resultCode, errorMessage) => {
+    if (gui.handleError(resultCode, errorMessage, true)) {
+      $(targetElementSelector).text(value);
+    } else {
+       $(targetElementSelector).text('-');
+    }  
+  });
+}
+
+gui.makeOrder = function(qCountTargetSelector, bCountTargetSelector) {
+  notify.message();
+  gui.setInProgress(true);
+  api.makeOrder((value, resultCode, errorMessage) => {
+    gui.setInProgress(false);
+    if (gui.handleError(resultCode, errorMessage)) {
+      if (qCountTargetSelector) {
+        $(qCountTargetSelector).text(value.queueCount);
+      }
+      
+      if (bCountTargetSelector) {
+        $(bCountTargetSelector).text(value.billCount);
+      }
+      
+      gui.validate(resultCode == 'ok', null, "Objednáno", 5000);
+    }
   });
 }
 
@@ -353,6 +424,23 @@ passwordChange.cancel = function() {
   gui.navigateToReferrer();
 }
 
+var orders = {};
+orders.loadQCount = function() {
+  gui.loadValue(api.getQueueCount, "#q-count");
+}
+
+orders.loadBCount = function() {
+  gui.loadValue(api.getUserBillCount, "#b-count");
+}
+
+orders.loadValues = function() {
+  orders.loadQCount();
+  orders.loadBCount();
+}
+
+orders.makeOrder = function() {
+  gui.makeOrder("#q-count", "#b-count");
+}
 
 ////Global Events////
 $(window).on("pageshow",function(){
@@ -362,3 +450,4 @@ $(window).on("pageshow",function(){
 //DEBUG
 //Přihlášeného uživatel vždy místo login page směrovat na orders - vyřešit asi rovnou na serveru?
 //favicon
+//RETEST všech operací stránek s ohledem na zamykání při delším trvání odpovědi

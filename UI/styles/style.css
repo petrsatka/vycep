@@ -216,3 +216,9 @@ body {
 .page-content .button-large:active {
     background: #BDBDBD;
 }
+
+.page-content .button-large:disabled {
+  color: gray;
+  background: gainsboro;
+  transition: background 2s ease 0.5s, color 2s ease 0.5s;
+}
