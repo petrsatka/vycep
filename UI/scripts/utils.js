@@ -446,6 +446,15 @@ orders.navigateToPayment = function() {
   gui.navigate("payment.html");
 }
 
+var payment = {};
+payment.pay = function() {
+}
+
+payment.goBack = function() {
+  passwordChange.clearValues();
+  gui.navigateToReferrer();
+}
+
 ////Global Events////
 $(window).on("pageshow",function(){
   gui.clearSensitiveInputs(); 
