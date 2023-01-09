@@ -121,7 +121,7 @@ api.getQueueCount = function(callback) {
   Získá aktuální počet nápojů na účtě přihlášeného uživatele
 */
 api.getUserBillCount = function(callback) {
-  setTimeout(() => callback(api.billCountDEBUG,"ok", null),500);
+  setTimeout(() => callback(api.billCountDEBUG,"ok", null),1000);
   //setTimeout(() => callback(-1,"unable_to_get_bcount", null),500);
   //setTimeout(() => callback(null, null, "500 - bad request"),500);
 }
@@ -134,11 +134,26 @@ api.makeOrder = function(callback) {
    queueCount: ++api.qCountDEBUG,
    billCount: ++api.billCountDEBUG, 
   },"ok", null), 1000);
-  
+
   /*setTimeout(() => callback({
     queueCount: api.qCountDEBUG,
     billCount: api.billCountDEBUG, 
   },"unable_to_make_order", null),5000); */
+  //setTimeout(() => callback(null, null, "500 - bad request"), 500); 
+}
+  
+/*
+  Provede platbu a vrátí zaplacený počet a počet nápojů na účtě přihlášeného uživatele
+*/
+api.pay = function(count, callback) {
+  setTimeout(() => callback({
+    paid: Math.min(api.billCountDEBUG,Math.max(0, count)),
+    billCount: api.billCountDEBUG - Math.max(0, count)
+  }, Math.max(api.billCountDEBUG - Math.max(0, count)),"ok", null), 1000);    
+  /*setTimeout(() => callback({
+     paid: 0,
+     billCount: api.billCountDEBUG,
+  },"unable_to_make_payment", null), 1000);*/
   //setTimeout(() => callback(null, null, "500 - bad request"), 500); 
 }
 
@@ -410,6 +425,20 @@ gui.makeOrder = function(qCountTargetSelector, bCountTargetSelector) {
 }
 
 /*
+  Provede platbu
+*/
+gui.pay = function(count, callback) {
+  gui.setInProgress(true);
+  api.pay(count, (value, resultCode, errorMessage) => {
+    gui.setInProgress(false);
+    var isOK = gui.handleError(resultCode, errorMessage);    
+    if (callback) {
+      callback(value, !isOK);
+    }
+  });
+}
+
+/*
   Maže citlivé položky
 */
 gui.clearSensitiveInputs = function() {
@@ -476,8 +505,20 @@ orders.navigateToPayment = function() {
   gui.navigate("payment.html");
 }
 
+orders.onPageShow = function() {
+  orders.loadValues();
+}
+
 var payment = {};
 payment.pay = function() {
+  $("#count").prop('disabled', true);
+  gui.pay($("#count").val(), (value, isError) => {
+    if (!isError) {
+      //aktualizovat hodnoty, aktualiizovat max a zviditelnit potvrzení, zneviditnit form a přepsat tlačítko.
+      //v onpageshow správně inicializovat stav?
+    }
+    $("#count").prop('disabled', false;);
+  });
 }
 
 payment.goBack = function() {
@@ -486,8 +527,10 @@ payment.goBack = function() {
 }
 
 payment.loadBCount = function() {
+  $("#count").prop('disabled', true);
   gui.loadValue(api.getUserBillCount, "#count", (val, isError) => {
     $("#count").prop('max', val || 0);
+    $("#count").prop('disabled', false);
   });
 }
 
@@ -496,12 +539,20 @@ payment.loadValues = function() {
   payment.loadBCount();
 }
 
+payment.onPageShow = function() {
+  payment.loadValues();
+}
+
 ////Global Events////
 $(window).on("pageshow",function(){
-  gui.clearSensitiveInputs(); 
-})
+  gui.clearSensitiveInputs();
+});
 
 //DEBUG
 //Přihlášeného uživatel vždy místo login page směrovat na orders - vyřešit asi rovnou na serveru?
 //favicon
 //RETEST všech operací stránek s ohledem na zamykání při delším trvání odpovědi
+
+//TODO
+//Vždy pouze jedna ktická chyba, zbytek zahodit
+//v pageshow vymazat prostor pro hlášky
