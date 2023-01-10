@@ -5,14 +5,23 @@ var notify = {};
 /*
   Vypíše chybu do message boxu.
 */
+notify.isError = false;
 notify.error = function(message) {
-  $.alert({
-    title: 'Chyba!',
-    content: message,
-    container:'.page-wrapper',
-    boxWidth: '90%',
-    useBootstrap: false,
-  });
+  if (!notify.isError) {
+    notify.isError = true;
+    $.alert({
+      title: 'Chyba!',
+      content: message,
+      container:'.page-wrapper',
+      boxWidth: '90%',
+      useBootstrap: false,
+      buttons: {
+        ok: function () {
+          notify.isError = false;
+        }
+      }
+    });
+  }
 },
   
 notify.message_timeout_id = null;
@@ -146,10 +155,19 @@ api.makeOrder = function(callback) {
   Provede platbu a vrátí zaplacený počet a počet nápojů na účtě přihlášeného uživatele
 */
 api.pay = function(count, callback) {
-  setTimeout(() => callback({
-    paid: Math.min(api.billCountDEBUG,Math.max(0, count)),
-    billCount: api.billCountDEBUG - Math.max(0, count)
-  }, Math.max(api.billCountDEBUG - Math.max(0, count)),"ok", null), 1000);    
+  if (count > api.billCountDEBUG || count < 0) {
+    setTimeout(() => callback({
+      paid: 0,
+      billCount: api.billCountDEBUG
+    },"invalid-payment-value", null), 1000);
+  } else { 
+    var paid = Math.min(api.billCountDEBUG, Math.max(0, count));
+    api.billCountDEBUG -= paid;
+    setTimeout(() => callback({
+      paid: paid,
+      billCount: api.billCountDEBUG
+    },"ok", null), 1000);
+  }   
   /*setTimeout(() => callback({
      paid: 0,
      billCount: api.billCountDEBUG,
@@ -280,8 +298,11 @@ gui.handleError = function(resultCode, errorMessage, popupWindow = false) {
       message = 'Neplatné jméno nebo heslo.';
       break;
     case 'invalid_password':
-      message = 'Neplatné heslo'
+      message = 'Neplatné heslo';
       break
+    case 'invalid-payment-value':
+      message = 'Nelze zaplatit neplatné množství.';
+      break;
   }
   
   if (message) {
@@ -379,6 +400,7 @@ gui.logout = function(navigationTarget) {
   Načtení hodnoty pomocí apiMethod a vložení do targetElementSelector
 */
 gui.loadValue = function(apiMethod, targetElementSelector, callback) {
+  $(targetElementSelector).prop('disabled', true);
   apiMethod((value, resultCode, errorMessage) => {
     var isError = true;
     if (gui.handleError(resultCode, errorMessage, true)) {
@@ -399,6 +421,8 @@ gui.loadValue = function(apiMethod, targetElementSelector, callback) {
     if (callback) {
       callback(value, isError);
     }
+    
+    $(targetElementSelector).prop('disabled', false);
   });
 }
 
@@ -428,13 +452,15 @@ gui.makeOrder = function(qCountTargetSelector, bCountTargetSelector) {
   Provede platbu
 */
 gui.pay = function(count, callback) {
+  notify.message();
   gui.setInProgress(true);
   api.pay(count, (value, resultCode, errorMessage) => {
-    gui.setInProgress(false);
     var isOK = gui.handleError(resultCode, errorMessage);    
     if (callback) {
       callback(value, !isOK);
     }
+    
+    gui.setInProgress(false);
   });
 }
 
@@ -455,7 +481,7 @@ firstRegistration.createAdmin = function() {
 }
 
 var registration = {};
-registration.createUser = function() {
+  registration.createUser = function() {
   gui.createUser($('#name').val(), $('#password').val(), $('#password-verification').val(), 'orders.html');
 }
 
@@ -510,14 +536,32 @@ orders.onPageShow = function() {
 }
 
 var payment = {};
+payment.setCountValue = function(count) {
+  $("#count").val(count || 0);  
+}
+
+payment.setPaidText = function(paid) {
+  $("#paid").text(paid)
+}
+
+payment.setPaidMessage = function(paid) {
+  payment.setPaidText(paid);
+  $("#payment-form").addClass("not-displayed");
+  $("#pay-button").addClass("not-displayed");
+  $("#back-button").val("OK");
+  $("#confirmation-message").removeClass("not-displayed");
+}
+
 payment.pay = function() {
   $("#count").prop('disabled', true);
   gui.pay($("#count").val(), (value, isError) => {
     if (!isError) {
-      //aktualizovat hodnoty, aktualiizovat max a zviditelnit potvrzení, zneviditnit form a přepsat tlačítko.
+      payment.setCountValue(value.billCount);
+      payment.setPaidMessage(value.paid);
       //v onpageshow správně inicializovat stav?
     }
-    $("#count").prop('disabled', false;);
+    
+    $("#count").prop('disabled', false);
   });
 }
 
@@ -527,11 +571,7 @@ payment.goBack = function() {
 }
 
 payment.loadBCount = function() {
-  $("#count").prop('disabled', true);
-  gui.loadValue(api.getUserBillCount, "#count", (val, isError) => {
-    $("#count").prop('max', val || 0);
-    $("#count").prop('disabled', false);
-  });
+  gui.loadValue(api.getUserBillCount, "#count");
 }
 
 payment.loadValues = function() {
@@ -546,6 +586,7 @@ payment.onPageShow = function() {
 ////Global Events////
 $(window).on("pageshow",function(){
   gui.clearSensitiveInputs();
+  notify.message();
 });
 
 //DEBUG
@@ -554,5 +595,5 @@ $(window).on("pageshow",function(){
 //RETEST všech operací stránek s ohledem na zamykání při delším trvání odpovědi
 
 //TODO
-//Vždy pouze jedna ktická chyba, zbytek zahodit
-//v pageshow vymazat prostor pro hlášky
+//PLatba a objednávky - nastavit in progress během prvního načítání dat
+//Platba - reset stránky při návratu přes back button

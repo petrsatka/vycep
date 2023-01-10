@@ -23,21 +23,21 @@
       <div class="page-content">
         <div class="center">
           <span class="label">Plátce</span>
+          <span class="value" id="username">&nbsp;</span>
           <div id="payment-form">
-            <span class="value" id="username"></span>
             <label for="count">K zaplacení</label>
-            <input type="number" id="count" value="0" name="count" min="0" step="1">
+            <input type="number" id="count" name="count" min="0" step="1">
           </div>
           <div id="confirmation-message" class="not-displayed">
             <span class="label large green">ZAPLACENO</span>
-            <span class="value large green">-</span>
+            <span class="value large green" id="paid">-</span>
           </div>
         </div>
-        <div class="message-holder">
-          <span class="error-message">Uživateská chyba placení</span>
+        <div class="message-holder"></div>
+        <div>
+          <input class="button-large" id="pay-button" type="button" onclick="payment.pay()" value="Zaplatit">
+          <input class="button-large" id="back-button" type="button" onclick="payment.goBack()" value="Zrušit">
         </div>
-        <input class="button-large" type="button" onclick="payment.pay()" value="Zaplatit">
-        <input class="button-large" type="button" onclick="payment.goBack()" value="Zrušit">
       </div>
     </div>
   </body>
