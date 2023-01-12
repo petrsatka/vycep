@@ -474,6 +474,17 @@ gui.clearSensitiveInputs = function() {
   $('input#password-verification').val("");
 }
 
+gui.removeTemporaryClasses = function() {
+  $(".not-displayed-temporary").removeClass("not-displayed-temporary");
+  $(".displayed-temporary").removeClass("displayed-temporary");  
+}
+
+gui.resetDefaultValues = function() {
+  $("[data-defval]").each(function() {
+    $(this).val($(this).data('defval'));
+  });
+}
+
 ///////////Metody jednotlivých stránek. Získají vstupní hodnoty a volají metody gui//////////////////////////
 var firstRegistration = {};
 firstRegistration.createAdmin = function() {
@@ -546,10 +557,10 @@ payment.setPaidText = function(paid) {
 
 payment.setPaidMessage = function(paid) {
   payment.setPaidText(paid);
-  $("#payment-form").addClass("not-displayed");
-  $("#pay-button").addClass("not-displayed");
+  $("#payment-form").addClass("not-displayed-temporary");
+  $("#pay-button").addClass("not-displayed-temporary");
   $("#back-button").val("OK");
-  $("#confirmation-message").removeClass("not-displayed");
+  $("#confirmation-message").addClass("displayed-temporary");
 }
 
 payment.pay = function() {
@@ -558,7 +569,6 @@ payment.pay = function() {
     if (!isError) {
       payment.setCountValue(value.billCount);
       payment.setPaidMessage(value.paid);
-      //v onpageshow správně inicializovat stav?
     }
     
     $("#count").prop('disabled', false);
@@ -571,7 +581,12 @@ payment.goBack = function() {
 }
 
 payment.loadBCount = function() {
-  gui.loadValue(api.getUserBillCount, "#count");
+  gui.setInProgress(true);
+  gui.loadValue(api.getUserBillCount, "#count", (count, isError) => {
+    if (!isError) {
+      gui.setInProgress(false);
+    }
+  });
 }
 
 payment.loadValues = function() {
@@ -586,6 +601,8 @@ payment.onPageShow = function() {
 ////Global Events////
 $(window).on("pageshow",function(){
   gui.clearSensitiveInputs();
+  gui.resetDefaultValues();
+  gui.removeTemporaryClasses();
   notify.message();
 });
 
@@ -593,7 +610,3 @@ $(window).on("pageshow",function(){
 //Přihlášeného uživatel vždy místo login page směrovat na orders - vyřešit asi rovnou na serveru?
 //favicon
 //RETEST všech operací stránek s ohledem na zamykání při delším trvání odpovědi
-
-//TODO
-//PLatba a objednávky - nastavit in progress během prvního načítání dat
-//Platba - reset stránky při návratu přes back button
