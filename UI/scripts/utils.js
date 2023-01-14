@@ -175,6 +175,22 @@ api.pay = function(count, callback) {
   //setTimeout(() => callback(null, null, "500 - bad request"), 500); 
 }
 
+api.loadUsers = function(callback) {
+  const jsonData = [
+    { "username": "VLS", "payment": true, "admin": true },
+    { "username": "Pepa", "payment": false, "admin": false },
+    { "username": "Franta", "payment": true, "admin": false },
+    { "username": "Honza", "payment": true, "admin": false },
+    { "username": "Tonda", "payment": true, "admin": false },
+    { "username": "Petr", "payment": false, "admin": false },
+    { "username": "Pavel", "payment": false, "admin": false },
+  ]
+  setTimeout(() => callback(jsonData,"ok", null),1000);
+  //setTimeout(() => callback(null, "unable_to_get_users", null),500);
+  //setTimeout(() => callback(null, null, "500 - bad request"),500);
+}
+
+
 /*
   Odhlášení
 */
@@ -464,6 +480,16 @@ gui.pay = function(count, callback) {
   });
 }
 
+gui.loadUsers = function(callback) {
+  api.loadUsers((value, resultCode, errorMessage) => {
+    if (gui.handleError(resultCode, errorMessage, true)) {
+      if (callback) {
+        callback(value);
+      }
+    }
+  });
+}
+
 /*
   Maže citlivé položky
 */
@@ -596,6 +622,60 @@ payment.loadValues = function() {
 
 payment.onPageShow = function() {
   payment.loadValues();
+}
+
+var users = {}
+users.generateCheckboxCell = function(item, propertyName) {
+  return `<td> <input type="checkbox" onchange="users.handleCheckboxChange('${item.username}', '${propertyName}', event)" ${item[propertyName] ? ' checked' : ''}> </td>`;
+}
+
+users.generateButtonCell = function(value, name, action) {
+  return `<td> <input type="button" value="${value}" onclick="users.handleButtonClick('${name}','${action}')"> </td>`;
+}
+
+users.generateRow = function(item) {
+    let row = `<tr> <td> ${item.username} </td> `;
+    row += users.generateCheckboxCell(item, 'payment');
+    row += users.generateCheckboxCell(item, 'admin');
+    row += '</tr> <tr>';
+    row += users.generateButtonCell('Reset hesla', item.username, 'reset');
+    row += users.generateButtonCell('Zaplatit', item.username, 'pay');
+    row += users.generateButtonCell('Vymazat', item.username, 'delete');
+    row += '</tr>';
+    return row;
+}
+
+users.createTable = function(tableRowsData) {
+  let html = '<table> <thead> <tr> <th>Jméno</th> <th>Platba</th> <th>Admin</th> </tr> </thead> <tbody>';
+
+  tableRowsData.forEach(function(item) {
+    html += users.generateRow(item);
+  });
+
+  html += '</tbody> </table>';
+  return html;
+}
+
+users.handleCheckboxChange = function(name, propertyName, event) {
+  let checkbox = event.target;
+  let status = checkbox.checked;
+  //call your method here with name and status as parameter
+  console.log(name + ' ' + propertyName + ' ' + status);
+}
+
+users.handleButtonClick = function(name, action) {
+   //call your method here with name and action as parameter
+   console.log(name + ' ' + action);
+}
+
+users.loadUsers = function() {
+  gui.loadUsers((tableRowsData) => {
+   $('#users-table-holder').html(users.createTable(tableRowsData));
+  });  
+}
+
+users.onPageShow = function() {
+  users.loadUsers();
 }
 
 ////Global Events////
