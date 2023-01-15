@@ -198,11 +198,25 @@ api.logout = function(callback) {
   setTimeout(() => callback(true,"ok", null), 500);
 }
 
-api.setValue = function(name, value, callback) {
+api.setSettingsValue = function(name, value, callback) {
 
 }
 
-api.getValue = function(name, value, callback) {
+api.getSettingsValue = function(name, callback) {
+  var settings = {
+    'newUsersPayment' : true,
+  }
+  
+  val = settings[name];
+  if (val === undefined) {
+    setTimeout(() => callback(null, "unable_to_ge_settings_value", null),800); 
+  } else {
+    setTimeout(() => callback(val,"ok", null),800);
+  }
+  //setTimeout(() => callback(null, null, "500 - bad request"),500);
+}
+
+api.setPermissionValue = function(name, value, callback) {
 
 }
 
@@ -422,13 +436,23 @@ gui.loadValue = function(apiMethod, targetElementSelector, callback) {
     if (gui.handleError(resultCode, errorMessage, true)) {
       isError = false;
       if ($(targetElementSelector).is(':input')) { 
-        $(targetElementSelector).val(value);
+        if ($(targetElementSelector).is(':checkbox')) {
+          $(targetElementSelector).prop("checked", !!value);
+        } else {      
+          $(targetElementSelector).val(value);
+        }
       } else {
         $(targetElementSelector).text(value);
       }
+      
+      $(targetElementSelector).prop('disabled', false);
     } else {
-      if ($(targetElementSelector).is(':input')) { 
-         $(targetElementSelector).val(""); 
+      if ($(targetElementSelector).is(':input')) {
+         if ($(targetElementSelector).is(':checkbox')) {
+          $(targetElementSelector).prop("checked", false);
+        } else {    
+          $(targetElementSelector).val("");
+        } 
       } else {
         $(targetElementSelector).text('-');
       }
@@ -437,9 +461,11 @@ gui.loadValue = function(apiMethod, targetElementSelector, callback) {
     if (callback) {
       callback(value, isError);
     }
-    
-    $(targetElementSelector).prop('disabled', false);
   });
+}
+
+gui.loadSettingsValue = function(name, targetElementSelector, callback) {
+  gui.loadValue(function(cb) {api.getSettingsValue(name, cb);}, targetElementSelector, callback);
 }
 
 /*
@@ -674,8 +700,13 @@ users.loadUsers = function() {
   });  
 }
 
+users.loadAllowPayment = function() {
+  gui.loadSettingsValue('newUsersPayment', '#allow-payment');
+}
+
 users.onPageShow = function() {
   users.loadUsers();
+  users.loadAllowPayment();
 }
 
 ////Global Events////
