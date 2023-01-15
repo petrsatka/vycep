@@ -129,7 +129,16 @@ api.getQueueCount = function(callback) {
 /*
   Získá aktuální počet nápojů na účtě přihlášeného uživatele
 */
-api.getUserBillCount = function(callback) {
+api.getCurrentUserBillCount = function(callback) {
+  setTimeout(() => callback(api.billCountDEBUG,"ok", null),1000);
+  //setTimeout(() => callback(-1,"unable_to_get_bcount", null),500);
+  //setTimeout(() => callback(null, null, "500 - bad request"),500);
+}
+
+/*
+  Získá aktuální počet nápojů na účtě uživatele
+*/
+api.getUserBillCount = function(username, callback) {
   setTimeout(() => callback(api.billCountDEBUG,"ok", null),1000);
   //setTimeout(() => callback(-1,"unable_to_get_bcount", null),500);
   //setTimeout(() => callback(null, null, "500 - bad request"),500);
@@ -154,7 +163,7 @@ api.makeOrder = function(callback) {
 /*
   Provede platbu a vrátí zaplacený počet a počet nápojů na účtě přihlášeného uživatele
 */
-api.pay = function(count, callback) {
+api.pay = function(username, count, callback) {
   if (count > api.billCountDEBUG || count < 0) {
     setTimeout(() => callback({
       paid: 0,
@@ -525,10 +534,10 @@ gui.makeOrder = function(qCountTargetSelector, bCountTargetSelector) {
 /*
   Provede platbu
 */
-gui.pay = function(count, callback) {
+gui.pay = function(username, count, callback) {
   notify.message();
   gui.setInProgress(true);
-  api.pay(count, (result, resultCode, errorMessage) => {
+  api.pay(username, count, (result, resultCode, errorMessage) => {
     var isOK = gui.handleError(resultCode, errorMessage);    
     if (callback) {
       callback(result, !isOK);
@@ -610,7 +619,7 @@ orders.loadQCount = function() {
 }
 
 orders.loadBCount = function() {
-  gui.loadValue(api.getUserBillCount, "#b-count");
+  gui.loadValue(api.getCurrentUserBillCount, "#b-count");
 }
 
 orders.loadValues = function() {
@@ -649,7 +658,7 @@ payment.setPaidMessage = function(paid) {
 
 payment.pay = function() {
   $("#count").prop('disabled', true);
-  gui.pay($("#count").val(), (result, isError) => {
+  gui.pay(payment.getUsername(), $("#count").val(), (result, isError) => {
     if (!isError) {
       payment.setCountValue(result.billCount);
       payment.setPaidMessage(result.paid);
@@ -666,15 +675,19 @@ payment.goBack = function() {
 
 payment.loadBCount = function() {
   gui.setInProgress(true);
-  gui.loadValue(api.getUserBillCount, "#count", (count, isError) => {
+  gui.loadValue((callback) => {api.getUserBillCount(payment.getUsername(), callback)}, "#count", (count, isError) => {
     if (!isError) {
       gui.setInProgress(false);
     }
   });
 }
 
+payment.getUsername = function() {
+  return $(location).attr('hash').replace("#", '') || cookies.getUsername();
+}                                          
+
 payment.loadValues = function() {
-  $("#username").text(cookies.getUsername());
+  $("#username").text(payment.getUsername());
   payment.loadBCount();
 }
 
@@ -720,9 +733,20 @@ users.handleCheckboxChange = function(username, permissionKey, event) {
   gui.setPermissionValue(username, permissionKey, status);
 }
 
-users.handleButtonClick = function(name, action) {
-   //call your method here with name and action as parameter
-   console.log(name + ' ' + action);
+users.handleButtonClick = function(username, action) {
+  switch(action) {
+    case 'passwordReset':
+    break;
+    case 'pay':
+      users.pay(username);
+    break
+    case 'delete':
+    break;
+  }
+}
+
+users.pay = function(username) {
+  gui.navigate('payment.html#'+ username)
 }
 
 users.loadUsers = function() {
