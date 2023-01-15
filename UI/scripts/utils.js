@@ -177,13 +177,13 @@ api.pay = function(count, callback) {
 
 api.loadUsers = function(callback) {
   const jsonData = [
-    { "username": "VLS", "payment": true, "admin": true },
-    { "username": "Pepa", "payment": false, "admin": false },
-    { "username": "Franta", "payment": true, "admin": false },
-    { "username": "Honza", "payment": true, "admin": false },
-    { "username": "Tonda", "payment": true, "admin": false },
-    { "username": "Petr", "payment": false, "admin": false },
-    { "username": "Pavel", "payment": false, "admin": false },
+    { "username": "VLS", "payment": true, "admin": true, "paymentCheckboxEnabled":true, "adminCheckboxEnabled":true, "passwordResetButtonEnabled":true, "payButtonEnabled":true, "deleteButtonEnabled":true },
+    { "username": "Pepa", "payment": false, "admin": false, "paymentCheckboxEnabled":true, "adminCheckboxEnabled":true, "passwordResetButtonEnabled":true, "payButtonEnabled":true, "deleteButtonEnabled":true },
+    { "username": "Franta", "payment": true, "admin": true, "paymentCheckboxEnabled":false, "adminCheckboxEnabled":false, "passwordResetButtonEnabled":true, "payButtonEnabled":true, "deleteButtonEnabled":false },
+    { "username": "Honza", "payment": true, "admin": false, "paymentCheckboxEnabled":true, "adminCheckboxEnabled":true, "passwordResetButtonEnabled":true, "payButtonEnabled":true, "deleteButtonEnabled":true },
+    { "username": "Tonda", "payment": true, "admin": false, "paymentCheckboxEnabled":true, "adminCheckboxEnabled":true, "passwordResetButtonEnabled":true, "payButtonEnabled":true, "deleteButtonEnabled":true },
+    { "username": "Petr", "payment": false, "admin": false, "paymentCheckboxEnabled":true, "adminCheckboxEnabled":true, "passwordResetButtonEnabled":true, "payButtonEnabled":true, "deleteButtonEnabled":true },
+    { "username": "Pavel", "payment": false, "admin": false, "paymentCheckboxEnabled":true, "adminCheckboxEnabled":true, "passwordResetButtonEnabled":true, "payButtonEnabled":true, "deleteButtonEnabled":true },
   ]
   setTimeout(() => callback(jsonData,"ok", null),1000);
   //setTimeout(() => callback(null, "unable_to_get_users", null),500);
@@ -626,11 +626,11 @@ payment.onPageShow = function() {
 
 var users = {}
 users.generateCheckboxCell = function(item, propertyName) {
-  return `<td> <input type="checkbox" onchange="users.handleCheckboxChange('${item.username}', '${propertyName}', event)" ${item[propertyName] ? ' checked' : ''}> </td>`;
+  return `<td> <input ${item[propertyName+'CheckboxEnabled'] ? '' : 'disabled'} type="checkbox" onchange="users.handleCheckboxChange('${item.username}', '${propertyName}', event)" ${item[propertyName] ? ' checked' : ''}> </td>`;
 }
 
-users.generateButtonCell = function(value, name, action) {
-  return `<td> <input type="button" value="${value}" onclick="users.handleButtonClick('${name}','${action}')"> </td>`;
+users.generateButtonCell = function(item, value, action) {  
+  return `<td> <input ${item[action+'ButtonEnabled'] ? '' : 'disabled'} type="button" value="${value}" onclick="users.handleButtonClick('${item.username}','${action}')"> </td>`;
 }
 
 users.generateRow = function(item) {
@@ -638,9 +638,9 @@ users.generateRow = function(item) {
     row += users.generateCheckboxCell(item, 'payment');
     row += users.generateCheckboxCell(item, 'admin');
     row += '</tr> <tr>';
-    row += users.generateButtonCell('Reset hesla', item.username, 'reset');
-    row += users.generateButtonCell('Zaplatit', item.username, 'pay');
-    row += users.generateButtonCell('Vymazat', item.username, 'delete');
+    row += users.generateButtonCell(item, 'Reset hesla', 'passwordReset');
+    row += users.generateButtonCell(item, 'Zaplatit', 'pay');
+    row += users.generateButtonCell(item, 'Vymazat', 'delete');
     row += '</tr>';
     return row;
 }
