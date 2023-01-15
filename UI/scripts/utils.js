@@ -198,26 +198,38 @@ api.logout = function(callback) {
   setTimeout(() => callback(true,"ok", null), 500);
 }
 
-api.setSettingsValue = function(name, value, callback) {
+/*DEBUG*/
+api.settings = {
+  'newUsersPayment' : true,
+}
 
+api.setSettingsValue = function(name, value, callback) {
+  val = api.settings[name];
+  if (val === undefined) {
+    setTimeout(() => callback(null, "unable_to_set_settings_value", null), 800); 
+  } else {
+    setTimeout(() => callback({name: name, value: value}, "ok", null), 800);  
+  }
+  //setTimeout(() => callback(null, null, "500 - bad request"),500);  
 }
 
 api.getSettingsValue = function(name, callback) {
-  var settings = {
-    'newUsersPayment' : true,
-  }
-  
-  val = settings[name];
+  val = api.settings[name];
   if (val === undefined) {
-    setTimeout(() => callback(null, "unable_to_ge_settings_value", null),800); 
+    setTimeout(() => callback(null, "unable_to_get_settings_value", null), 800); 
   } else {
     setTimeout(() => callback(val,"ok", null),800);
   }
   //setTimeout(() => callback(null, null, "500 - bad request"),500);
 }
 
-api.setPermissionValue = function(name, value, callback) {
-
+api.setPermissionValue = function(username, permissionKey, value, callback) {
+  if (value == 'admin' || value == 'payment') {
+    setTimeout(() => callback({username : username, permissionKey: permissionKey, value: value}, "ok", null), 800); 
+  } else {
+    setTimeout(() => callback(null, "unable_to_set_settings_value", null), 800);
+  }
+  //setTimeout(() => callback(null, null, "500 - bad request"),500); 
 }
 
 /*
@@ -361,7 +373,7 @@ gui.createAdmin = function(username, password, passwordVerification, navigationT
   gui.validatePassword(password) &&
   gui.verifyPassword(password, passwordVerification) &&
   gui.setInProgress(true) &&
-  api.createAdmin(username, password, (value, resultCode, errorMessage) => {
+  api.createAdmin(username, password, (result, resultCode, errorMessage) => {
     gui.setInProgress(false);
     if (gui.handleError(resultCode, errorMessage)) {
       gui.navigate(navigationTarget);
@@ -377,7 +389,7 @@ gui.createUser = function(username, password, passwordVerification, navigationTa
   gui.validatePassword(password) &&
   gui.verifyPassword(password, passwordVerification) &&
   gui.setInProgress(true) &&
-  api.createUser(username, password, (value, resultCode, errorMessage) => {
+  api.createUser(username, password, (result, resultCode, errorMessage) => {
     gui.setInProgress(false);
     if (gui.handleError(resultCode, errorMessage)) {
       gui.navigate(navigationTarget);
@@ -392,10 +404,10 @@ gui.changePassword = function(oldPassword, password, passwordVerification) {
   gui.validatePassword(password) &&
   gui.verifyPassword(password, passwordVerification) &&
   gui.setInProgress(true) &&
-  api.changePassword(oldPassword, password, (value, resultCode, errorMessage) => {
+  api.changePassword(oldPassword, password, (result, resultCode, errorMessage) => {
     gui.setInProgress(false);
     if (gui.handleError(resultCode, errorMessage)) {
-      gui.validate(value, "Heslo nelze změnit.", "Heslo bylo změněno");
+      gui.validate(result, "Heslo nelze změnit.", "Heslo bylo změněno");
     }
   });  
 }
@@ -405,7 +417,7 @@ gui.changePassword = function(oldPassword, password, passwordVerification) {
 */
 gui.login = function(username, password, navigationTarget) {
   gui.setInProgress(true);
-  api.login(username, password, (value, resultCode, errorMessage) => {
+  api.login(username, password, (result, resultCode, errorMessage) => {
     gui.setInProgress(false);
     if (gui.handleError(resultCode, errorMessage)) {
       gui.navigate(navigationTarget);
@@ -418,7 +430,7 @@ gui.login = function(username, password, navigationTarget) {
 */
 gui.logout = function(navigationTarget) {
   gui.setInProgress(true);
-  api.logout((value, resultCode, errorMessage) => {
+  api.logout((result, resultCode, errorMessage) => {
     gui.setInProgress(false);
     if (gui.handleError(resultCode, errorMessage, true)) {
       gui.navigate(navigationTarget);
@@ -431,18 +443,18 @@ gui.logout = function(navigationTarget) {
 */
 gui.loadValue = function(apiMethod, targetElementSelector, callback) {
   $(targetElementSelector).prop('disabled', true);
-  apiMethod((value, resultCode, errorMessage) => {
+  apiMethod((result, resultCode, errorMessage) => {
     var isError = true;
     if (gui.handleError(resultCode, errorMessage, true)) {
       isError = false;
       if ($(targetElementSelector).is(':input')) { 
         if ($(targetElementSelector).is(':checkbox')) {
-          $(targetElementSelector).prop("checked", !!value);
+          $(targetElementSelector).prop("checked", !!result);
         } else {      
-          $(targetElementSelector).val(value);
+          $(targetElementSelector).val(result);
         }
       } else {
-        $(targetElementSelector).text(value);
+        $(targetElementSelector).text(result);
       }
       
       $(targetElementSelector).prop('disabled', false);
@@ -459,7 +471,7 @@ gui.loadValue = function(apiMethod, targetElementSelector, callback) {
     }
     
     if (callback) {
-      callback(value, isError);
+      callback(result, isError);
     }
   });
 }
@@ -468,21 +480,33 @@ gui.loadSettingsValue = function(name, targetElementSelector, callback) {
   gui.loadValue(function(cb) {api.getSettingsValue(name, cb);}, targetElementSelector, callback);
 }
 
+gui.setSettingsValue = function(name, value) {
+  api.setSettingsValue(name, value, (result, resultCode, errorMessage) => {
+    gui.handleError(resultCode, errorMessage, true);  
+  });
+}
+
+gui.setPermissionsValue = function(name, value) {
+  api.setPermissionsValue(name, value, (result, resultCode, errorMessage) => {
+    gui.handleError(resultCode, errorMessage, true);  
+  });
+}
+
 /*
   Vytvoří objednávku a hdnoty fronty a počtu nápůjů na účtu nastaví do qCountTargetSelector, bCountTargetSelector
 */
 gui.makeOrder = function(qCountTargetSelector, bCountTargetSelector) {
   notify.message();
   gui.setInProgress(true);
-  api.makeOrder((value, resultCode, errorMessage) => {
+  api.makeOrder((result, resultCode, errorMessage) => {
     gui.setInProgress(false);
     if (gui.handleError(resultCode, errorMessage)) {
       if (qCountTargetSelector) {
-        $(qCountTargetSelector).text(value.queueCount);
+        $(qCountTargetSelector).text(result.queueCount);
       }
       
       if (bCountTargetSelector) {
-        $(bCountTargetSelector).text(value.billCount);
+        $(bCountTargetSelector).text(result.billCount);
       }
       
       gui.validate(resultCode == 'ok', null, "Objednáno", 5000);
@@ -496,10 +520,10 @@ gui.makeOrder = function(qCountTargetSelector, bCountTargetSelector) {
 gui.pay = function(count, callback) {
   notify.message();
   gui.setInProgress(true);
-  api.pay(count, (value, resultCode, errorMessage) => {
+  api.pay(count, (result, resultCode, errorMessage) => {
     var isOK = gui.handleError(resultCode, errorMessage);    
     if (callback) {
-      callback(value, !isOK);
+      callback(result, !isOK);
     }
     
     gui.setInProgress(false);
@@ -507,10 +531,10 @@ gui.pay = function(count, callback) {
 }
 
 gui.loadUsers = function(callback) {
-  api.loadUsers((value, resultCode, errorMessage) => {
+  api.loadUsers((result, resultCode, errorMessage) => {
     if (gui.handleError(resultCode, errorMessage, true)) {
       if (callback) {
-        callback(value);
+        callback(result);
       }
     }
   });
@@ -617,10 +641,10 @@ payment.setPaidMessage = function(paid) {
 
 payment.pay = function() {
   $("#count").prop('disabled', true);
-  gui.pay($("#count").val(), (value, isError) => {
+  gui.pay($("#count").val(), (result, isError) => {
     if (!isError) {
-      payment.setCountValue(value.billCount);
-      payment.setPaidMessage(value.paid);
+      payment.setCountValue(result.billCount);
+      payment.setPaidMessage(result.paid);
     }
     
     $("#count").prop('disabled', false);
@@ -702,6 +726,12 @@ users.loadUsers = function() {
 
 users.loadAllowPayment = function() {
   gui.loadSettingsValue('newUsersPayment', '#allow-payment');
+}
+
+users.onAllowPaymentCheckboxChange = function(event) {
+  let checkbox = event.target;
+  let status = checkbox.checked;
+  gui.setSettingsValue('newUsersPayment', status); 
 }
 
 users.onPageShow = function() {
