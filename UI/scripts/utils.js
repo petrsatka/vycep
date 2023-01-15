@@ -9,19 +9,28 @@ notify.isError = false;
 notify.error = function(message) {
   if (!notify.isError) {
     notify.isError = true;
-    $.alert({
-      title: 'Chyba!',
-      content: message,
-      container:'.page-wrapper',
-      boxWidth: '90%',
-      useBootstrap: false,
-      buttons: {
-        ok: function () {
-          notify.isError = false;
-        }
-      }
+    notify.alert('Chyba!', message, () => {
+      notify.isError = false;  
     });
   }
+},
+
+notify.alert = function(title, message, callback) {
+  $.alert({
+    title: title,
+    content: message,
+    container:'.page-wrapper',
+    boxWidth: '90%',
+    useBootstrap: false,
+    animateFromElement:false,
+    buttons: {
+      ok: function () {
+        if (callback) {
+          callback();
+        }
+      }
+    }
+  });
 },
   
 notify.message_timeout_id = null;
@@ -94,14 +103,6 @@ api.changePassword = function(oldPassword, password, callback) {
     setTimeout(() => callback(true,"ok", null),500); 
     //setTimeout(() => callback(false,"ok", null),500);
   }  
-}
-
-api.resetPassword = function(username, callback) {
-
-} 
-
-api.deleteUser = function(username, callback) {
-
 }
 
 /*
@@ -242,11 +243,15 @@ api.setPermissionValue = function(username, permissionKey, value, callback) {
 }
 
 api.resetPassword = function(username, callback) {
-
+  setTimeout(() => callback('xyz7abc',"ok", null),1000);
+  //setTimeout(() => callback(null, "unable_to_reset_password", null),500);
+  //setTimeout(() => callback(null, null, "500 - bad request"),500);
 }
 
-api.deleteUser = function(username) {
-
+api.deleteUser = function(username, callback) {
+  setTimeout(() => callback(username,"ok", null),1000);
+  //setTimeout(() => callback(null, "unable_to_delete_user", null),500);
+  //setTimeout(() => callback(null, null, "500 - bad request"),500);
 }
 
 /*
@@ -557,6 +562,36 @@ gui.loadUsers = function(callback) {
   });
 }
 
+gui.deleteUser = function(username, callback) {
+  api.deleteUser(username, (result, resultCode, errorMessage) => {
+    var isError = true;
+    if (gui.handleError(resultCode, errorMessage, true)) {
+      isError = false;
+    }
+    
+    if (callback) {
+      callback(result, isError);
+    }
+  });
+}
+
+gui.resetPassword = function(username, callback) {
+  api.resetPassword(username, (result, resultCode, errorMessage) => {
+    var isError = true;
+    if (gui.handleError(resultCode, errorMessage, true)) {
+      isError = false;
+    }
+    
+    if (callback) {
+      callback(result, isError);
+    }
+  });
+}
+
+/*gui.setInputsEnabled = function(parentSelector, isEnabled) => {
+  $(parentSelector + ' input').prop('disabled', !isEnabled);
+}*/
+
 /*
   Maže citlivé položky
 */
@@ -701,14 +736,14 @@ users.generateCheckboxCell = function(item, propertyName) {
 }
 
 users.generateButtonCell = function(item, value, action) {  
-  return `<td> <input ${item[action+'ButtonEnabled'] ? '' : 'disabled'} type="button" value="${value}" onclick="users.handleButtonClick('${item.username}','${action}')"> </td>`;
+  return `<td> <input ${item[action+'ButtonEnabled'] ? '' : 'disabled'} type="button" value="${value}" onclick="users.handleButtonClick('${item.username}','${action}', event)"> </td>`;
 }
 
 users.generateRow = function(item) {
-    let row = `<tr> <td> ${item.username} </td> `;
+    let row = `<tr class="user-row-${item.username}"> <td> ${item.username} </td> `;
     row += users.generateCheckboxCell(item, 'payment');
     row += users.generateCheckboxCell(item, 'admin');
-    row += '</tr> <tr>';
+    row += `</tr> <tr class="user-row-${item.username}">`;
     row += users.generateButtonCell(item, 'Reset hesla', 'passwordReset');
     row += users.generateButtonCell(item, 'Zaplatit', 'pay');
     row += users.generateButtonCell(item, 'Vymazat', 'delete');
@@ -733,14 +768,21 @@ users.handleCheckboxChange = function(username, permissionKey, event) {
   gui.setPermissionValue(username, permissionKey, status);
 }
 
-users.handleButtonClick = function(username, action) {
+users.handleButtonClick = function(username, action, event) {
+  $(event.target).prop("disabled", true);
+  var enableButton = () => {
+    $(event.target).prop("disabled", false);
+  };
   switch(action) {
     case 'passwordReset':
+      users.resetPassword(username, enableButton);
     break;
     case 'pay':
+      enableButton();
       users.pay(username);
     break
     case 'delete':
+      users.deleteUser(username, enableButton);
     break;
   }
 }
@@ -763,6 +805,30 @@ users.onAllowPaymentCheckboxChange = function(event) {
   let checkbox = event.target;
   let status = checkbox.checked;
   gui.setSettingsValue('newUsersPayment', status); 
+}
+
+users.resetPassword = function(username, callback) {
+  gui.resetPassword(username, (result, isError) => {
+    if (!isError) {
+      notify.alert('Nové heslo', result);
+    }
+    
+    if (callback) {
+      callback(result, isError);
+    }  
+  });
+}
+
+users.deleteUser = function(username, callback) {
+  gui.deleteUser(username, (result, isError) => {
+    if(!isError) {
+      $('.user-row-' + username).remove();
+    }
+    
+    if (callback) {
+      callback(result, isError);
+    }   
+  });
 }
 
 users.onPageShow = function() {
