@@ -224,12 +224,20 @@ api.getSettingsValue = function(name, callback) {
 }
 
 api.setPermissionValue = function(username, permissionKey, value, callback) {
-  if (value == 'admin' || value == 'payment') {
+  if (permissionKey == 'admin' || permissionKey == 'payment') {
     setTimeout(() => callback({username : username, permissionKey: permissionKey, value: value}, "ok", null), 800); 
   } else {
-    setTimeout(() => callback(null, "unable_to_set_settings_value", null), 800);
+    setTimeout(() => callback(null, "unable_to_set_permissions_value", null), 800);
   }
   //setTimeout(() => callback(null, null, "500 - bad request"),500); 
+}
+
+api.resetPassword = function(username, callback) {
+
+}
+
+api.deleteUser = function(username) {
+
 }
 
 /*
@@ -486,8 +494,8 @@ gui.setSettingsValue = function(name, value) {
   });
 }
 
-gui.setPermissionsValue = function(name, value) {
-  api.setPermissionsValue(name, value, (result, resultCode, errorMessage) => {
+gui.setPermissionValue = function(username, permissionKey, value) {
+  api.setPermissionValue(username, permissionKey, value, (result, resultCode, errorMessage) => {
     gui.handleError(resultCode, errorMessage, true);  
   });
 }
@@ -706,11 +714,10 @@ users.createTable = function(tableRowsData) {
   return html;
 }
 
-users.handleCheckboxChange = function(name, propertyName, event) {
+users.handleCheckboxChange = function(username, permissionKey, event) {
   let checkbox = event.target;
   let status = checkbox.checked;
-  //call your method here with name and status as parameter
-  console.log(name + ' ' + propertyName + ' ' + status);
+  gui.setPermissionValue(username, permissionKey, status);
 }
 
 users.handleButtonClick = function(name, action) {
