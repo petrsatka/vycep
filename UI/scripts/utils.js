@@ -1,7 +1,7 @@
 /*
   Sdružuje výpisy notifikací a chyb.
 */
-var notify = {};
+let notify = {};
 /*
   Vypíše chybu do message boxu.
 */
@@ -59,7 +59,7 @@ notify.message = function(message, error = false, timeout = 0) {
 /*
   Volání zařízení - nejnižší vrstva
 */
-var api = {};
+let api = {};
 
 /*
   Vytvoření administrátorského účtu.
@@ -171,7 +171,7 @@ api.pay = function(username, count, callback) {
       billCount: api.billCountDEBUG
     },"invalid-payment-value", null), 1000);
   } else { 
-    var paid = Math.min(api.billCountDEBUG, Math.max(0, count));
+    let paid = Math.min(api.billCountDEBUG, Math.max(0, count));
     api.billCountDEBUG -= paid;
     setTimeout(() => callback({
       paid: paid,
@@ -247,6 +247,14 @@ api.setPermissionValue = function(username, permissionKey, value, callback) {
   //setTimeout(() => callback(null, null, "500 - bad request"),500); 
 }
 
+api.getIP = function(callback) {
+  setTimeout(() => callback('192.168.1.45',"ok", null),800);  
+}
+
+api.getGateway = function(callback) {
+  setTimeout(() => callback('192.168.1.1',"ok", null),800);  
+}
+
 api.resetPassword = function(username, callback) {
   setTimeout(() => callback('xyz7abc',"ok", null),1000);
   //setTimeout(() => callback(null, "unable_to_reset_password", null),500);
@@ -262,7 +270,7 @@ api.deleteUser = function(username, callback) {
 /*
 Správa cookies
 */
-var cookies = {};
+let cookies = {};
 
 /*
 Vrátí jmnéno aktuálně přihlášeného uživatele
@@ -275,7 +283,7 @@ cookies.getUsername = function() {
   Vrstva nad voláním api
   Řeší validaci vstupů a obsluhu chyb
 */
-var gui = {};
+let gui = {};
 
 /*
   Přechod na jinou stránku
@@ -316,9 +324,9 @@ gui.validate = function(isOK, errorMessage, okMessage = "", timeout = 0){
   Validace uživatelského jména
 */
 gui.validateUsername = function(username) {
-  var regEx = /^[0-9a-zA-Z]+$/;
-  var minLen = 5;
-  var maxLen = 15;
+  let regEx = /^[0-9a-zA-Z]+$/;
+  let minLen = 5;
+  let maxLen = 15;
   return gui.validate(username, "Není vyplněno jméno.") && 
   gui.validate(username.length >= minLen, `Minimální délka jména je ${minLen} znaků.`) &&
   gui.validate(username.length <= maxLen, `Maximální délka jména je ${maxLen} znaků.`) && 
@@ -329,8 +337,8 @@ gui.validateUsername = function(username) {
   Validace hesla
 */
 gui.validatePassword = function(password) {
-  var minLen = 6;
-  var maxLen = 30;
+  let minLen = 6;
+  let maxLen = 30;
   return gui.validate(password, "Není vyplněno heslo.") && 
   gui.validate(password.length >= minLen, `Minimální délka hesla je ${minLen} znaků.`) &&
   gui.validate(password.length <= maxLen, `Maximální délka hesla je ${maxLen} znaků.`);
@@ -358,7 +366,7 @@ gui.handleError = function(resultCode, errorMessage, popupWindow = false) {
   }
   
   //vlastní chyby
-  var message = '';; 
+  let message = '';; 
   switch(resultCode) {
     case 'user_exists':
       message = 'Uživatel s tímto jménem už existuje.';
@@ -471,7 +479,7 @@ gui.logout = function(navigationTarget) {
 gui.loadValue = function(apiMethod, targetElementSelector, callback) {
   $(targetElementSelector).prop('disabled', true);
   apiMethod((result, resultCode, errorMessage) => {
-    var isError = true;
+    let isError = true;
     if (gui.handleError(resultCode, errorMessage, true)) {
       isError = false;
       if ($(targetElementSelector).is(':input')) { 
@@ -548,7 +556,7 @@ gui.pay = function(username, count, callback) {
   notify.message();
   gui.setInProgress(true);
   api.pay(username, count, (result, resultCode, errorMessage) => {
-    var isOK = gui.handleError(resultCode, errorMessage);    
+    let isOK = gui.handleError(resultCode, errorMessage);    
     if (callback) {
       callback(result, !isOK);
     }
@@ -569,7 +577,7 @@ gui.loadUsers = function(callback) {
 
 gui.deleteUser = function(username, callback) {
   api.deleteUser(username, (result, resultCode, errorMessage) => {
-    var isError = true;
+    let isError = true;
     if (gui.handleError(resultCode, errorMessage, true)) {
       isError = false;
     }
@@ -582,7 +590,7 @@ gui.deleteUser = function(username, callback) {
 
 gui.resetPassword = function(username, callback) {
   api.resetPassword(username, (result, resultCode, errorMessage) => {
-    var isError = true;
+    let isError = true;
     if (gui.handleError(resultCode, errorMessage, true)) {
       isError = false;
     }
@@ -619,17 +627,17 @@ gui.resetDefaultValues = function() {
 }
 
 ///////////Metody jednotlivých stránek. Získají vstupní hodnoty a volají metody gui//////////////////////////
-var firstRegistration = {};
+let firstRegistration = {};
 firstRegistration.createAdmin = function() {
   gui.createAdmin($('#name').val(), $('#password').val(), $('#password-verification').val(), 'settings.html');
 }
 
-var registration = {};
+let registration = {};
   registration.createUser = function() {
   gui.createUser($('#name').val(), $('#password').val(), $('#password-verification').val(), 'orders.html');
 }
 
-var login = {};
+let login = {};
 login.login = function() {
   gui.login($('#name').val(), $('#password').val(), 'orders.html');
 }
@@ -638,7 +646,7 @@ login.logout = function() {
   gui.logout('login.html');
 }
 
-var passwordChange = {};
+let passwordChange = {};
 passwordChange.clearValues = function() {
    gui.clearSensitiveInputs();
 }
@@ -653,7 +661,7 @@ passwordChange.cancel = function() {
   gui.navigateToReferrer();
 }
 
-var orders = {};
+let orders = {};
 orders.loadQCount = function() {
   gui.loadValue(api.getQueueCount, "#q-count");
 }
@@ -679,7 +687,7 @@ orders.onPageShow = function() {
   orders.loadValues();
 }
 
-var payment = {};
+let payment = {};
 payment.setCountValue = function(count) {
   $("#count").val(count || 0);  
 }
@@ -735,7 +743,7 @@ payment.onPageShow = function() {
   payment.loadValues();
 }
 
-var users = {}
+let users = {}
 users.generateCheckboxCell = function(item, propertyName) {
   return `<td> <input ${item[propertyName+'CheckboxEnabled'] ? '' : 'disabled'} type="checkbox" onchange="users.handleCheckboxChange('${item.username}', '${propertyName}', event)" ${item[propertyName] ? ' checked' : ''}> </td>`;
 }
@@ -775,7 +783,7 @@ users.handleCheckboxChange = function(username, permissionKey, event) {
 
 users.handleButtonClick = function(username, action, event) {
   $(event.target).prop("disabled", true);
-  var enableButton = () => {
+  let enableButton = () => {
     $(event.target).prop("disabled", false);
   };
   switch(action) {
@@ -841,14 +849,21 @@ users.onPageShow = function() {
   users.loadAllowPayment();
 }
 
-var settings = {};
+let settings = {};
 
-settings.loadValues =function() {
+settings.loadNetworkInfo = function() {
+  gui.loadValue(api.getGateway, '#gateway');
+  gui.loadValue(api.getIP, '#ip');
+}
+
+settings.loadValues = function() {
   gui.loadSettingsValue('ssid', '#ssid');
   gui.loadSettingsValue('skey', '#skey');
   gui.loadSettingsValue('pcount', '#pcount');
   gui.loadSettingsValue('inactTimeout', '#inactivity-timeout');
   gui.loadSettingsValue('underLimTimeout', '#nder-limit-timeout');
+  settings.loadNetworkInfo();
+  //'[name="tcol1"]'
 }
 
 settings.onPageShow = function() {
