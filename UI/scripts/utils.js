@@ -216,6 +216,7 @@ api.settings = {
   'pcount': 345,
   'inactTimeout': 10,
   'underLimTimeout': 5,
+  'mode': 'auto'
 }
 
 api.setSettingsValue = function(name, value, callback) {
@@ -485,6 +486,8 @@ gui.loadValue = function(apiMethod, targetElementSelector, callback) {
       if ($(targetElementSelector).is(':input')) { 
         if ($(targetElementSelector).is(':checkbox')) {
           $(targetElementSelector).prop("checked", !!result);
+        } else if ($(targetElementSelector).is(':radio')) {
+          $(targetElementSelector).val([result]);
         } else {      
           $(targetElementSelector).val(result);
         }
@@ -495,7 +498,9 @@ gui.loadValue = function(apiMethod, targetElementSelector, callback) {
       $(targetElementSelector).prop('disabled', false);
     } else {
       if ($(targetElementSelector).is(':input')) {
-         if ($(targetElementSelector).is(':checkbox')) {
+        if ($(targetElementSelector).is(':checkbox')) {
+          $(targetElementSelector).prop("checked", false);
+        } else if ($(targetElementSelector).is(':radio')) {
           $(targetElementSelector).prop("checked", false);
         } else {    
           $(targetElementSelector).val("");
@@ -860,10 +865,10 @@ settings.loadValues = function() {
   gui.loadSettingsValue('ssid', '#ssid');
   gui.loadSettingsValue('skey', '#skey');
   gui.loadSettingsValue('pcount', '#pcount');
+  gui.loadSettingsValue('mode', '[name="mode"]');
   gui.loadSettingsValue('inactTimeout', '#inactivity-timeout');
   gui.loadSettingsValue('underLimTimeout', '#nder-limit-timeout');
   settings.loadNetworkInfo();
-  //'[name="tcol1"]'
 }
 
 settings.onPageShow = function() {
