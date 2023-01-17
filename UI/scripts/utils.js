@@ -211,10 +211,15 @@ api.logout = function(callback) {
 /*DEBUG*/
 api.settings = {
   'newUsersPayment' : true,
+  'ssid': 'coolap',
+  'skey': 'coolSecurityKey',
+  'pcount': 345,
+  'inactTimeout': 10,
+  'underLimTimeout': 5,
 }
 
 api.setSettingsValue = function(name, value, callback) {
-  val = api.settings[name];
+  let val = api.settings[name];
   if (val === undefined) {
     setTimeout(() => callback(null, "unable_to_set_settings_value", null), 800); 
   } else {
@@ -224,7 +229,7 @@ api.setSettingsValue = function(name, value, callback) {
 }
 
 api.getSettingsValue = function(name, callback) {
-  val = api.settings[name];
+  let val = api.settings[name];
   if (val === undefined) {
     setTimeout(() => callback(null, "unable_to_get_settings_value", null), 800); 
   } else {
@@ -834,6 +839,20 @@ users.deleteUser = function(username, callback) {
 users.onPageShow = function() {
   users.loadUsers();
   users.loadAllowPayment();
+}
+
+var settings = {};
+
+settings.loadValues =function() {
+  gui.loadSettingsValue('ssid', '#ssid');
+  gui.loadSettingsValue('skey', '#skey');
+  gui.loadSettingsValue('pcount', '#pcount');
+  gui.loadSettingsValue('inactTimeout', '#inactivity-timeout');
+  gui.loadSettingsValue('underLimTimeout', '#nder-limit-timeout');
+}
+
+settings.onPageShow = function() {
+  settings.loadValues();
 }
 
 ////Global Events////
