@@ -1,3 +1,5 @@
+"use strict";
+
 /*
   Sdružuje výpisy notifikací a chyb.
 */
@@ -268,6 +270,20 @@ api.deleteUser = function(username, callback) {
   //setTimeout(() => callback(null, null, "500 - bad request"),500);
 }
 
+api.calibrate = function(callback) {
+  api.settings['pcount'] = 330;
+  setTimeout(() => callback(true,"ok", null),1000);
+  //setTimeout(() => callback(false, "unable_to_get_users", null),500);
+  //setTimeout(() => callback(null, null, "500 - bad request"),500);
+}
+
+api.stopCalibration = function(callback) {
+  setTimeout(() => callback(true,"ok", null),1000);
+  //setTimeout(() => callback(false, "unable_to_get_users", null),500);
+  //setTimeout(() => callback(null, null, "500 - bad request"),500);
+}
+
+
 /*
 Správa cookies
 */
@@ -522,7 +538,8 @@ gui.loadSettingsValue = function(name, targetElementSelector, callback) {
 
 gui.setSettingsValue = function(name, value) {
   api.setSettingsValue(name, value, (result, resultCode, errorMessage) => {
-    gui.handleError(resultCode, errorMessage, true);  
+    gui.handleError(resultCode, errorMessage, true);
+    console.log(`set ${name} ${value}`);  
   });
 }
 
@@ -602,6 +619,44 @@ gui.resetPassword = function(username, callback) {
     
     if (callback) {
       callback(result, isError);
+    }
+  });
+}
+
+gui.onInputChange = function(targetSelector, callback) {
+  $(targetSelector).change(function() {
+    var val = null;
+    if ($(this).is(':checkbox')) {
+      val =  $(this).is(':checked'); 
+    } else {
+      val = $(this).val()
+    }
+    
+    if (callback) {
+      callback(this, val);
+    }
+  });
+}
+
+gui.calibrate = function(callback) {
+  gui.setInProgress(true);
+  api.calibrate((result, resultCode, errorMessage) => {
+    if (gui.handleError(resultCode, errorMessage, true)) {
+      if (callback) {
+        callback(result);
+      }
+    }
+    
+    gui.setInProgress(false);
+  });
+}
+
+gui.stopCalibration = function(callback) {
+  api.stopCalibration((result, resultCode, errorMessage) => {
+    if (gui.handleError(resultCode, errorMessage, true)) {
+      if (callback) {
+        callback(result);
+      }
     }
   });
 }
@@ -861,6 +916,15 @@ settings.loadNetworkInfo = function() {
   gui.loadValue(api.getIP, '#ip');
 }
 
+settings.registerChange = function() {
+  gui.onInputChange('#ssid', function(element, val) {gui.setSettingsValue('ssid',val);});
+  gui.onInputChange('#skey', function(element, val) {gui.setSettingsValue('skey',val);});
+  gui.onInputChange('#pcount', function(element, val) {gui.setSettingsValue('pcount',val);});
+  gui.onInputChange('[name="mode"]', function(element, val) {gui.setSettingsValue('mode',val);});
+  gui.onInputChange('#inactivity-timeout', function(element, val) {gui.setSettingsValue('inactTimeout',val);});
+  gui.onInputChange('#under-limit-timeout', function(element, val) {gui.setSettingsValue('underLimTimeout',val);});
+}
+
 settings.loadValues = function() {
   gui.loadSettingsValue('ssid', '#ssid');
   gui.loadSettingsValue('skey', '#skey');
@@ -872,7 +936,29 @@ settings.loadValues = function() {
 }
 
 settings.onPageShow = function() {
+  gui.stopCalibration();
+  settings.registerChange();
   settings.loadValues();
+}
+
+settings.calibrate = function() {
+  gui.calibrate(() => {
+    $("#pcount").prop('disabled', true);
+    $("#pcount").val("");
+    $("#button-calibrate").addClass("not-displayed-temporary");
+    $("#button-done").addClass("displayed-temporary");  
+  });
+}
+
+settings.done = function() {
+  gui.setInProgress(true);
+  gui.stopCalibration(() => {   
+    gui.loadSettingsValue('pcount', '#pcount', () => {
+      $("#button-calibrate").removeClass("not-displayed-temporary");
+      $("#button-done").removeClass("displayed-temporary");
+      gui.setInProgress(false); 
+    });
+  }); 
 }
 
 ////Global Events////
