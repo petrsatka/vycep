@@ -189,13 +189,13 @@ api.pay = function(username, count, callback) {
 
 api.loadUsers = function(callback) {
   const jsonData = [
-    { "username": "VLS", "payment": true, "admin": true, "paymentCheckboxEnabled":true, "adminCheckboxEnabled":true, "passwordResetButtonEnabled":true, "payButtonEnabled":true, "deleteButtonEnabled":true },
-    { "username": "Pepa", "payment": false, "admin": false, "paymentCheckboxEnabled":true, "adminCheckboxEnabled":true, "passwordResetButtonEnabled":true, "payButtonEnabled":true, "deleteButtonEnabled":true },
-    { "username": "Franta", "payment": true, "admin": true, "paymentCheckboxEnabled":false, "adminCheckboxEnabled":false, "passwordResetButtonEnabled":true, "payButtonEnabled":true, "deleteButtonEnabled":false },
-    { "username": "Honza", "payment": true, "admin": false, "paymentCheckboxEnabled":true, "adminCheckboxEnabled":true, "passwordResetButtonEnabled":true, "payButtonEnabled":true, "deleteButtonEnabled":true },
-    { "username": "Tonda", "payment": true, "admin": false, "paymentCheckboxEnabled":true, "adminCheckboxEnabled":true, "passwordResetButtonEnabled":true, "payButtonEnabled":true, "deleteButtonEnabled":true },
-    { "username": "Petr", "payment": false, "admin": false, "paymentCheckboxEnabled":true, "adminCheckboxEnabled":true, "passwordResetButtonEnabled":true, "payButtonEnabled":true, "deleteButtonEnabled":true },
-    { "username": "Pavel", "payment": false, "admin": false, "paymentCheckboxEnabled":true, "adminCheckboxEnabled":true, "passwordResetButtonEnabled":true, "payButtonEnabled":true, "deleteButtonEnabled":true },
+    { "username": "VLS", "payment": true, "admin": true, "active": true, "paymentCheckboxEnabled":true, "adminCheckboxEnabled":true, "passwordResetButtonEnabled":true, "payButtonEnabled":true, "deleteButtonEnabled":true, "activateButtonEnabled":false },
+    { "username": "Pepa", "payment": false, "admin": false, "active": true, "paymentCheckboxEnabled":true, "adminCheckboxEnabled":true, "passwordResetButtonEnabled":true, "payButtonEnabled":true, "deleteButtonEnabled":true, "activateButtonEnabled":false },
+    { "username": "Franta", "payment": true, "admin": true, "active": true, "paymentCheckboxEnabled":false, "adminCheckboxEnabled":false, "passwordResetButtonEnabled":true, "payButtonEnabled":true, "deleteButtonEnabled":false, "activateButtonEnabled":false },
+    { "username": "Honza", "payment": true, "admin": false, "active": true, "paymentCheckboxEnabled":true, "adminCheckboxEnabled":true, "passwordResetButtonEnabled":true, "payButtonEnabled":true, "deleteButtonEnabled":true, "activateButtonEnabled":false },
+    { "username": "Tonda", "payment": true, "admin": false, "active": false, "paymentCheckboxEnabled":false, "adminCheckboxEnabled":false, "passwordResetButtonEnabled":false, "payButtonEnabled":false, "deleteButtonEnabled":false, "activateButtonEnabled":true },
+    { "username": "Petr", "payment": false, "admin": false, "active": true, "paymentCheckboxEnabled":true, "adminCheckboxEnabled":true, "passwordResetButtonEnabled":true, "payButtonEnabled":true, "deleteButtonEnabled":true, "activateButtonEnabled":false },
+    { "username": "Pavel", "payment": false, "admin": false, "active": true, "paymentCheckboxEnabled":true, "adminCheckboxEnabled":true, "passwordResetButtonEnabled":true, "payButtonEnabled":true, "deleteButtonEnabled":true, "activateButtonEnabled":false },
   ]
   setTimeout(() => callback(jsonData,"ok", null), 1000);
   //setTimeout(() => callback(null, "unable_to_get_users", null), 1000);
@@ -872,7 +872,12 @@ users.generateRow = function(item) {
     row += users.generateCheckboxCell(item, 'payment');
     row += users.generateCheckboxCell(item, 'admin');
     row += `</tr> <tr class="user-row-${item.username}">`;
-    row += users.generateButtonCell(item, 'Reset hesla', 'passwordReset');
+    if (item.active) {
+      row += users.generateButtonCell(item, 'Reset hesla', 'passwordReset');
+    } else {
+      row += users.generateButtonCell(item, 'Aktivovat', 'activate');
+    }
+    
     row += users.generateButtonCell(item, 'Zaplatit', 'pay');
     row += users.generateButtonCell(item, 'Vymazat', 'delete');
     row += '</tr>';
