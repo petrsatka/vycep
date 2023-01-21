@@ -299,10 +299,13 @@ api.restart = function(callback) {
   //setTimeout(() => callback(null, null, "500 - bad request"), 1000);
 }
 
-api.connectAP = function(ssid, securityKey, callback) {
-  console.log("connect");
-  //setTimeout(() => callback(true,"ok", null), 1000);
-  setTimeout(() => callback(false,"ok", null), 1000);
+api.connect = function(ssid, securityKey, callback) {
+  console.log(`connect ${ssid} ${securityKey}`);
+  if (!ssid || !securityKey) {
+    setTimeout(() => callback(null,"unnable_to_connect", null), 1000);
+  } else {
+    setTimeout(() => callback('192.168.1.25',"ok", null), 1000);
+  }
   //setTimeout(() => callback(false, "unable_to_run_connect", null), 1000);
   //setTimeout(() => callback(null, null, "500 - bad request"), 1000);
 }
@@ -420,6 +423,8 @@ gui.handleError = function(resultCode, errorMessage, popupWindow = false) {
       break
     case 'invalid-payment-value':
       message = 'Nelze zaplatit neplatné množství.';
+    case 'unnable_to_connect':
+      message = 'Připojení se nezdařilo';
       break;
   }
   
@@ -698,6 +703,19 @@ gui.callApiAction = function(apiMethod, callback) {
   });
 }
 
+gui.connect = function(ssid, securityKey, callback) {
+  gui.setInProgress(true);
+  api.connect(ssid, securityKey, (result, resultCode, errorMessage) => {
+    if (gui.handleError(resultCode, errorMessage, true)) {
+      if (callback) {
+        callback(result);
+      }
+    }
+    
+    gui.setInProgress(false);
+  });
+}
+
 /*gui.setInputsEnabled = function(parentSelector, isEnabled) => {
   $(parentSelector + ' input').prop('disabled', !isEnabled);
 }*/
@@ -954,8 +972,8 @@ settings.loadNetworkInfo = function() {
 }
 
 settings.registerChange = function() {
-  gui.onInputChange('#ssid', function(element, val) {gui.setSettingsValue('ssid',val);});
-  gui.onInputChange('#skey', function(element, val) {gui.setSettingsValue('skey',val);});
+  //gui.onInputChange('#ssid', function(element, val) {gui.setSettingsValue('ssid',val);});
+  //gui.onInputChange('#skey', function(element, val) {gui.setSettingsValue('skey',val);});
   gui.onInputChange('#pcount', function(element, val) {gui.setSettingsValue('pcount',val);});
   gui.onInputChange('[name="mode"]', function(element, val) {gui.setSettingsValue('mode',val);});
   gui.onInputChange('#inactivity-timeout', function(element, val) {gui.setSettingsValue('inactTimeout',val);});
@@ -1012,6 +1030,17 @@ settings.restart = function() {
   });
 }
 
+settings.connect = function() {
+  gui.connect($("#ssid").val(), $("#skey"), (result) => {
+    notify.alert('Připojeno', `Přidělená IP adresa: ${result}`, () => {
+      setTimeout(() => {
+        let target = `http://${result}`;
+        gui.navigate(target);
+      }, 2000);
+    });
+  });
+}
+
 ////Global Events////
 $(window).on("pageshow",function(){
   gui.clearSensitiveInputs();
@@ -1021,5 +1050,5 @@ $(window).on("pageshow",function(){
 });
 
 //DEBUG
-//Přihlášeného uživatel vždy místo login page směrovat na orders - vyřešit asi rovnou na serveru?
+//Přihlášeného uživatele vždy místo login page směrovat na orders - vyřešit asi rovnou na serveru?
 //favicon
