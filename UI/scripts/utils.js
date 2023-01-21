@@ -187,8 +187,7 @@ api.pay = function(username, count, callback) {
   //setTimeout(() => callback(null, null, "500 - bad request"), 1000); 
 }
 
-api.loadUsers = function(callback) {
-  const jsonData = [
+api.debugUsers = [
     { "username": "VLS", "payment": true, "admin": true, "active": true, "paymentCheckboxEnabled":true, "adminCheckboxEnabled":true, "passwordResetButtonEnabled":true, "payButtonEnabled":true, "deleteButtonEnabled":true, "activateButtonEnabled":false },
     { "username": "Pepa", "payment": false, "admin": false, "active": true, "paymentCheckboxEnabled":true, "adminCheckboxEnabled":true, "passwordResetButtonEnabled":true, "payButtonEnabled":true, "deleteButtonEnabled":true, "activateButtonEnabled":false },
     { "username": "Franta", "payment": true, "admin": true, "active": true, "paymentCheckboxEnabled":false, "adminCheckboxEnabled":false, "passwordResetButtonEnabled":true, "payButtonEnabled":true, "deleteButtonEnabled":false, "activateButtonEnabled":false },
@@ -197,7 +196,9 @@ api.loadUsers = function(callback) {
     { "username": "Petr", "payment": false, "admin": false, "active": true, "paymentCheckboxEnabled":true, "adminCheckboxEnabled":true, "passwordResetButtonEnabled":true, "payButtonEnabled":true, "deleteButtonEnabled":true, "activateButtonEnabled":false },
     { "username": "Pavel", "payment": false, "admin": false, "active": true, "paymentCheckboxEnabled":true, "adminCheckboxEnabled":true, "passwordResetButtonEnabled":true, "payButtonEnabled":true, "deleteButtonEnabled":true, "activateButtonEnabled":false },
   ]
-  setTimeout(() => callback(jsonData,"ok", null), 1000);
+
+api.loadUsers = function(callback) {
+  setTimeout(() => callback(api.debugUsers,"ok", null), 1000);
   //setTimeout(() => callback(null, "unable_to_get_users", null), 1000);
   //setTimeout(() => callback(null, null, "500 - bad request"), 1000);
 }
@@ -267,6 +268,23 @@ api.resetPassword = function(username, callback) {
 api.deleteUser = function(username, callback) {
   setTimeout(() => callback(username,"ok", null), 1000);
   //setTimeout(() => callback(null, "unable_to_delete_user", null), 1000);
+  //setTimeout(() => callback(null, null, "500 - bad request"), 1000);
+}
+
+api.activateUser = function(username, callback) {
+  let user = api.debugUsers.find(element => element['username'] == 'Tonda');
+  if (user) {
+    user["active"] = true;
+    user["paymentCheckboxEnabled"] = true;
+    user["adminCheckboxEnabled"] = true;
+    user["passwordResetButtonEnabled"] = true;
+    user["payButtonEnabled"] = true;
+    user["deleteButtonEnabled"] = true;
+    user["activateButtonEnabled"] =true
+  }
+  
+  setTimeout(() => callback(username,"ok", null), 1000);
+  //setTimeout(() => callback(null, "unable_to_activate_user", null), 1000);
   //setTimeout(() => callback(null, null, "500 - bad request"), 1000);
 }
 
@@ -639,6 +657,19 @@ gui.deleteUser = function(username, callback) {
   });
 }
 
+gui.activateUser = function(username, callback) {
+  api.activateUser(username, (result, resultCode, errorMessage) => {
+    let isError = true;
+    if (gui.handleError(resultCode, errorMessage, true)) {
+      isError = false;
+    }
+    
+    if (callback) {
+      callback(result, isError);
+    }
+  });
+}
+
 gui.resetPassword = function(username, callback) {
   api.resetPassword(username, (result, resultCode, errorMessage) => {
     let isError = true;
@@ -654,7 +685,7 @@ gui.resetPassword = function(username, callback) {
 
 gui.onInputChange = function(targetSelector, callback) {
   $(targetSelector).change(function() {
-    var val = null;
+    let val = null;
     if ($(this).is(':checkbox')) {
       val =  $(this).is(':checked'); 
     } else {
@@ -916,6 +947,13 @@ users.handleButtonClick = function(username, action, event) {
     break
     case 'delete':
       users.deleteUser(username, enableButton);
+    break
+    case 'activate':
+      users.activateUser(username, (result, isError) => { 
+        if (isError) {
+          enableButton()
+        }
+      });
     break;
   }
 }
@@ -956,6 +994,18 @@ users.deleteUser = function(username, callback) {
   gui.deleteUser(username, (result, isError) => {
     if(!isError) {
       $('.user-row-' + username).remove();
+    }
+    
+    if (callback) {
+      callback(result, isError);
+    }   
+  });
+}
+
+users.activateUser = function(username, callback) {
+  gui.activateUser(username, (result, isError) => {
+    if(!isError) {
+      users.loadUsers();
     }
     
     if (callback) {
@@ -1057,3 +1107,5 @@ $(window).on("pageshow",function(){
 //DEBUG
 //Přihlášeného uživatele vždy místo login page směrovat na orders - vyřešit asi rovnou na serveru?
 //favicon
+//Neaktivním uživatelům nedovolit žádnou akci - ošetřit na serveru
+//Uživatele třídit podle abecedy
