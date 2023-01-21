@@ -5,7 +5,7 @@
 */
 let notify = {};
 /*
-  Vypíše chybu do message boxu.
+  Vypíše chybu do okna.
 */
 notify.isError = false;
 notify.error = function(message) {
@@ -17,6 +17,9 @@ notify.error = function(message) {
   }
 },
 
+/*
+  Vypíše zprávu do okna
+*/
 notify.alert = function(title, message, callback) {
   $.alert({
     title: title,
@@ -197,6 +200,9 @@ api.debugUsers = [
 { "username": "VLS", "payment": true, "admin": true, "active": true, "paymentCheckboxEnabled":true, "adminCheckboxEnabled":true, "passwordResetButtonEnabled":true, "payButtonEnabled":true, "deleteButtonEnabled":true, "activateButtonEnabled":false }
 ]
 
+/*
+  Načte uživatele
+*/
 api.loadUsers = function(callback) {
   setTimeout(() => callback(api.debugUsers,"ok", null), 1000);
   //setTimeout(() => callback(null, "unable_to_get_users", null), 1000);
@@ -222,6 +228,9 @@ api.settings = {
   'mode': 'auto'
 }
 
+/*
+  Uloží hodnotu nastavení
+*/
 api.setSettingsValue = function(name, value, callback) {
   let val = api.settings[name];
   if (val === undefined) {
@@ -232,6 +241,9 @@ api.setSettingsValue = function(name, value, callback) {
   //setTimeout(() => callback(null, null, "500 - bad request"), 1000);  
 }
 
+/*
+  Získá hodnotu nastavení
+*/
 api.getSettingsValue = function(name, callback) {
   let val = api.settings[name];
   if (val === undefined) {
@@ -242,6 +254,9 @@ api.getSettingsValue = function(name, callback) {
   //setTimeout(() => callback(null, null, "500 - bad request"), 1000);
 }
 
+/*
+  Uloží hodnotu oprávnění
+*/
 api.setPermissionValue = function(username, permissionKey, value, callback) {
   if (permissionKey == 'admin' || permissionKey == 'payment') {
     setTimeout(() => callback({username : username, permissionKey: permissionKey, value: value}, "ok", null), 1000); 
@@ -251,26 +266,41 @@ api.setPermissionValue = function(username, permissionKey, value, callback) {
   //setTimeout(() => callback(null, null, "500 - bad request"), 1000); 
 }
 
+/*
+  Získá IP adresu zařízení
+*/
 api.getIP = function(callback) {
   setTimeout(() => callback('192.168.1.45',"ok", null), 1000);  
 }
 
+/*
+  Získá bránu zařízení
+*/
 api.getGateway = function(callback) {
   setTimeout(() => callback('192.168.1.1',"ok", null), 1000);  
 }
 
+/*
+  Resetuje heslo
+*/
 api.resetPassword = function(username, callback) {
   setTimeout(() => callback('xyz7abc',"ok", null), 1000);
   //setTimeout(() => callback(null, "unable_to_reset_password", null), 1000);
   //setTimeout(() => callback(null, null, "500 - bad request"), 1000);
 }
 
+/*
+  Vymaže uživatele
+*/
 api.deleteUser = function(username, callback) {
   setTimeout(() => callback(username,"ok", null), 1000);
   //setTimeout(() => callback(null, "unable_to_delete_user", null), 1000);
   //setTimeout(() => callback(null, null, "500 - bad request"), 1000);
 }
 
+/*
+  Aktivuje nového uživatele
+*/
 api.activateUser = function(username, callback) {
   let user = api.debugUsers.find(element => element['username'] == 'Tonda');
   if (user) {
@@ -288,6 +318,9 @@ api.activateUser = function(username, callback) {
   //setTimeout(() => callback(null, null, "500 - bad request"), 1000);
 }
 
+/*
+  Spustí kalibraci
+*/
 api.startCalibration = function(callback) {
   api.settings['pcount'] = 330;
   console.log("calibration start");
@@ -296,6 +329,9 @@ api.startCalibration = function(callback) {
   //setTimeout(() => callback(null, null, "500 - bad request"), 1000);
 }
 
+/*
+  Ukončí kalibraci
+*/
 api.stopCalibration = function(callback) {
   console.log("calibration stop");
   setTimeout(() => callback(true,"ok", null), 1000);
@@ -303,6 +339,9 @@ api.stopCalibration = function(callback) {
   //setTimeout(() => callback(null, null, "500 - bad request"), 1000);
 }
 
+/*
+  Spustí test
+*/
 api.runTest = function(callback) {
   console.log("test");
   setTimeout(() => callback(true,"ok", null), 1000);
@@ -310,6 +349,9 @@ api.runTest = function(callback) {
   //setTimeout(() => callback(null, null, "500 - bad request"), 1000);
 }
 
+/*
+  Restartuje zařízení
+*/
 api.restart = function(callback) {
   console.log("restart");
   setTimeout(() => callback(true,"ok", null), 1000);
@@ -317,6 +359,9 @@ api.restart = function(callback) {
   //setTimeout(() => callback(null, null, "500 - bad request"), 1000);
 }
 
+/*
+  Připojí zařízení k AP. V případě úspěchu uloží ssid a securityKey a restartuje zařízení.
+*/
 api.connect = function(ssid, securityKey, callback) {
   console.log(`connect ${ssid} ${securityKey}`);
   if (!ssid || !securityKey) {
@@ -579,10 +624,16 @@ gui.loadValue = function(apiMethod, targetElementSelector, callback) {
   });
 }
 
+/*
+  Načtení hodnoty nastavení
+*/
 gui.loadSettingsValue = function(name, targetElementSelector, callback) {
   gui.loadValue(function(cb) {api.getSettingsValue(name, cb);}, targetElementSelector, callback);
 }
 
+/*
+  Uložení hodnoty nastavení
+*/
 gui.setSettingsValue = function(name, value) {
   api.setSettingsValue(name, value, (result, resultCode, errorMessage) => {
     gui.handleError(resultCode, errorMessage, true);
@@ -590,6 +641,9 @@ gui.setSettingsValue = function(name, value) {
   });
 }
 
+/*
+  Nastavení hodnoty oprávnění
+*/
 gui.setPermissionValue = function(username, permissionKey, value) {
   api.setPermissionValue(username, permissionKey, value, (result, resultCode, errorMessage) => {
     gui.handleError(resultCode, errorMessage, true);  
@@ -634,6 +688,9 @@ gui.pay = function(username, count, callback) {
   });
 }
 
+/*
+  Načtení uživatelů
+*/
 gui.loadUsers = function(callback) {
   api.loadUsers((result, resultCode, errorMessage) => {
     if (gui.handleError(resultCode, errorMessage, true)) {
@@ -644,6 +701,9 @@ gui.loadUsers = function(callback) {
   });
 }
 
+/*
+  Smazání uživatele
+*/
 gui.deleteUser = function(username, callback) {
   api.deleteUser(username, (result, resultCode, errorMessage) => {
     let isError = true;
@@ -657,6 +717,9 @@ gui.deleteUser = function(username, callback) {
   });
 }
 
+/*
+  Aktivace nového uživatele
+*/
 gui.activateUser = function(username, callback) {
   api.activateUser(username, (result, resultCode, errorMessage) => {
     let isError = true;
@@ -670,6 +733,9 @@ gui.activateUser = function(username, callback) {
   });
 }
 
+/*
+  Reset hesla
+*/
 gui.resetPassword = function(username, callback) {
   api.resetPassword(username, (result, resultCode, errorMessage) => {
     let isError = true;
@@ -683,6 +749,9 @@ gui.resetPassword = function(username, callback) {
   });
 }
 
+/*
+  Obsluha změny inputu
+*/
 gui.onInputChange = function(targetSelector, callback) {
   $(targetSelector).change(function() {
     let val = null;
@@ -698,6 +767,9 @@ gui.onInputChange = function(targetSelector, callback) {
   });
 }
 
+/*
+  Spuštění kalibrace
+*/
 gui.startCalibration = function(callback) {
   gui.setInProgress(true);
   api.startCalibration((result, resultCode, errorMessage) => {
@@ -711,6 +783,9 @@ gui.startCalibration = function(callback) {
   });
 }
 
+/*
+  Ukončení kalibrace
+*/
 gui.stopCalibration = function(callback) {
   api.stopCalibration((result, resultCode, errorMessage) => {
     if (gui.handleError(resultCode, errorMessage, true)) {
@@ -721,6 +796,9 @@ gui.stopCalibration = function(callback) {
   });
 }
 
+/*
+  Metoda pro volání api metod
+*/
 gui.callApiAction = function(apiMethod, callback) {
   gui.setInProgress(true);
   apiMethod((result, resultCode, errorMessage) => {
@@ -734,6 +812,9 @@ gui.callApiAction = function(apiMethod, callback) {
   });
 }
 
+/*
+  Připojení k AP
+*/
 gui.connect = function(ssid, securityKey, callback) {
   gui.setInProgress(true);
   api.connect(ssid, securityKey, (result, resultCode, errorMessage) => {
@@ -747,10 +828,6 @@ gui.connect = function(ssid, securityKey, callback) {
   });
 }
 
-/*gui.setInputsEnabled = function(parentSelector, isEnabled) => {
-  $(parentSelector + ' input').prop('disabled', !isEnabled);
-}*/
-
 /*
   Maže citlivé položky
 */
@@ -761,11 +838,17 @@ gui.clearSensitiveInputs = function() {
   $('input#password-verification').val("");
 }
 
+/*
+  Odstraní dočasně nastavené třídy
+*/
 gui.removeTemporaryClasses = function() {
   $(".not-displayed-temporary").removeClass("not-displayed-temporary");
   $(".displayed-temporary").removeClass("displayed-temporary");  
 }
 
+/*
+  Nastavý výchozí hodnoty inputů
+*/
 gui.resetDefaultValues = function() {
   $("[data-defval]").each(function() {
     $(this).val($(this).data('defval'));
@@ -1027,8 +1110,6 @@ settings.loadNetworkInfo = function() {
 }
 
 settings.registerChange = function() {
-  //gui.onInputChange('#ssid', function(element, val) {gui.setSettingsValue('ssid',val);});
-  //gui.onInputChange('#skey', function(element, val) {gui.setSettingsValue('skey',val);});
   gui.onInputChange('#pcount', function(element, val) {gui.setSettingsValue('pcount',val);});
   gui.onInputChange('[name="mode"]', function(element, val) {gui.setSettingsValue('mode',val);});
   gui.onInputChange('#inactivity-timeout', function(element, val) {gui.setSettingsValue('inactTimeout',val);});
@@ -1108,4 +1189,3 @@ $(window).on("pageshow",function(){
 //Přihlášeného uživatele vždy místo login page směrovat na orders - vyřešit asi rovnou na serveru?
 //favicon
 //Neaktivním uživatelům nedovolit žádnou akci - ošetřit na serveru
-//Uživatele třídit podle abecedy
