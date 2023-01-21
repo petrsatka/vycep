@@ -40,8 +40,7 @@
         <label for="pcount">Počet pulsů na litr</label>
         <input type="text" id="pcount" name="pcount">
         <span class="description">Stiskněte kalibrovat. Poté nechte odtéct 1 litr a stiskněte hotovo.</span>
-        <input id="button-calibrate" class="button-large" type="button" onclick="settings.calibrate()" value="Kalibrovat">
-        <input id="button-done" class="button-large not-displayed" type="button" onclick="settings.done()" value="Hotovo">  
+        <input id="button-calibrate" class="button-large" type="button" onclick="settings.toggleCalibration()" data-defval="Kalibrovat">  
         <input class="button-large" type="button" value="Test 0,5 l">
         <span class="label header">Režim</span>
         <input type="radio" id="auto" name="mode" value="auto">

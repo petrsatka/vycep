@@ -74,9 +74,9 @@ api.createAdmin = function(username, password, callback) {
   //Test existujícího jména
   //Test chyby HTTP
   //Test neplatné návratové hodnty
-  //setTimeout(() => callback(null, null, "500 - bad request"), 500);
-  //setTimeout(() => callback(username,"user_exists", null),500);
-  setTimeout(() => callback(username,"ok", null),500);
+  //setTimeout(() => callback(null, null, "500 - bad request"), 1000);
+  //setTimeout(() => callback(username,"user_exists", null), 1000);
+  setTimeout(() => callback(username,"ok", null), 1000);
 }
 
 /*
@@ -84,13 +84,13 @@ api.createAdmin = function(username, password, callback) {
 */
 api.createUser = function(username, password, callback) {
   //DEBUG Omezit volání pouze adminovi
-  //setTimeout(() => callback(username,"user_exists", null), 500);
-  //setTimeout(() => callback(null, null, "500 - bad request"), 500);
-  //setTimeout(() => callback(username,"unknown_error", null), 500);
+  //setTimeout(() => callback(username,"user_exists", null), 1000);
+  //setTimeout(() => callback(null, null, "500 - bad request"), 1000);
+  //setTimeout(() => callback(username,"unknown_error", null), 1000);
   if (username.toLowerCase() == 'franta') {
-     setTimeout(() => callback(username,"user_exists", null),500);
+     setTimeout(() => callback(username,"user_exists", null), 1000);
   } else {
-    setTimeout(() => callback(username,"ok", null),500);
+    setTimeout(() => callback(username,"ok", null), 1000);
   }
 }
 
@@ -99,11 +99,11 @@ api.createUser = function(username, password, callback) {
 */
 api.changePassword = function(oldPassword, password, callback) {
   if (oldPassword == '') {
-    setTimeout(() => callback(false,"invalid_password", null),500);
+    setTimeout(() => callback(false,"invalid_password", null), 1000);
   } else {
-    //setTimeout(() => callback(null, null, "500 - bad request"),500);
-    setTimeout(() => callback(true,"ok", null),500); 
-    //setTimeout(() => callback(false,"ok", null),500);
+    //setTimeout(() => callback(null, null, "500 - bad request"), 1000);
+    setTimeout(() => callback(true,"ok", null), 1000); 
+    //setTimeout(() => callback(false,"ok", null), 1000);
   }  
 }
 
@@ -112,9 +112,9 @@ api.changePassword = function(oldPassword, password, callback) {
 */
 api.login = function(username, password, callback) {
   if (!username || !password) {
-    setTimeout(() => callback(username,"bad_username_or_password", null),500);
+    setTimeout(() => callback(username,"bad_username_or_password", null), 1000);
   } else {
-    setTimeout(() => callback(username,"ok", null),500);
+    setTimeout(() => callback(username,"ok", null), 1000);
   }
 }
 
@@ -124,27 +124,27 @@ api.billCountDEBUG = 20;
   Získá aktuální počet nápojů ve frontě zařízení
 */
 api.getQueueCount = function(callback) {
-  setTimeout(() => callback(api.qCountDEBUG,"ok", null),500);
-  //setTimeout(() => callback(-1,"unable_to_get_qcount", null), 500);
-  //setTimeout(() => callback(null, null, "500 - bad request"), 500); 
+  setTimeout(() => callback(api.qCountDEBUG,"ok", null), 1000);
+  //setTimeout(() => callback(-1,"unable_to_get_qcount", null), 1000);
+  //setTimeout(() => callback(null, null, "500 - bad request"), 1000); 
 }
 
 /*
   Získá aktuální počet nápojů na účtě přihlášeného uživatele
 */
 api.getCurrentUserBillCount = function(callback) {
-  setTimeout(() => callback(api.billCountDEBUG,"ok", null),1000);
-  //setTimeout(() => callback(-1,"unable_to_get_bcount", null),500);
-  //setTimeout(() => callback(null, null, "500 - bad request"),500);
+  setTimeout(() => callback(api.billCountDEBUG,"ok", null), 1000);
+  //setTimeout(() => callback(-1,"unable_to_get_bcount", null), 1000);
+  //setTimeout(() => callback(null, null, "500 - bad request"), 1000);
 }
 
 /*
   Získá aktuální počet nápojů na účtě uživatele
 */
 api.getUserBillCount = function(username, callback) {
-  setTimeout(() => callback(api.billCountDEBUG,"ok", null),1000);
-  //setTimeout(() => callback(-1,"unable_to_get_bcount", null),500);
-  //setTimeout(() => callback(null, null, "500 - bad request"),500);
+  setTimeout(() => callback(api.billCountDEBUG,"ok", null), 1000);
+  //setTimeout(() => callback(-1,"unable_to_get_bcount", null), 1000);
+  //setTimeout(() => callback(null, null, "500 - bad request"), 1000);
 }
 
 /*
@@ -159,8 +159,8 @@ api.makeOrder = function(callback) {
   /*setTimeout(() => callback({
     queueCount: api.qCountDEBUG,
     billCount: api.billCountDEBUG, 
-  },"unable_to_make_order", null),5000); */
-  //setTimeout(() => callback(null, null, "500 - bad request"), 500); 
+  },"unable_to_make_order", null), 1000); */
+  //setTimeout(() => callback(null, null, "500 - bad request"), 1000); 
 }
   
 /*
@@ -184,7 +184,7 @@ api.pay = function(username, count, callback) {
      paid: 0,
      billCount: api.billCountDEBUG,
   },"unable_to_make_payment", null), 1000);*/
-  //setTimeout(() => callback(null, null, "500 - bad request"), 500); 
+  //setTimeout(() => callback(null, null, "500 - bad request"), 1000); 
 }
 
 api.loadUsers = function(callback) {
@@ -197,9 +197,9 @@ api.loadUsers = function(callback) {
     { "username": "Petr", "payment": false, "admin": false, "paymentCheckboxEnabled":true, "adminCheckboxEnabled":true, "passwordResetButtonEnabled":true, "payButtonEnabled":true, "deleteButtonEnabled":true },
     { "username": "Pavel", "payment": false, "admin": false, "paymentCheckboxEnabled":true, "adminCheckboxEnabled":true, "passwordResetButtonEnabled":true, "payButtonEnabled":true, "deleteButtonEnabled":true },
   ]
-  setTimeout(() => callback(jsonData,"ok", null),1000);
-  //setTimeout(() => callback(null, "unable_to_get_users", null),500);
-  //setTimeout(() => callback(null, null, "500 - bad request"),500);
+  setTimeout(() => callback(jsonData,"ok", null), 1000);
+  //setTimeout(() => callback(null, "unable_to_get_users", null), 1000);
+  //setTimeout(() => callback(null, null, "500 - bad request"), 1000);
 }
 
 
@@ -207,7 +207,7 @@ api.loadUsers = function(callback) {
   Odhlášení
 */
 api.logout = function(callback) {
-  setTimeout(() => callback(true,"ok", null), 500);
+  setTimeout(() => callback(true,"ok", null), 1000);
 }
 
 /*DEBUG*/
@@ -224,63 +224,65 @@ api.settings = {
 api.setSettingsValue = function(name, value, callback) {
   let val = api.settings[name];
   if (val === undefined) {
-    setTimeout(() => callback(null, "unable_to_set_settings_value", null), 800); 
+    setTimeout(() => callback(null, "unable_to_set_settings_value", null), 1000); 
   } else {
-    setTimeout(() => callback({name: name, value: value}, "ok", null), 800);  
+    setTimeout(() => callback({name: name, value: value}, "ok", null), 1000);  
   }
-  //setTimeout(() => callback(null, null, "500 - bad request"),500);  
+  //setTimeout(() => callback(null, null, "500 - bad request"), 1000);  
 }
 
 api.getSettingsValue = function(name, callback) {
   let val = api.settings[name];
   if (val === undefined) {
-    setTimeout(() => callback(null, "unable_to_get_settings_value", null), 800); 
+    setTimeout(() => callback(null, "unable_to_get_settings_value", null), 1000); 
   } else {
-    setTimeout(() => callback(val,"ok", null),800);
+    setTimeout(() => callback(val,"ok", null), 1000);
   }
-  //setTimeout(() => callback(null, null, "500 - bad request"),500);
+  //setTimeout(() => callback(null, null, "500 - bad request"), 1000);
 }
 
 api.setPermissionValue = function(username, permissionKey, value, callback) {
   if (permissionKey == 'admin' || permissionKey == 'payment') {
-    setTimeout(() => callback({username : username, permissionKey: permissionKey, value: value}, "ok", null), 800); 
+    setTimeout(() => callback({username : username, permissionKey: permissionKey, value: value}, "ok", null), 1000); 
   } else {
-    setTimeout(() => callback(null, "unable_to_set_permissions_value", null), 800);
+    setTimeout(() => callback(null, "unable_to_set_permissions_value", null), 1000);
   }
-  //setTimeout(() => callback(null, null, "500 - bad request"),500); 
+  //setTimeout(() => callback(null, null, "500 - bad request"), 1000); 
 }
 
 api.getIP = function(callback) {
-  setTimeout(() => callback('192.168.1.45',"ok", null),800);  
+  setTimeout(() => callback('192.168.1.45',"ok", null), 1000);  
 }
 
 api.getGateway = function(callback) {
-  setTimeout(() => callback('192.168.1.1',"ok", null),800);  
+  setTimeout(() => callback('192.168.1.1',"ok", null), 1000);  
 }
 
 api.resetPassword = function(username, callback) {
-  setTimeout(() => callback('xyz7abc',"ok", null),1000);
-  //setTimeout(() => callback(null, "unable_to_reset_password", null),500);
-  //setTimeout(() => callback(null, null, "500 - bad request"),500);
+  setTimeout(() => callback('xyz7abc',"ok", null), 1000);
+  //setTimeout(() => callback(null, "unable_to_reset_password", null), 1000);
+  //setTimeout(() => callback(null, null, "500 - bad request"), 1000);
 }
 
 api.deleteUser = function(username, callback) {
-  setTimeout(() => callback(username,"ok", null),1000);
-  //setTimeout(() => callback(null, "unable_to_delete_user", null),500);
-  //setTimeout(() => callback(null, null, "500 - bad request"),500);
+  setTimeout(() => callback(username,"ok", null), 1000);
+  //setTimeout(() => callback(null, "unable_to_delete_user", null), 1000);
+  //setTimeout(() => callback(null, null, "500 - bad request"), 1000);
 }
 
-api.calibrate = function(callback) {
+api.startCalibration = function(callback) {
   api.settings['pcount'] = 330;
-  setTimeout(() => callback(true,"ok", null),1000);
-  //setTimeout(() => callback(false, "unable_to_get_users", null),500);
-  //setTimeout(() => callback(null, null, "500 - bad request"),500);
+  console.log("calibration start");
+  setTimeout(() => callback(true,"ok", null), 1000);
+  //setTimeout(() => callback(false, "unable_to_get_users", null), 1000);
+  //setTimeout(() => callback(null, null, "500 - bad request"), 1000);
 }
 
 api.stopCalibration = function(callback) {
-  setTimeout(() => callback(true,"ok", null),1000);
-  //setTimeout(() => callback(false, "unable_to_get_users", null),500);
-  //setTimeout(() => callback(null, null, "500 - bad request"),500);
+  console.log("calibration stop");
+  setTimeout(() => callback(true,"ok", null), 1000);
+  //setTimeout(() => callback(false, "unable_to_get_users", null), 1000);
+  //setTimeout(() => callback(null, null, "500 - bad request"), 1000);
 }
 
 
@@ -638,9 +640,9 @@ gui.onInputChange = function(targetSelector, callback) {
   });
 }
 
-gui.calibrate = function(callback) {
+gui.startCalibration = function(callback) {
   gui.setInProgress(true);
-  api.calibrate((result, resultCode, errorMessage) => {
+  api.startCalibration((result, resultCode, errorMessage) => {
     if (gui.handleError(resultCode, errorMessage, true)) {
       if (callback) {
         callback(result);
@@ -941,25 +943,27 @@ settings.onPageShow = function() {
   settings.loadValues();
 }
 
-settings.calibrate = function() {
-  gui.calibrate(() => {
+settings.startCalibration = function() {
+  gui.startCalibration(() => {
     $("#pcount").prop('disabled', true);
     $("#pcount").val("");
-    $("#button-calibrate").addClass("not-displayed-temporary");
-    $("#button-done").addClass("displayed-temporary");  
+    settings.toggleCalibration = settings.stopCalibration;
+    $("#button-calibrate").val("Hotovo");  
   });
 }
 
-settings.done = function() {
+settings.stopCalibration = function() {
   gui.setInProgress(true);
   gui.stopCalibration(() => {   
     gui.loadSettingsValue('pcount', '#pcount', () => {
-      $("#button-calibrate").removeClass("not-displayed-temporary");
-      $("#button-done").removeClass("displayed-temporary");
+      settings.toggleCalibration = settings.startCalibration;
+      $("#button-calibrate").val($("#button-calibrate").data('defval'));
       gui.setInProgress(false); 
     });
   }); 
 }
+
+settings.toggleCalibration = settings.startCalibration;
 
 ////Global Events////
 $(window).on("pageshow",function(){
@@ -972,4 +976,3 @@ $(window).on("pageshow",function(){
 //DEBUG
 //Přihlášeného uživatel vždy místo login page směrovat na orders - vyřešit asi rovnou na serveru?
 //favicon
-//RETEST všech operací stránek s ohledem na zamykání při delším trvání odpovědi
