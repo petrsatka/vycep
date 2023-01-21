@@ -28,7 +28,7 @@
         <input type="text" id="skey" name="skey">
         <span class="description">Po úspěšném připojení k síti bude zařízení automaticky restartováno.</span>    
         <input class="button-large" type="button" value="Připojit">
-        <input class="button-large" type="button" value="Restart">
+        <input class="button-large" type="button" value="Restart" onclick="settings.restart()">
         <span class="label header">TCP/IP info</span>
         <span class="label">Výchozí brána</span>
         <span class="value small" id="gateway">-</span>
@@ -41,7 +41,7 @@
         <input type="text" id="pcount" name="pcount">
         <span class="description">Stiskněte kalibrovat. Poté nechte odtéct 1 litr a stiskněte hotovo.</span>
         <input id="button-calibrate" class="button-large" type="button" onclick="settings.toggleCalibration()" data-defval="Kalibrovat">  
-        <input class="button-large" type="button" value="Test 0,5 l">
+        <input class="button-large" type="button" value="Test 0,5 l" onclick="settings.runTest()">
         <span class="label header">Režim</span>
         <input type="radio" id="auto" name="mode" value="auto">
         <label class="inline" for="auto">Auto</label><br>

@@ -274,14 +274,36 @@ api.startCalibration = function(callback) {
   api.settings['pcount'] = 330;
   console.log("calibration start");
   setTimeout(() => callback(true,"ok", null), 1000);
-  //setTimeout(() => callback(false, "unable_to_get_users", null), 1000);
+  //setTimeout(() => callback(false, "unable_to_start_calibration", null), 1000);
   //setTimeout(() => callback(null, null, "500 - bad request"), 1000);
 }
 
 api.stopCalibration = function(callback) {
   console.log("calibration stop");
   setTimeout(() => callback(true,"ok", null), 1000);
-  //setTimeout(() => callback(false, "unable_to_get_users", null), 1000);
+  //setTimeout(() => callback(false, "unable_to_stop_calibration", null), 1000);
+  //setTimeout(() => callback(null, null, "500 - bad request"), 1000);
+}
+
+api.runTest = function(callback) {
+  console.log("test");
+  setTimeout(() => callback(true,"ok", null), 1000);
+  //setTimeout(() => callback(false, "unable_to_run_test", null), 1000);
+  //setTimeout(() => callback(null, null, "500 - bad request"), 1000);
+}
+
+api.restart = function(callback) {
+  console.log("restart");
+  setTimeout(() => callback(true,"ok", null), 1000);
+  //setTimeout(() => callback(false, "unable_to_run_test", null), 1000);
+  //setTimeout(() => callback(null, null, "500 - bad request"), 1000);
+}
+
+api.connectAP = function(ssid, securityKey, callback) {
+  console.log("connect");
+  //setTimeout(() => callback(true,"ok", null), 1000);
+  setTimeout(() => callback(false,"ok", null), 1000);
+  //setTimeout(() => callback(false, "unable_to_run_connect", null), 1000);
   //setTimeout(() => callback(null, null, "500 - bad request"), 1000);
 }
 
@@ -663,6 +685,19 @@ gui.stopCalibration = function(callback) {
   });
 }
 
+gui.callApiAction = function(apiMethod, callback) {
+  gui.setInProgress(true);
+  apiMethod((result, resultCode, errorMessage) => {
+    if (gui.handleError(resultCode, errorMessage, true)) {
+      if (callback) {
+        callback(result);
+      }
+    }
+    
+    gui.setInProgress(false);
+  });
+}
+
 /*gui.setInputsEnabled = function(parentSelector, isEnabled) => {
   $(parentSelector + ' input').prop('disabled', !isEnabled);
 }*/
@@ -964,6 +999,18 @@ settings.stopCalibration = function() {
 }
 
 settings.toggleCalibration = settings.startCalibration;
+
+settings.runTest = function() {
+  gui.callApiAction(api.runTest);
+}
+
+settings.restart = function() {
+  gui.callApiAction(api.restart, () => {
+    setTimeout(() => {
+      location.reload();
+    }, 2000);
+  });
+}
 
 ////Global Events////
 $(window).on("pageshow",function(){
