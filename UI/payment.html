@@ -12,7 +12,7 @@
     <script src="scripts/jquery-3.6.3.min.js"></script>
     <script src="scripts/jquery-confirm.min.js"></script>
     <script src="scripts/utils.js"></script>
-    <script src="scripts/navigation.js" type="module" defer></script>
+    <script src="scripts/navigation.js" type="module"></script>
     <script>
       $(window).on("pageshow", payment.onPageShow);
     </script>    
@@ -37,8 +37,8 @@
         </div>
         <div class="message-holder"></div>
         <div>
-          <input class="button-large" id="pay-button" type="button" onclick="payment.pay()" data-defval="Zaplatit">
-          <input class="button-large" id="back-button" type="button" onclick="payment.goBack()" data-defval="Zpět">
+          <input class="button-large" id="pay-button" type="button" onclick="payment.pay()" value="Zaplatit" data-defval="Zaplatit">
+          <input class="button-large" id="back-button" type="button" onclick="payment.goBack()" value="Zpět" data-defval="Zpět">
         </div>
       </div>
     </div>

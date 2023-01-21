@@ -12,7 +12,7 @@
     <script src="scripts/jquery-3.6.3.min.js"></script>
     <script src="scripts/jquery-confirm.min.js"></script>
     <script src="scripts/utils.js"></script>
-    <script src="scripts/navigation.js" type="module" defer></script>
+    <script src="scripts/navigation.js" type="module"></script>
     <script>
       $(window).on("pageshow", settings.onPageShow);
     </script>                   
@@ -42,7 +42,7 @@
         <label for="pcount">Počet pulsů na litr</label>
         <input type="text" id="pcount" name="pcount">
         <span class="description">Stiskněte kalibrovat. Poté nechte odtéct 1 litr a stiskněte hotovo.</span>
-        <input id="button-calibrate" class="button-large" type="button" onclick="settings.toggleCalibration()" data-defval="Kalibrovat">  
+        <input id="button-calibrate" class="button-large" type="button" onclick="settings.toggleCalibration()" value="Kalibrovat" data-defval="Kalibrovat">  
         <input class="button-large" type="button" value="Test 0,5 l" onclick="settings.runTest()">
         <span class="label header">Režim</span>
         <input type="radio" id="auto" name="mode" value="auto">
