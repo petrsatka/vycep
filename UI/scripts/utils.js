@@ -196,7 +196,7 @@ api.debugUsers = [
 { "username": "Pavel", "payment": false, "admin": false, "active": true, "paymentCheckboxEnabled":true, "adminCheckboxEnabled":true, "passwordResetButtonEnabled":true, "payButtonEnabled":true, "deleteButtonEnabled":true, "activateButtonEnabled":false },
 { "username": "Pepa", "payment": false, "admin": false, "active": true, "paymentCheckboxEnabled":true, "adminCheckboxEnabled":true, "passwordResetButtonEnabled":true, "payButtonEnabled":true, "deleteButtonEnabled":true, "activateButtonEnabled":false },
 { "username": "Petr", "payment": false, "admin": false, "active": true, "paymentCheckboxEnabled":true, "adminCheckboxEnabled":true, "passwordResetButtonEnabled":true, "payButtonEnabled":true, "deleteButtonEnabled":true, "activateButtonEnabled":false },
-{ "username": "Tonda", "payment": true, "admin": false, "active": false, "paymentCheckboxEnabled":false, "adminCheckboxEnabled":false, "passwordResetButtonEnabled":false, "payButtonEnabled":false, "deleteButtonEnabled":false, "activateButtonEnabled":true },
+{ "username": "Tonda", "payment": true, "admin": false, "active": false, "paymentCheckboxEnabled":false, "adminCheckboxEnabled":false, "passwordResetButtonEnabled":false, "payButtonEnabled":false, "deleteButtonEnabled":true, "activateButtonEnabled":true },
 { "username": "VLS", "payment": true, "admin": true, "active": true, "paymentCheckboxEnabled":true, "adminCheckboxEnabled":true, "passwordResetButtonEnabled":true, "payButtonEnabled":true, "deleteButtonEnabled":true, "activateButtonEnabled":false }
 ]
 
