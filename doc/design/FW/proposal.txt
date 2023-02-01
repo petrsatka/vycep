@@ -1,0 +1,51 @@
+DATA
+Settings
+newUsersPayment
+ssid
+skey
+pcount
+inactTimeout
+underLimTimeout
+mode
+
+operatingvalues
+qcount
+
+USERS
+klíč bude username.toLower()
+
+username, displayname
+username, pswhash
+username, permissions (int, co bit to oprávnění. První bit aktivní/neaktivní)
+username, bill
+
+Session cookie
+username
+displayname
+permissions
+creationDate
+permchecksum sha256(username + passwordhash + permissions + secKey)
+validitycheckusm sha256(username + permissions + creationDate + secKey)
+
+Na serveru vždy ověřit validityCheckusm pokud souhlasí, zkontrolujeme, zda token nevypršel podle creationDate.
+Pokud vypršel pak ověříme permchecksum. Pokud souhlasí, pak vytvoříme novou cookie. Pokud ne, znamená to, že se změnilo heslo, nebo oprávnění. - Vyžádáme nové přihlášení.
+
+Třídy
+
+AsyncSettings
+//Bude řešit zámky nvs
+Begin(namespace)
+getInt
+SetInt
+GetString
+SetString
+
+UserManager
+poskytuje a ukládá info o uživateli pomocí AsyncSettings
+Ověřuje a získává cookie
+
+Faucet
+Čítač pulsů - přerušení?
+Zapíná vypíná kouhout
+Mění qCount
+Při inicializaci načte poslední qCont a sníží o jedna - po restartu

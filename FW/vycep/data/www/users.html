@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="cs">           
+  <head>                   
+    <meta charset="UTF-8">                   
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Uživatelé</title>
+    <link rel="icon" href="/images/icon.png" type="image/png">
+    <link rel="apple-touch-icon" href="images/apple-touch-icon.png">                  
+    <link rel="stylesheet" href="styles/style.css">
+    <link rel="stylesheet" href="styles/navigation.css">
+    <link rel="stylesheet" href="styles/jquery-confirm.min.css">               
+    <script src="scripts/jquery-3.6.3.min.js"></script>
+    <script src="scripts/jquery-confirm.min.js"></script>
+    <script src="scripts/utils.js"></script>
+    <script src="scripts/navigation.js" type="module"></script>
+    <script>
+      $(window).on("pageshow", users.onPageShow);
+    </script>              
+  </head>           
+  <body>                   
+    <div class=page-wrapper>                           
+      <div class="main-header">                                   
+        <span class="title">Uživatelé</span>                           
+      </div>                           
+      <div class="page-content">                               
+        <input type="checkbox" id="allow-payment" name="allow-payment" onchange="users.onAllowPaymentCheckboxChange(event)">                                   
+        <label class="inline" for="allow-payment">Povolit platbu novým uživatelům</label>                                   
+        <div id="users-table-holder">
+        </div>                                                    
+      </div>                   
+    </div>           
+  </body>
+</html>

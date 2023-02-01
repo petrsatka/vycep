@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="cs">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Objednávky</title>
+    <link rel="icon" href="/images/icon.png" type="image/png">
+    <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
+    <link rel="stylesheet" href="styles/style.css">
+    <link rel="stylesheet" href="styles/navigation.css">
+    <link rel="stylesheet" href="styles/jquery-confirm.min.css">
+    <script src="scripts/jquery-3.6.3.min.js"></script>
+    <script src="scripts/jquery-confirm.min.js"></script>
+    <script src="scripts/utils.js"></script>
+    <script src="scripts/navigation.js" type="module"></script>
+    <script>
+      $(window).on("pageshow", orders.onPageShow);
+    </script>
+  </head>
+  <body>
+    <div class=page-wrapper>
+      <div class="main-header">
+      <span class="title">Objednávky</span>
+      </div>
+      <div class="page-content">
+        <div class="center">
+          <span class="label large">Výčep</span>
+          <span id="q-count" class="value">-</span>
+          <span class="label large">Účet</span>
+          <span id="b-count" class="value large">-</span>
+        </div>
+        <div class="message-holder"></div>
+        <input class="button-large" type="button" onclick="orders.makeOrder()" value="Objednat">
+        <input class="button-large" type="button" onclick="orders.navigateToPayment()" value="Přejít k placení">
+      </div>
+    </div>
+  </body>
+</html>

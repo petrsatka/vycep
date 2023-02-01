@@ -1,0 +1,236 @@
+html, body, .page-wrapper {
+  height:100%;
+  margin:0;
+}
+
+html {
+  box-sizing: border-box;
+}
+
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.not-displayed:not(.displayed-temporary), .page-content .not-displayed:not(.displayed-temporary), .page-content .not-displayed.button-large:not(.displayed-temporary), .not-displayed-temporary, .page-content .not-displayed-temporary, .page-content .not-displayed-temporary.button-large {
+  display:none;
+}
+
+.page-content table {
+  width:100%;
+  border:none;
+  margin-top:2mm;
+  border-spacing:0;
+}
+
+.page-content thead {
+  position:sticky;
+  top:-0.4px;/*Oprava mezery mezi headery v mobilním Chromiu*/
+}
+
+.page-content table td {
+  font-size:4mm;
+}
+
+.page-content table th {
+  font-size:4mm;
+  background-color:grey;
+}
+
+.page-content table td input {
+ font-size:4mm;
+ margin:0;
+ width:auto;
+}
+
+.page-content table td:first-child {
+  width:100%;
+}
+
+.page-content table th {
+  text-align:left;
+}
+
+.page-content table tr:nth-child(even) td {
+  text-align:right;
+  padding-top:2mm;
+  padding-bottom:2mm;
+  padding-right:1mm;
+}
+
+.page-content table tr:nth-child(odd) td {
+  padding-top:2mm;
+}
+
+.page-content table tr:nth-child(4n), tr:nth-child(4n-1) {
+    background-color:lightgrey;
+}
+
+.page-content table tr:nth-child(4n-2), tr:nth-child(4n-3) {
+    
+}
+
+.page-content .registration-link {
+    font-size: 4.5mm;
+    margin-top: 7mm;
+    display: block;
+}
+
+.main-header span {
+  font-size: 6mm;
+  display: inline-block;
+  vertical-align: middle;
+  line-height: normal;
+  font-weight: bold;
+}
+
+@media screen and (orientation: landscape) {
+  .page-wrapper {
+    width: 60vw;
+  }
+}
+
+.main-header {
+  width:100%;
+  background-color:lightblue;
+  position:relative;
+}
+
+.main-header .title {
+  line-height: 18mm;
+  text-align:center;
+  width:100%;
+}
+
+.page-wrapper {
+  margin:auto;
+  position: relative;
+}
+
+.page-wrapper .jconfirm {
+  position: absolute;
+}
+
+.page-content {
+  padding-left:10px;
+  padding-right:10px;
+  padding-bottom:10px;
+  margin-top:4mm;
+  height:calc(100% - 4mm - 18mm);
+  overflow-y:auto;
+  width:100%;
+}
+
+.message-holder {
+  color: green;
+  font-size: 5mm;
+  height: 12mm;
+  line-height: 12mm;
+  font-weight: bold;
+  margin-top:2mm;
+  text-align:center;
+}
+
+.message-holder span {
+  display: inline-block;
+  line-height: normal;
+}
+
+.error-message {
+  color: red;
+}
+
+.page-content .green {
+  color: green;
+}
+
+.page-content label, .label {
+  display: block;
+  font-size: 4mm;
+  font-weight: bold;
+  margin-top:4mm;
+}
+
+.page-content label.large, .label.large {
+  font-size:8mm;
+  margin-top:4mm;
+  font-weight: normal;
+}
+
+.page-content label.header, .label.header {
+  background-color:#e0f7fa;
+}
+
+.page-content .description {
+  margin-top: 3mm;
+  font-size: 3mm;
+  display: block;
+}
+
+.page-content .inline {
+  display: inline;
+}
+
+.page-content .value {
+  display: block;
+  font-size: 12mm;
+  margin-top:1mm;
+}
+
+.page-content .value.large {
+  font-size:15mm;
+}
+
+.page-content .value.small {
+  font-size:4mm;
+}
+
+.page-content .center {
+  text-align:center;
+}
+
+.page-content input {
+  width:100%;
+  font-size: 6mm;
+  margin-top:2mm;
+}
+
+.page-content input[type=checkbox], .page-content input[type=radio]{
+   width:auto;
+}
+
+.page-content .button-large {
+  background: lightgray;
+  color: black;
+  display: block;
+  text-align: center;
+  text-decoration: none;
+  border-color:gray;
+  border-style:solid;
+  border-radius: 8px;
+  padding-top:4mm;
+  padding-bottom:4mm;
+  font-size:5mm;
+  margin-top:4mm;
+}
+
+.page-content .button-large:first-child {
+  margin-top: 2mm;
+}
+
+.page-content .button-large:active {
+    background: #BDBDBD;
+}
+
+.page-content .button-large:disabled {
+  color: gray;
+  background: gainsboro;
+  transition: background 2s ease 0.5s, color 2s ease 0.5s;
+}
+
+.page-content #confirmation-message {
+  padding-top:2mm;
+}
