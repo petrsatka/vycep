@@ -1,5 +1,7 @@
+#include <Arduino.h>
 #include "ESPAsyncWebSrv.h"
 #include "LittleFS.h"
+#include "TSafePreferences.h"
 AsyncWebServer server(80);
 
 void onNotFound(AsyncWebServerRequest *request) {
@@ -27,7 +29,7 @@ void serverInit() {
               request->redirect("/login.html");
             })
     .setFilter(filterNotLoggetIn);
-  //api
+  //api//Opravit toto je blbost
   server.on("/api/*", HTTP_GET,
             [](AsyncWebServerRequest *request) {
               request->redirect("/login.html");
@@ -41,7 +43,8 @@ void serverInit() {
   });
 
   //Statický obsah
-  server.serveStatic("/", LittleFS, "/www/").setDefaultFile("orders.html");
+  server.serveStatic("/", LittleFS, "/www/")
+    .setDefaultFile("orders.html");
 
   //Fallback
   server.onNotFound(onNotFound);
@@ -72,5 +75,6 @@ void setup() {
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
+  Serial.println(millis());
+  delay(1000);
 }
