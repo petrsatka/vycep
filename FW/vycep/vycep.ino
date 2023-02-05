@@ -1,21 +1,39 @@
 #include <Arduino.h>
 #include "ESPAsyncWebSrv.h"
 #include "LittleFS.h"
-#include "TSafePreferences.h"
+#include "Users.h"
 AsyncWebServer server(80);
+Users users;
 
 void onNotFound(AsyncWebServerRequest *request) {
   request->send(404);
 }
 
 bool filterNotLoggetIn(AsyncWebServerRequest *request) {
-  return false;
+  return true;
 }
 
 void serverInit() {
 
   //Vždy přístupný obsah
   server.serveStatic("/login.html", LittleFS, "/www/login.html");
+
+  ///TEST
+    // server.on("/api/addUser", HTTP_GET,
+    //         [](AsyncWebServerRequest *request) {
+    //           users.createUser("aaa", "bbbb");
+    //           request->send(200, "text/plain", "aaa");
+    //         })
+    // .setFilter(filterNotLoggetIn);  
+    //    server.on("/api/getUser", HTTP_GET,
+    //         [](AsyncWebServerRequest *request) {
+    //           char displayName[15] = {'\0'};
+    //           users.getUserCookie("aaa", displayName);
+    //           request->send(200, "text/plain", displayName);
+    //         })
+    // .setFilter(filterNotLoggetIn);  
+  ///TEST
+
   //Chráněný obsah
   //html
   server.on("/*.html", HTTP_GET,
@@ -29,12 +47,14 @@ void serverInit() {
               request->redirect("/login.html");
             })
     .setFilter(filterNotLoggetIn);
-  //api//Opravit toto je blbost
+  //api
   server.on("/api/*", HTTP_GET,
             [](AsyncWebServerRequest *request) {
-              request->redirect("/login.html");
+              request->send(401);
             })
     .setFilter(filterNotLoggetIn);
+
+    //Sem ještě někde vrazit filtr podle oprávnění
 
   //Částečně chráněný obsah. Co nezaychtí handlery nahoře, projde sem.
   //Api
@@ -75,6 +95,6 @@ void setup() {
 }
 
 void loop() {
-  Serial.println(millis());
-  delay(1000);
+  Serial.println(ESP.getFreeHeap());
+  delay(5000);
 }
