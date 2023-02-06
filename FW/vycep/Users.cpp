@@ -12,6 +12,7 @@ Users::~Users() {
   delete (displayNamesStorage);
   delete (hashesStorage);
   delete (permissionsStorage);
+  delete (billsStorage);
   vSemaphoreDelete(xSemaphore);
 }
 

@@ -3,6 +3,9 @@
   position:absolute;
   top:0;
   left:0;
+  /*Workaround pro safari*/
+  webkit-transform: translate3d(0, 0, 0);
+  transform: translate3d(0, 0, 0);
   z-index:2;
 }
 
