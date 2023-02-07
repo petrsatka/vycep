@@ -56,14 +56,10 @@ bool Users::addUserBill(const char* username, uint16_t add, uint16_t& res) {
   return billsStorage->addUShort(username, add, 0, res);
 }
 
-bool Users::isActive(uint32_t permissions) {
-  return false;
+bool Users::checkPermissions(uint32_t permissions, uint32_t permissionMask) {
+  return permissions & permissionMask;
 }
 
-bool Users::isAdmin(uint32_t permissions) {
-  return false;
-}
-
-bool Users::canPay(uint32_t permissions) {
-  return false;
+bool Users::isPermited(const char* username, uint32_t permissionMask) {
+  return checkPermissions(permissionsStorage->getUInt(username), permissionMask);
 }
