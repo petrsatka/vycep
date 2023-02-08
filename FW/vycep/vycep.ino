@@ -19,12 +19,11 @@ void serverInit() {
   server.serveStatic("/login.html", LittleFS, "/www/login.html");
 
   ///TEST
-    // server.on("/api/addUser", HTTP_GET,
-    //         [](AsyncWebServerRequest *request) {
-    //           users.createUser("aaa", "bbbb");
-    //           request->send(200, "text/plain", "aaa");
-    //         })
-    // .setFilter(filterNotLoggetIn);  
+    server.on("/api/test", HTTP_GET,
+            [](AsyncWebServerRequest *request) {
+              users.verifyPassword("aaa", "orgojchorchoj");
+              request->send(200, "text/plain", "aaa");
+            });  
     //    server.on("/api/getUser", HTTP_GET,
     //         [](AsyncWebServerRequest *request) {
     //           char displayName[15] = {'\0'};

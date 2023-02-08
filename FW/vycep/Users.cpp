@@ -6,6 +6,9 @@ Users::Users() {
   hashesStorage = new TSafePreferences(this->xSemaphore, NAMESPACE_HASHES, NVS_PARTTION);
   permissionsStorage = new TSafePreferences(this->xSemaphore, NAMESPACE_PERMISSIONS, NVS_PARTTION);
   billsStorage = new TSafePreferences(this->xSemaphore, NAMESPACE_BILLS, NVS_PARTTION);
+  mbedtls_md_init(&hashCtx);
+  mbedtls_md_setup(&hashCtx, mbedtls_md_info_from_type(MBEDTLS_MD_SHA256), 1);
+  mbedtls_md_hmac_starts(&hashCtx, (unsigned char*)HMAC_KEY, strlen(HMAC_KEY));
 }
 
 Users::~Users() {
@@ -14,10 +17,19 @@ Users::~Users() {
   delete (permissionsStorage);
   delete (billsStorage);
   vSemaphoreDelete(xSemaphore);
+  mbedtls_md_free(&hashCtx);
 }
 
-bool Users::createUser(const char* username, const char* displayname, const unsigned char* passwordHash, uint32_t permissions) {
-  return displayNamesStorage->putString(username, displayname) > 0 && hashesStorage->putBytes(username, passwordHash, HASH_LEN) > 0 && permissionsStorage->putUInt(username, permissions) > 0 && billsStorage->putUShort(username, 0) > 0;
+int Users::computeHMAChash(const char* message, unsigned char* hash) {
+  mbedtls_md_hmac_reset(&hashCtx);
+  mbedtls_md_hmac_update(&hashCtx, (unsigned char*)message, strlen(message));
+  return mbedtls_md_hmac_finish(&hashCtx, hash);
+}
+
+bool Users::createUser(const char* username, const char* displayname, const char* password, uint32_t permissions) {
+  unsigned char hash[HASH_LEN];
+  computeHMAChash(password, hash);
+  return displayNamesStorage->putString(username, displayname) > 0 && hashesStorage->putBytes(username, hash, HASH_LEN) > 0 && permissionsStorage->putUInt(username, permissions) > 0 && billsStorage->putUShort(username, 0) > 0;
 }
 
 bool Users::delteUser(const char* username) {
@@ -28,20 +40,30 @@ bool Users::delteUser(const char* username) {
   return res;
 }
 
-bool Users::verifyPasswordHash(const char* username, const unsigned char* passwordHash) {
+bool Users::verifyPassword(const char* username, const char* password) {
+  unsigned char hash[HASH_LEN];
+  computeHMAChash(password, hash);
+  //for (int i = 0; i < HASH_LEN; i++) Serial.print(hash[i], HEX);
+  //Serial.println();
   return false;
 }
 
-bool Users::setPasswordHash(const char* username, const unsigned char* passwordHash) {
-  return hashesStorage->putBytes(username, passwordHash, HASH_LEN);
+bool Users::setPassword(const char* username, const char* password) {
+  unsigned char hash[HASH_LEN];
+  computeHMAChash(password, hash);
+  return hashesStorage->putBytes(username, hash, HASH_LEN);
 }
 
 bool Users::getUserCookie(const char* username, char* cookie, size_t maxLen) {
+  unsigned char hash[HASH_LEN];
+  //computeHMAChash(password, hash);
   return false;
   //return displayNames->getString(username, cookie, USERNAME_MAX_LEN);
 }
 
 bool Users::verifyUserCookie(const char* cookie) {
+  unsigned char hash[HASH_LEN];
+  //computeHMAChash(password, hash);
   return false;
 }
 int16_t Users::getUserBill(const char* username) {
