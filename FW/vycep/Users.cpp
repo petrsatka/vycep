@@ -41,11 +41,11 @@ bool Users::delteUser(const char* username) {
 }
 
 bool Users::verifyPassword(const char* username, const char* password) {
-  unsigned char hash[HASH_LEN];
-  computeHMAChash(password, hash);
-  //for (int i = 0; i < HASH_LEN; i++) Serial.print(hash[i], HEX);
-  //Serial.println();
-  return false;
+  unsigned char hash1[HASH_LEN];
+  unsigned char hash2[HASH_LEN];  
+  computeHMAChash(password, hash1);
+  hashesStorage->getBytes(username, hash2, HASH_LEN);
+  return strcmp((char*)hash1, (char*)hash2) == 0;
 }
 
 bool Users::setPassword(const char* username, const char* password) {

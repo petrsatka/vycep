@@ -26,7 +26,7 @@ public:
   bool checkPermissions(uint32_t permissions, uint32_t permissionMask);
   bool isPermited(const char* username, uint32_t permissionMask);
 private:
-  const char* HMAC_KEY = "E5CpIivwYIXK4pgARBd1hVRyNcCugNj5B9T4VSUbeGHlElrLrR1Zo4Q1S4bf2sbk";
+  const char* HMAC_KEY = "iR8sPr11YLDR1Ij7bw2ec70YvpJrt3gK";
   const char* NVS_PARTTION = "nvs_ext";
   const char* NAMESPACE_DISPLAY_NAMES = "usrs-dispnms";
   const char* NAMESPACE_HASHES = "usrs-hashes";

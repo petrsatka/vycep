@@ -1,7 +1,9 @@
 #include <Arduino.h>
-#include "ESPAsyncWebSrv.h"
-#include "LittleFS.h"
+#include <ESPAsyncWebSrv.h>
+#include <LittleFS.h>
+#include <time.h>
 #include "Users.h"
+
 AsyncWebServer server(80);
 Users users;
 
@@ -76,6 +78,7 @@ void serverInit() {
 
 void setup() {
   Serial.begin(115200);
+  configTime(0, 0, "pool.ntp.org");
   if (!LittleFS.begin()) {
     Serial.println("An Error has occurred while mounting LittleFS");
     return;
@@ -88,12 +91,18 @@ void setup() {
     return;
   }
 
-  Serial.println(WiFi.localIP().toString());
+  //čekání na NTP. max 5s;
+  struct tm timeInfo;
+  getLocalTime(&timeInfo);
 
+  Serial.println(WiFi.localIP().toString());
   serverInit();
+  Serial.println("Start");
 }
 
 void loop() {
   Serial.println(ESP.getFreeHeap());
+  time_t current = time(nullptr);
+  Serial.print(ctime(&current));
   delay(5000);
 }
