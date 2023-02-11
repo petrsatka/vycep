@@ -21,18 +21,24 @@ void serverInit() {
   server.serveStatic("/login.html", LittleFS, "/www/login.html");
 
   ///TEST
-    server.on("/api/test", HTTP_GET,
+  server.on("/api/test", HTTP_GET,
             [](AsyncWebServerRequest *request) {
-              users.verifyPassword("aaa", "orgojchorchoj");
+              // time_t rawtime;
+              // struct tm *ptm;
+              // time(&rawtime);
+              // ptm = gmtime(&rawtime);
+              // char cookieBase[Users::COOKIE_BUFFER_SIZE] = { 0 };
+              // users.composeCookieBase("xxxxxxxxxxxxxxx", "yyyyyyyyyyyyyyy", UINT_MAX, ptm, cookieBase);
+              // Serial.println(cookieBase);
               request->send(200, "text/plain", "aaa");
-            });  
-    //    server.on("/api/getUser", HTTP_GET,
-    //         [](AsyncWebServerRequest *request) {
-    //           char displayName[15] = {'\0'};
-    //           users.getUserCookie("aaa", displayName);
-    //           request->send(200, "text/plain", displayName);
-    //         })
-    // .setFilter(filterNotLoggetIn);  
+            });
+  //    server.on("/api/getUser", HTTP_GET,
+  //         [](AsyncWebServerRequest *request) {
+  //           char displayName[15] = {'\0'};
+  //           users.getUserCookie("aaa", displayName);
+  //           request->send(200, "text/plain", displayName);
+  //         })
+  // .setFilter(filterNotLoggetIn);
   ///TEST
 
   //Chráněný obsah
@@ -55,7 +61,7 @@ void serverInit() {
             })
     .setFilter(filterNotLoggetIn);
 
-    //Sem ještě někde vrazit filtr podle oprávnění
+  //Sem ještě někde vrazit filtr podle oprávnění
 
   //Částečně chráněný obsah. Co nezaychtí handlery nahoře, projde sem.
   //Api
@@ -102,7 +108,7 @@ void setup() {
 
 void loop() {
   Serial.println(ESP.getFreeHeap());
-  time_t current = time(nullptr);
-  Serial.print(ctime(&current));
+  //time_t current = time(nullptr);
+  //Serial.print(ctime(&current));
   delay(5000);
 }
