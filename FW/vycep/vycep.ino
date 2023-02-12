@@ -2,10 +2,10 @@
 #include <ESPAsyncWebSrv.h>
 #include <LittleFS.h>
 #include <time.h>
-#include "Users.h"
+#include "User.h"
 
 AsyncWebServer server(80);
-Users users;
+User user;
 
 void onNotFound(AsyncWebServerRequest *request) {
   request->send(404);
@@ -23,13 +23,15 @@ void serverInit() {
   ///TEST
   server.on("/api/test", HTTP_GET,
             [](AsyncWebServerRequest *request) {
-              // time_t rawtime;
-              // struct tm *ptm;
-              // time(&rawtime);
-              // ptm = gmtime(&rawtime);
-              // char cookieBase[Users::COOKIE_BUFFER_SIZE] = { 0 };
-              // users.composeCookieBase("xxxxxxxxxxxxxxx", "yyyyyyyyyyyyyyy", UINT_MAX, ptm, cookieBase);
-              // Serial.println(cookieBase);
+              char hexHash[2 * User::HASH_BUFFER_SIZE + 1];
+              char cookieBase[User::COOKIE_BUFFER_SIZE];
+              //users.computeHMAChash("xxx", hash);
+              //users.getPermissionsValidityHash("qwertyuiopasdfg", 4294967295, hash, hexHash);
+              user.composeCookieBase("xxxxxxxxxxxxxxx", "yyyyyyyyyyyyyyy", 4294967295, cookieBase, hexHash);
+              Serial.println(cookieBase);
+              Serial.println(strlen(cookieBase));
+              Serial.println(User::COOKIE_BUFFER_SIZE);
+              Serial.println(hexHash);
               request->send(200, "text/plain", "aaa");
             });
   //    server.on("/api/getUser", HTTP_GET,
@@ -84,7 +86,7 @@ void serverInit() {
 
 void setup() {
   Serial.begin(115200);
-  configTime(0, 0, "pool.ntp.org");
+  configTime(3600, 3600, "pool.ntp.org");
   if (!LittleFS.begin()) {
     Serial.println("An Error has occurred while mounting LittleFS");
     return;
@@ -99,7 +101,9 @@ void setup() {
 
   //čekání na NTP. max 5s;
   struct tm timeInfo;
-  getLocalTime(&timeInfo);
+  if (!getLocalTime(&timeInfo)) {
+    Serial.println("NTP Timeout");
+  }
 
   Serial.println(WiFi.localIP().toString());
   serverInit();
