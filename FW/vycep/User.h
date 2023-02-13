@@ -8,6 +8,12 @@ class User {
 public:
   User();
   ~User();
+  enum CookieVerificationResult {
+    OK = 0,
+    OUT_OF_DATE = 1,
+    INVALID_HASH = 2,
+    INVALID_PERMISSIONS = 3
+  };
 
   static constexpr size_t INT32_CHAR_BUFFER_SIZE = 11;
   static constexpr size_t UTC_TIME_STRING_BUFFER_SIZE = 20;
@@ -24,7 +30,8 @@ public:
   bool verifyPassword(const char* username, const char* password);
   bool setPassword(const char* username, const char* password);
   bool getCookie(const char* username, char* cookie);
-  bool verifyCookie(const char* cookie);
+  bool verifyCookieHash(const char* cookie);
+  CookieVerificationResult verifyCookie(const char* cookie);
   int16_t getUserBill(const char* username);
   bool setUserBill(const char* username, uint16_t bill);
   bool addUserBill(const char* username, uint16_t add, uint16_t& res);
@@ -47,11 +54,11 @@ public:
   TSafePreferences* permissionsStorage = NULL;
   TSafePreferences* billsStorage = NULL;
 
-  void actTime(struct tm &timeInfo);
+  void actTime(struct tm& timeInfo);
   void hexStr(const unsigned char* data, int len, char* buffer);
   int computeHmacHash(const char* message, unsigned char* hash);
   void getPermissionsValidityHash(const char* username, uint32_t permissions, const unsigned char* passwordHash, char* hexHash);
   void composeCookieBase(const char* username, const char* displayname, uint32_t permissions, char* cookieBase, char* hexHash);
-  void composeCookieBase(const char* username, const char* displayname, uint32_t permissions, struct tm &timeInfo, char* cookieBase, char* hexHash);
+  void composeCookieBase(const char* username, const char* displayname, uint32_t permissions, struct tm& timeInfo, char* cookieBase, char* hexHash);
 };
 #endif

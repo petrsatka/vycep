@@ -100,7 +100,7 @@ bool User::getCookie(const char* username, char* cookie) {
   unsigned char passwordHash[HASH_BUFFER_SIZE];
   char cookieBase[COOKIE_BUFFER_SIZE] = { 0 };
   bool res = true;
-  
+
   res = res && displayNamesStorage->getString(username, displayname, USERNAME_BUFFER_SIZE);
   res = res && hashesStorage->getBytes(username, passwordHash, HASH_BUFFER_SIZE);
   if (!res) {
@@ -119,11 +119,24 @@ bool User::getCookie(const char* username, char* cookie) {
   return true;
 }
 
-bool User::verifyCookie(const char* cookie) {
+bool User::verifyCookieHash(const char* cookie) {
+  //OTESTOVAT !!!!
+  short hashPartSize = 2 * (2 * HASH_BUFFER_SIZE + 1);
+  if (!cookie || strlen(cookie) < hashPartSize + 1) {
+    return false;
+  }
+
   unsigned char hash[HASH_BUFFER_SIZE];
-  //computeHMAChash(password, hash);
-  return false;
+  computeHmacHash(&cookie[hashPartSize], hash);
+  char hexHash[2 * HASH_BUFFER_SIZE + 1] = { 0 };
+  hexStr(hash, HASH_BUFFER_SIZE, hexHash);
+  return memcmp(cookie, hexHash, 2 * HASH_BUFFER_SIZE) == 0;
 }
+
+User::CookieVerificationResult User::verifyCookie(const char* cookie) {
+  return CookieVerificationResult::OK;
+}
+
 int16_t User::getUserBill(const char* username) {
   return billsStorage->getUShort(username) > 0;
 }
