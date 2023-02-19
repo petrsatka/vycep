@@ -1,7 +1,7 @@
 #include "User.h"
 
-User::User() {
-  xSemaphore = xSemaphoreCreateMutex();
+User::User(SemaphoreHandle_t xSemaphore) {
+  this->xSemaphore = xSemaphore;
   displayNamesStorage = new TSafePreferences(this->xSemaphore, NAMESPACE_DISPLAY_NAMES, NVS_PARTTION);
   hashesStorage = new TSafePreferences(this->xSemaphore, NAMESPACE_HASHES, NVS_PARTTION);
   permissionsStorage = new TSafePreferences(this->xSemaphore, NAMESPACE_PERMISSIONS, NVS_PARTTION);
@@ -13,7 +13,7 @@ User::~User() {
   delete (hashesStorage);
   delete (permissionsStorage);
   delete (billsStorage);
-  vSemaphoreDelete(xSemaphore);
+  //vSemaphoreDelete(xSemaphore);
 }
 
 void User::actTime(struct tm& timeInfo) {
@@ -24,8 +24,8 @@ void User::actTime(struct tm& timeInfo) {
 
 void User::hexStr(const unsigned char* data, int len, char* buffer) {
   for (int i = 0; i < len; ++i) {
-    buffer[2 * i] = hexmap[(data[i] & 0xF0) >> 4];
-    buffer[2 * i + 1] = hexmap[data[i] & 0x0F];
+    buffer[2 * i] = HEXMAP[(data[i] & 0xF0) >> 4];
+    buffer[2 * i + 1] = HEXMAP[data[i] & 0x0F];
   }
 
   buffer[len * 2] = 0;
@@ -35,8 +35,8 @@ int User::computeHmacHash(const char* message, unsigned char* hash) {
   return mbedtls_md_hmac(mbedtls_md_info_from_type(MBEDTLS_MD_SHA256), (unsigned char*)HMAC_KEY, strlen(HMAC_KEY), (unsigned char*)message, strlen(message), hash);
 }
 
-void User::getPermissionsValidityHash(const char* username, uint32_t permissions, const unsigned char* passwordHash, char* hexHash) {
-  char message[USERNAME_BUFFER_SIZE + INT32_CHAR_BUFFER_SIZE + 2 * HASH_BUFFER_SIZE + 1] = { 0 };
+void User::getPermissionsValidityHexHash(const char* username, uint32_t permissions, const unsigned char* passwordHash, char* hexHash) {
+  char message[USERNAME_BUFFER_SIZE + INT32_CHAR_BUFFER_SIZE + HASH_HEXSTRING_BUFFER_SIZE] = { 0 };
   strcpy(message, username);
   strcat(message, COOKIE_DELIMITER);
   utoa(permissions, &message[strlen(message)], 10);
@@ -61,10 +61,69 @@ void User::composeCookieBase(const char* username, const char* displayname, uint
   strcat(cookieBase, COOKIE_DELIMITER);
   utoa(permissions, &cookieBase[strlen(cookieBase)], 10);
   strcat(cookieBase, COOKIE_DELIMITER);
-  strftime(&cookieBase[strlen(cookieBase)], UTC_TIME_STRING_BUFFER_SIZE, "%Y-%m-%dT%H:%M:%S", &timeInfo);  //2023-02-11T07:37:40
+  strftime(&cookieBase[strlen(cookieBase)], UTC_TIME_STRING_BUFFER_SIZE, COOKIE_DT_FORMAT, &timeInfo);  //2023-02-11T07:37:40
   unsigned char hash[HASH_BUFFER_SIZE];
   computeHmacHash(cookieBase, hash);
   hexStr(hash, HASH_BUFFER_SIZE, hexHash);
+}
+
+bool User::parseCookie(const char* cookie, char* username, char* displayname, uint32_t* permissions, struct tm* timeInfo, char* cookieHexHash, char* permissionsValidityHexHash) {
+  //Otestovat
+  if (cookieHexHash != NULL) {
+    memcpy(cookieHexHash, cookie, HASH_HEXSTRING_BUFFER_SIZE - 1);
+    cookieHexHash[HASH_HEXSTRING_BUFFER_SIZE - 1] = 0;
+  }
+
+  if (permissionsValidityHexHash != NULL) {
+    memcpy(permissionsValidityHexHash, &cookie[HASH_HEXSTRING_BUFFER_SIZE], HASH_HEXSTRING_BUFFER_SIZE - 1);
+    permissionsValidityHexHash[HASH_HEXSTRING_BUFFER_SIZE - 1] = 0;
+  }
+
+  size_t l = strspn(&cookie[2 * HASH_HEXSTRING_BUFFER_SIZE], COOKIE_DELIMITER);
+  if (l == 0) {
+    return false;
+  }
+
+  if (username != NULL) {
+    memcpy(username, cookie, l);
+    username[l] = 0;
+    if (strlen(username) == 0 || strlen(username) > USERNAME_MAX_CHAR_COUNT) {
+      return false;
+    }
+  }
+
+  l = strspn(&cookie[l], COOKIE_DELIMITER);
+  if (l == 0) {
+    return false;
+  }
+
+  if (displayname != NULL) {
+    memcpy(displayname, &cookie[l], l);
+    displayname[l] = 0;
+    if (strlen(displayname) == 0 || strlen(displayname) > USERNAME_MAX_CHAR_COUNT) {
+      return false;
+    }
+  }
+
+  l = strspn(&cookie[l], COOKIE_DELIMITER);
+  if (l == 0) {
+    return false;
+  }
+
+  char* pEnd = NULL;
+  if (permissions != NULL) {
+    *permissions = (uint32_t)strtoul(&cookie[l], &pEnd, 10);
+  }
+
+  if (pEnd == NULL || *pEnd == 0) {
+    return false;
+  }
+
+  if (timeInfo != NULL && strptime(pEnd, COOKIE_DT_FORMAT, timeInfo) == NULL) {
+    return false;
+  }
+
+  return true;
 }
 
 bool User::createUser(const char* username, const char* displayname, const char* password, uint32_t permissions) {
@@ -112,28 +171,108 @@ bool User::getCookie(const char* username, char* cookie) {
   composeCookieBase(username, displayname, permissions, cookieBase, cookie);
   strcat(cookie, COOKIE_DELIMITER);
   //Hash pro ověření změny hesla a práv
-  getPermissionsValidityHash(username, permissions, passwordHash, &cookie[strlen(cookie)]);
+  getPermissionsValidityHexHash(username, permissions, passwordHash, &cookie[strlen(cookie)]);
   strcat(cookie, COOKIE_DELIMITER);
   strcat(cookie, cookieBase);
 
   return true;
 }
+bool User::checkCookieMinimalLength(const char* cookie) {
+  short hashPartSize = 2 * (HASH_HEXSTRING_BUFFER_SIZE);
+  if (cookie == NULL || strlen(cookie) < hashPartSize + 1) {
+    return false;
+  }
+
+  return true;
+}
+
+bool User::verifyPermissionsHash(const char* cookie) {
+  //Otestovat
+  char permissionsValidityHexHash[HASH_HEXSTRING_BUFFER_SIZE] = { 0 };
+  char username[USERNAME_BUFFER_SIZE] = { 0 };
+
+  if (!parseCookie(cookie, username, NULL, NULL, NULL, NULL, permissionsValidityHexHash)) {
+    return false;
+  }
+
+  if (permissionsValidityHexHash == NULL || strlen(permissionsValidityHexHash) != HASH_HEXSTRING_BUFFER_SIZE - 1) {
+    return false;
+  }
+
+  uint32_t permissions = permissionsStorage->getUInt(username, 0);
+  unsigned char passwordHash[HASH_BUFFER_SIZE];
+  if (!hashesStorage->getBytes(username, passwordHash, HASH_BUFFER_SIZE)) {
+    return false;
+  }
+
+  char permHexHash[HASH_HEXSTRING_BUFFER_SIZE] = { 0 };
+  getPermissionsValidityHexHash(username, permissions, passwordHash, permHexHash);
+  return memcmp(permissionsValidityHexHash, permHexHash, HASH_HEXSTRING_BUFFER_SIZE) == 0;
+}
 
 bool User::verifyCookieHash(const char* cookie) {
   //OTESTOVAT !!!!
-  short hashPartSize = 2 * (2 * HASH_BUFFER_SIZE + 1);
-  if (!cookie || strlen(cookie) < hashPartSize + 1) {
+  if (!checkCookieMinimalLength(cookie)) {
     return false;
   }
 
   unsigned char hash[HASH_BUFFER_SIZE];
-  computeHmacHash(&cookie[hashPartSize], hash);
-  char hexHash[2 * HASH_BUFFER_SIZE + 1] = { 0 };
+  computeHmacHash(&cookie[2 * (HASH_HEXSTRING_BUFFER_SIZE)], hash);
+  char hexHash[HASH_HEXSTRING_BUFFER_SIZE] = { 0 };
   hexStr(hash, HASH_BUFFER_SIZE, hexHash);
   return memcmp(cookie, hexHash, 2 * HASH_BUFFER_SIZE) == 0;
 }
 
-User::CookieVerificationResult User::verifyCookie(const char* cookie) {
+bool User::isAuthenticated(const char* cookie) {
+  return verifyCookieHash(cookie);
+}
+
+bool User::isAuthorized(const char* cookie, uint32_t permissionMask) {
+  //otestovat
+  if (!isAuthenticated(cookie)) {
+    return false;
+  }
+
+  if (permissionMask == 0) {
+    return true;
+  }
+
+  uint32_t cookiePermissions = 0;
+  if (!parseCookie(cookie, NULL, NULL, &cookiePermissions, NULL, NULL, NULL)) {
+    return false;
+  }
+
+  return checkPermissions(cookiePermissions, permissionMask);
+}
+
+User::CookieVerificationResult User::getCookieInfo(const char* cookie, char* username, uint32_t* permissions, char* newCookie) {
+  //Otestovat
+  if (!verifyCookieHash(cookie)) {
+    return CookieVerificationResult::INVALID_HASH;
+  }
+
+  struct tm timeInfo;
+  if (!parseCookie(cookie, username, NULL, permissions, &timeInfo, NULL, NULL)) {
+    return CookieVerificationResult::INVALID_FORMAT;
+  }
+
+  time_t now;
+  time(&now);
+  double cookieLifeSeconds = difftime(now, mktime(&timeInfo));
+  if (cookieLifeSeconds > AUTH_TIMEOUT_SEC) {
+    if (!verifyPermissionsHash(cookie)) {
+      return CookieVerificationResult::INVALID_PERMISSIONS;
+    }
+
+    if (newCookie != NULL && username != NULL) {
+      getCookie(username, newCookie);
+    } else {
+      return CookieVerificationResult::UNABLE_TO_REVALIDATE;
+    }
+    //Vystavit nové cookie
+    return CookieVerificationResult::OUT_OF_DATE;
+  }
+
   return CookieVerificationResult::OK;
 }
 

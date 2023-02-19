@@ -5,13 +5,20 @@
 #include "User.h"
 
 AsyncWebServer server(80);
-User user;
+SemaphoreHandle_t xSemaphore = xSemaphoreCreateMutex();
+User user(xSemaphore);
 
 void onNotFound(AsyncWebServerRequest *request) {
   request->send(404);
 }
 
 bool filterNotLoggetIn(AsyncWebServerRequest *request) {
+  int headers = request->headers();
+  int i;
+  for (i = 0; i < headers; i++) {
+    AsyncWebHeader *h = request->getHeader(i);
+    Serial.printf("HEADER[%s]: %s\n", h->name().c_str(), h->value().c_str());
+  }
   return true;
 }
 
@@ -23,17 +30,13 @@ void serverInit() {
   ///TEST
   server.on("/api/test", HTTP_GET,
             [](AsyncWebServerRequest *request) {
-              char hexHash[2 * User::HASH_BUFFER_SIZE + 1];
-              char cookieBase[User::COOKIE_BUFFER_SIZE];
-              //users.computeHMAChash("xxx", hash);
-              //users.getPermissionsValidityHash("qwertyuiopasdfg", 4294967295, hash, hexHash);
-              user.composeCookieBase("xxxxxxxxxxxxxxx", "yyyyyyyyyyyyyyy", 4294967295, cookieBase, hexHash);
-              Serial.println(cookieBase);
-              Serial.println(strlen(cookieBase));
-              Serial.println(User::COOKIE_BUFFER_SIZE);
-              Serial.println(hexHash);
-              request->send(200, "text/plain", "aaa");
-            });
+              ///
+
+              //
+              AsyncWebServerResponse *response = request->beginResponse(200, "text/plain", "xxx");
+              response->addHeader("Set-Cookie:", "testCookie=abcd");
+              request->send(response);
+            }).setFilter(filterNotLoggetIn);
   //    server.on("/api/getUser", HTTP_GET,
   //         [](AsyncWebServerRequest *request) {
   //           char displayName[15] = {'\0'};
