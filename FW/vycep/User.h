@@ -2,7 +2,7 @@
 #define User_h
 #include <Arduino.h>
 #include "TSafePreferences.h"
-#include "mbedtls/md.h"
+#include "Utils.h"
 
 class User {
 public:
@@ -45,8 +45,6 @@ public:
   bool isPermited(const char* username, uint32_t permissionMask);
 
 private:
-  static constexpr const char* HEXMAP = "0123456789abcdef";
-  static constexpr const char* HMAC_KEY = "iR8sPr11YLDR1Ij7bw2ec70YvpJrt3gK";
   static constexpr const char* NVS_PARTTION = "nvs_ext";
   static constexpr const char* NAMESPACE_DISPLAY_NAMES = "usrs-dispnms";
   static constexpr const char* NAMESPACE_HASHES = "usrs-hashes";
@@ -61,9 +59,6 @@ private:
   TSafePreferences* permissionsStorage = NULL;
   TSafePreferences* billsStorage = NULL;
 
-  void actTime(struct tm& timeInfo);
-  void hexStr(const unsigned char* data, int len, char* buffer);
-  int computeHmacHash(const char* message, unsigned char* hash);
   void getPermissionsValidityHexHash(const char* username, uint32_t permissions, const unsigned char* passwordHash, char* hexHash);
   void composeCookieBase(const char* username, const char* displayname, uint32_t permissions, char* cookieBase, char* hexHash);
   void composeCookieBase(const char* username, const char* displayname, uint32_t permissions, struct tm& timeInfo, char* cookieBase, char* hexHash);

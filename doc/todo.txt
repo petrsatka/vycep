@@ -1,2 +1,6 @@
 Nějak rozumě nastavit cache pro js a css
 Otestovat brownout při výsledné konfiguraci. Možná přidat nějaký kondenzátor.
+
+cookies
+Promyslet optimalizace
+Postupně otestovat
