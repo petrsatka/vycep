@@ -30,6 +30,7 @@ public:
   static constexpr uint32_t PERMISSIONS_ADMIN = 0b10;
   static constexpr uint32_t PERMISSIONS_PAYMENT = 0b100;
 
+  bool isUserSet();
   bool createUser(const char* username, const char* displayname, const char* password, uint32_t permissions);
   bool delteUser(const char* username);
   bool verifyPassword(const char* username, const char* password);
@@ -43,6 +44,7 @@ public:
   bool addUserBill(const char* username, uint16_t add, uint16_t& res);
   bool checkPermissions(uint32_t permissions, uint32_t permissionMask);
   bool isPermited(const char* username, uint32_t permissionMask);
+  bool clearAll();
 
 private:
   static constexpr const char* NVS_PARTTION = "nvs_ext";
@@ -50,14 +52,17 @@ private:
   static constexpr const char* NAMESPACE_HASHES = "usrs-hashes";
   static constexpr const char* NAMESPACE_PERMISSIONS = "usrs-perms";
   static constexpr const char* NAMESPACE_BILLS = "usrs-bills";
+  static constexpr const char* NAMESPACE_SETTINGS = "usrs-sets";
   static constexpr const char* COOKIE_DELIMITER = " ";
   static constexpr const char* COOKIE_DT_FORMAT = "%Y-%m-%dT%H:%M:%S";
+  static constexpr const char* KEY_USER_IS_SET = "usr-is-set";
 
   SemaphoreHandle_t xSemaphore = NULL;
   TSafePreferences* displayNamesStorage = NULL;
   TSafePreferences* hashesStorage = NULL;
   TSafePreferences* permissionsStorage = NULL;
   TSafePreferences* billsStorage = NULL;
+  TSafePreferences* settings = NULL;
 
   void getPermissionsValidityHexHash(const char* username, uint32_t permissions, const unsigned char* passwordHash, char* hexHash);
   void composeCookieBase(const char* username, const char* displayname, uint32_t permissions, char* cookieBase, char* hexHash);

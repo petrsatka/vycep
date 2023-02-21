@@ -6,6 +6,7 @@ User::User(SemaphoreHandle_t xSemaphore) {
   hashesStorage = new TSafePreferences(this->xSemaphore, NAMESPACE_HASHES, NVS_PARTTION);
   permissionsStorage = new TSafePreferences(this->xSemaphore, NAMESPACE_PERMISSIONS, NVS_PARTTION);
   billsStorage = new TSafePreferences(this->xSemaphore, NAMESPACE_BILLS, NVS_PARTTION);
+  settings = new TSafePreferences(this->xSemaphore, NAMESPACE_SETTINGS, NVS_PARTTION);
 }
 
 User::~User() {
@@ -13,6 +14,17 @@ User::~User() {
   delete (hashesStorage);
   delete (permissionsStorage);
   delete (billsStorage);
+  delete (settings);
+}
+
+bool User::clearAll() {
+  bool res = true;
+  res = displayNamesStorage->clear() && res;
+  res = hashesStorage->clear() && res;
+  res = permissionsStorage->clear() && res;
+  res = billsStorage->clear() && res;
+  res = settings->clear() && res;
+  return res;
 }
 
 void User::getPermissionsValidityHexHash(const char* username, uint32_t permissions, const unsigned char* passwordHash, char* hexHash) {
@@ -108,11 +120,19 @@ bool User::parseCookie(const char* cookie, char* username, char* displayname, ui
   return true;
 }
 
+bool User::isUserSet() {
+  return settings->getBool(KEY_USER_IS_SET);
+}
+
 bool User::createUser(const char* username, const char* displayname, const char* password, uint32_t permissions) {
   //OTESTOVAT
   unsigned char hash[HASH_BUFFER_SIZE];
   Utils::computeHmacHash(password, hash);
-  return displayNamesStorage->putString(username, displayname) > 0 && hashesStorage->putBytes(username, hash, HASH_BUFFER_SIZE) > 0 && permissionsStorage->putUInt(username, permissions) > 0 && billsStorage->putUShort(username, 0) > 0;
+  return displayNamesStorage->putString(username, displayname) > 0
+         && hashesStorage->putBytes(username, hash, HASH_BUFFER_SIZE) > 0
+         && permissionsStorage->putUInt(username, permissions) > 0
+         && billsStorage->putUShort(username, 0) > 0
+         && settings->putBool(KEY_USER_IS_SET, true);
 }
 
 bool User::delteUser(const char* username) {

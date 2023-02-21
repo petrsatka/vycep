@@ -4,3 +4,5 @@ Otestovat brownout při výsledné konfiguraci. Možná přidat nějaký kondenz
 cookies
 Promyslet optimalizace
 Postupně otestovat
+
+nedovolit smazat všechny uživatele
