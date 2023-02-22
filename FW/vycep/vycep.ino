@@ -8,6 +8,8 @@ AsyncWebServer server(80);
 SemaphoreHandle_t xSemaphore = xSemaphoreCreateMutex();
 User user(xSemaphore);
 
+AsyncStaticWebHandler *firstRegistrationHandler = NULL;
+
 void onNotFound(AsyncWebServerRequest *request) {
   request->send(404);
 }
@@ -25,58 +27,47 @@ bool filterNotLoggetIn(AsyncWebServerRequest *request) {
 void serverInit() {
 
   //Vždy přístupný obsah
+  server.serveStatic("/images/", LittleFS, "/www/images/");
+  server.serveStatic("/scripts/", LittleFS, "/www/scripts/");
+  server.serveStatic("/styles/", LittleFS, "/www/styles/");
   server.serveStatic("/login.html", LittleFS, "/www/login.html");
+  server.serveStatic("/registration.html", LittleFS, "/www/registration.html");
 
-  ///TEST
-  server.on("/api/test", HTTP_GET,
-            [](AsyncWebServerRequest *request) {
-              ///
+  //Pouze pokud nejsou uživatelé
+  //DOPLNIT IF !!!
+  firstRegistrationHandler = &server.serveStatic("/first-registration.html", LittleFS, "/www/first-registration.html");
 
-              //
-              AsyncWebServerResponse *response = request->beginResponse(200, "text/plain", "xxx");
-              response->addHeader("Set-Cookie:", "testCookie=abcd");
-              request->send(response);
-            }).setFilter(filterNotLoggetIn);
-  //    server.on("/api/getUser", HTTP_GET,
-  //         [](AsyncWebServerRequest *request) {
-  //           char displayName[15] = {'\0'};
-  //           users.getUserCookie("aaa", displayName);
-  //           request->send(200, "text/plain", displayName);
-  //         })
-  // .setFilter(filterNotLoggetIn);
-  ///TEST
+  //Po registraci odstranit handler
+  //server.removeHandler(firstRegistrationHandler);
+  //firstRegistrationHandler = NULL;
 
-  //Chráněný obsah
-  //html
-  server.on("/*.html", HTTP_GET,
-            [](AsyncWebServerRequest *request) {
-              request->redirect("/login.html");
-            })
-    .setFilter(filterNotLoggetIn);
-  //defaultDocument
-  server.on("/", HTTP_GET,
-            [](AsyncWebServerRequest *request) {
-              request->redirect("/login.html");
-            })
-    .setFilter(filterNotLoggetIn);
-  //api
-  server.on("/api/*", HTTP_GET,
-            [](AsyncWebServerRequest *request) {
-              request->send(401);
-            })
-    .setFilter(filterNotLoggetIn);
+  //Přihlášený uživatel
+  server.serveStatic("/orders.html", LittleFS, "/www/orders.html");
+  server.serveStatic("/password-change.html", LittleFS, "/www/password-change.html");
 
-  //Sem ještě někde vrazit filtr podle oprávnění
+  //Přihlášený s právy
+  server.serveStatic("/paymen.html", LittleFS, "/www/paymen.html");
 
-  //Částečně chráněný obsah. Co nezaychtí handlery nahoře, projde sem.
-  //Api
-  server.on("/api/heap", HTTP_GET, [](AsyncWebServerRequest *request) {
-    request->send(200, "text/plain", String(ESP.getFreeHeap()));
+  //Admin
+  server.serveStatic("/users.html", LittleFS, "/www/users.html");
+  server.serveStatic("/settings.html", LittleFS, "/www/settings.html");
+
+  //Při pokusu o přístup na HTML, na které nemám práva
+  server.on("/*.html", HTTP_GET, [](AsyncWebServerRequest *request) {
+    request->redirect("/login.html");
   });
 
-  //Statický obsah
-  server.serveStatic("/", LittleFS, "/www/")
-    .setDefaultFile("orders.html");
+  //Default webpage
+  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
+    request->redirect("/orders.html");
+  });
+
+  //ZDE API - rozhodnout se, zda aplikovat filtry, nebo kontrolovat až uvnitř
+    // server.on("/api/heap", HTTP_GET, [](AsyncWebServerRequest *request) {
+  //   request->send(200, "text/plain", String(ESP.getFreeHeap()));
+  // });
+
+  //Ověřit, zda se filtry aplikují až na konec. Tedy že se nebudou zbytečně vyhodnocovat několikrát.
 
   //Fallback
   server.onNotFound(onNotFound);
