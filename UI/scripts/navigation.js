@@ -1,4 +1,4 @@
-import { menuContent } from './menu-content.js';
+import { menuContent } from '../rolespecific/menu-content.js';
 
 (function createNavigation() {
   var path = window.location.pathname;

@@ -22,11 +22,10 @@ bool isAuthenticatedFilter(AsyncWebServerRequest *request) {
 
 bool isAuthorizedAdminFilter(AsyncWebServerRequest *request) {
   Serial.println("IsAdminFilter");
-  return true;
+  return false;
 }
 
 void serverInit() {
-
   //Vždy přístupný obsah
   server.serveStatic("/images/", LittleFS, "/www/images/");
   server.serveStatic("/scripts/", LittleFS, "/www/scripts/");
@@ -36,11 +35,11 @@ void serverInit() {
 
   //Pouze pokud nejsou uživatelé
   if (!user.isUserSet()) {
-    firstRegistrationRedirectHandler = &server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
-      request->redirect("/first-registration.html");
-    });
+    // firstRegistrationRedirectHandler = &server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
+    //   request->redirect("/first-registration.html");
+    // });
 
-    firstRegistrationStaticHandler = &server.serveStatic("/first-registration.html", LittleFS, "/www/first-registration.html");
+    // firstRegistrationStaticHandler = &server.serveStatic("/first-registration.html", LittleFS, "/www/first-registration.html");
 
     //Po registraci odstranit handler
     //server.removeHandler(firstRegistrationRedirectHandler);
@@ -54,6 +53,15 @@ void serverInit() {
     request->redirect("/orders.html");
   });
 
+  //Rozdělení obsahu podle práv
+  server.on("/rolespecific/menu-content.js", HTTP_GET, [](AsyncWebServerRequest *request) {
+    if (isAuthenticatedFilter(request) && isAuthorizedAdminFilter(request)) {
+      request->send(LittleFS, "/www/rolespecific/menu-content-admin.js");
+    } else {
+      request->send(LittleFS, "/www/rolespecific/menu-content.js");
+    }
+  });
+
   //Přihlášený uživatel
   server.serveStatic("/orders.html", LittleFS, "/www/orders.html").setFilter(isAuthenticatedFilter);
   server.serveStatic("/password-change.html", LittleFS, "/www/password-change.html").setFilter(isAuthenticatedFilter);
@@ -64,12 +72,13 @@ void serverInit() {
   //Admin
   server.serveStatic("/users.html", LittleFS, "/www/users.html").setFilter(isAuthenticatedFilter).setFilter(isAuthorizedAdminFilter);
   server.serveStatic("/settings.html", LittleFS, "/www/settings.html").setFilter(isAuthenticatedFilter).setFilter(isAuthorizedAdminFilter);
-  ;
 
   //Při pokusu o přístup na HTML, na které nemám práva
   server.on("/*.html", HTTP_GET, [](AsyncWebServerRequest *request) {
     request->redirect("/login.html");
   });
+
+  //OMEZIT FILTRY - kontrola až uvnitř requestu a pak buď odpověď nebo redirect na login
 
   //ZDE API - kontrouje se až uvnitř
   // server.on("/api/heap", HTTP_GET, [](AsyncWebServerRequest *request) {
