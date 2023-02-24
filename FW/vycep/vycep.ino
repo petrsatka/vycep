@@ -3,27 +3,13 @@
 #include <LittleFS.h>
 #include <time.h>
 #include "User.h"
+#include "Api.h"
 
 AsyncWebServer server(80);
 SemaphoreHandle_t xSemaphore = xSemaphoreCreateMutex();
 User user(xSemaphore);
 
 AsyncCallbackWebHandler *firstRegistrationRedirectHandler = NULL;
-AsyncStaticWebHandler *firstRegistrationStaticHandler = NULL;
-
-void onNotFound(AsyncWebServerRequest *request) {
-  request->send(404);
-}
-
-bool isAuthenticatedFilter(AsyncWebServerRequest *request) {
-  Serial.println("IsAuthenticatedFilter");
-  return true;
-}
-
-bool isAuthorizedAdminFilter(AsyncWebServerRequest *request) {
-  Serial.println("IsAdminFilter");
-  return false;
-}
 
 void serverInit() {
   //Vždy přístupný obsah
@@ -35,17 +21,13 @@ void serverInit() {
 
   //Pouze pokud nejsou uživatelé
   if (!user.isUserSet()) {
-    // firstRegistrationRedirectHandler = &server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
-    //   request->redirect("/first-registration.html");
-    // });
-
-    // firstRegistrationStaticHandler = &server.serveStatic("/first-registration.html", LittleFS, "/www/first-registration.html");
+    firstRegistrationRedirectHandler = &server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
+      request->redirect("/first-registration.html");
+    });
 
     //Po registraci odstranit handler
     //server.removeHandler(firstRegistrationRedirectHandler);
     //firstRegistrationRedirectHandler = NULL;
-    //server.removeHandler(firstRegistrationStaticHandler);
-    //firstRegistrationStaticHandler = NULL;
   }
 
   //Default webpage
@@ -55,40 +37,53 @@ void serverInit() {
 
   //Rozdělení obsahu podle práv
   server.on("/rolespecific/menu-content.js", HTTP_GET, [](AsyncWebServerRequest *request) {
-    if (isAuthenticatedFilter(request) && isAuthorizedAdminFilter(request)) {
+    if (Utils::isAuthorized(request, User::PERMISSIONS_ADMIN)) {
       request->send(LittleFS, "/www/rolespecific/menu-content-admin.js");
     } else {
       request->send(LittleFS, "/www/rolespecific/menu-content.js");
     }
   });
 
+  //Vlastní podmínka místo filtrů - je to efektivnější
   //Přihlášený uživatel
-  server.serveStatic("/orders.html", LittleFS, "/www/orders.html").setFilter(isAuthenticatedFilter);
-  server.serveStatic("/password-change.html", LittleFS, "/www/password-change.html").setFilter(isAuthenticatedFilter);
-
-  //Přihlášený s právy
-  server.serveStatic("/payment.html", LittleFS, "/www/payment.html").setFilter(isAuthenticatedFilter);
-
-  //Admin
-  server.serveStatic("/users.html", LittleFS, "/www/users.html").setFilter(isAuthenticatedFilter).setFilter(isAuthorizedAdminFilter);
-  server.serveStatic("/settings.html", LittleFS, "/www/settings.html").setFilter(isAuthenticatedFilter).setFilter(isAuthorizedAdminFilter);
-
-  //Při pokusu o přístup na HTML, na které nemám práva
-  server.on("/*.html", HTTP_GET, [](AsyncWebServerRequest *request) {
-    request->redirect("/login.html");
+  server.on("/orders.html", HTTP_GET, [](AsyncWebServerRequest *request) {
+    Utils::serveStaticAuth(request, "/www/orders.html", User::PERMISSIONS_ANY_PERMISSIONS);
   });
 
-  //OMEZIT FILTRY - kontrola až uvnitř requestu a pak buď odpověď nebo redirect na login
+  server.on("/payment.html", HTTP_GET, [](AsyncWebServerRequest *request) {
+    Utils::serveStaticAuth(request, "/www/payment.html", User::PERMISSIONS_ANY_PERMISSIONS);
+  });
+
+  server.on("/password-change.html", HTTP_GET, [](AsyncWebServerRequest *request) {
+    Utils::serveStaticAuth(request, "/www/password-change.html", User::PERMISSIONS_ANY_PERMISSIONS);
+  });
+
+  //Admin
+  server.on("/users.html", HTTP_GET, [](AsyncWebServerRequest *request) {
+    Utils::serveStaticAuth(request, "/www/users.html", User::PERMISSIONS_ADMIN);
+  });
+
+  server.on("/settings.html", HTTP_GET, [](AsyncWebServerRequest *request) {
+    Utils::serveStaticAuth(request, "/www/settings.html", User::PERMISSIONS_ADMIN);
+  });
 
   //ZDE API - kontrouje se až uvnitř
-  // server.on("/api/heap", HTTP_GET, [](AsyncWebServerRequest *request) {
-  //   request->send(200, "text/plain", String(ESP.getFreeHeap()));
-  // });
+  server.on("/api/test", HTTP_GET, [](AsyncWebServerRequest *request) {
+    AsyncWebServerResponse *response = request->beginResponse(200, "text/plain", String(ESP.getFreeHeap()));
+    response->addHeader("Set-Cookie", "ESPAUTH=abcd; Path=/");
+    request->send(response);
+  });
 
-  //Ověřit, zda se filtry aplikují až na konec. Tedy že se nebudou zbytečně vyhodnocovat několikrát.
+  server.on("/first-registration.html", HTTP_GET, [](AsyncWebServerRequest *request) {
+    if (user.isUserSet()) {
+      request->redirect("/login.html");
+    } else {
+      request->send(LittleFS, "/www/first-registration.html");
+    }
+  });
 
   //Fallback
-  server.onNotFound(onNotFound);
+  server.onNotFound(Utils::onNotFound);
   //Hlavičky
   DefaultHeaders::Instance().addHeader("Cache-Control", "max-age=0, no-cache, no-store, must-revalidate");
   DefaultHeaders::Instance().addHeader("Pragma", "no-cache");
@@ -127,5 +122,5 @@ void setup() {
 
 void loop() {
   Serial.println(ESP.getFreeHeap());
-  delay(60 * 10000);
+  delay(60 * 1000);
 }

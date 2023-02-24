@@ -73,7 +73,7 @@ bool User::parseCookie(const char* cookie, char* username, char* displayname, ui
     permissionsValidityHexHash[HASH_HEXSTRING_BUFFER_SIZE - 1] = 0;
   }
 
-  size_t l = strspn(&cookie[2 * HASH_HEXSTRING_BUFFER_SIZE], COOKIE_DELIMITER);
+  size_t l = strcspn(&cookie[2 * HASH_HEXSTRING_BUFFER_SIZE], COOKIE_DELIMITER);
   if (l == 0) {
     return false;
   }
@@ -86,7 +86,7 @@ bool User::parseCookie(const char* cookie, char* username, char* displayname, ui
     }
   }
 
-  l = strspn(&cookie[l], COOKIE_DELIMITER);
+  l = strcspn(&cookie[l], COOKIE_DELIMITER);
   if (l == 0) {
     return false;
   }
@@ -99,7 +99,7 @@ bool User::parseCookie(const char* cookie, char* username, char* displayname, ui
     }
   }
 
-  l = strspn(&cookie[l], COOKIE_DELIMITER);
+  l = strcspn(&cookie[l], COOKIE_DELIMITER);
   if (l == 0) {
     return false;
   }
@@ -174,7 +174,7 @@ bool User::getCookie(const char* username, char* cookie) {
   }
 
   uint32_t permissions = permissionsStorage->getUInt(username, 0);
-  //Hash pro ověření cookie
+  //Hash pro ověření cookie a cookie
   composeCookieBase(username, displayname, permissions, cookieBase, cookie);
   strcat(cookie, COOKIE_DELIMITER);
   //Hash pro ověření změny hesla a práv

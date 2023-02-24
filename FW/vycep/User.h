@@ -25,10 +25,14 @@ public:
   static constexpr size_t HASH_BUFFER_SIZE = 32;
   static constexpr size_t HASH_HEXSTRING_BUFFER_SIZE = 2 * HASH_BUFFER_SIZE + 1;
   static constexpr size_t COOKIE_BUFFER_SIZE = 2 * USERNAME_BUFFER_SIZE + INT32_CHAR_BUFFER_SIZE + UTC_TIME_STRING_BUFFER_SIZE + 2 * HASH_HEXSTRING_BUFFER_SIZE;
-  static constexpr uint32_t PERMISSIONS_NO_PERMISSIONS = 0;
+  static constexpr uint32_t PERMISSIONS_ANY_PERMISSIONS = 0;
   static constexpr uint32_t PERMISSIONS_ACTIVE = 0b1;
   static constexpr uint32_t PERMISSIONS_ADMIN = 0b10;
   static constexpr uint32_t PERMISSIONS_PAYMENT = 0b100;
+
+  static bool isAuthenticated(const char* cookie);
+  static bool isAuthorized(const char* cookie, uint32_t permissionMask);
+  static bool checkPermissions(uint32_t permissions, uint32_t permissionMask);
 
   bool isUserSet();
   bool createUser(const char* username, const char* displayname, const char* password, uint32_t permissions);
@@ -36,13 +40,10 @@ public:
   bool verifyPassword(const char* username, const char* password);
   bool setPassword(const char* username, const char* password);
   bool getCookie(const char* username, char* cookie);
-  bool isAuthenticated(const char* cookie);
-  bool isAuthorized(const char* cookie, uint32_t permissionMask);
   CookieVerificationResult getCookieInfo(const char* cookie, char* username, uint32_t* permissions, char* newCookie);
   int16_t getUserBill(const char* username);
   bool setUserBill(const char* username, uint16_t bill);
   bool addUserBill(const char* username, uint16_t add, uint16_t& res);
-  bool checkPermissions(uint32_t permissions, uint32_t permissionMask);
   bool isPermited(const char* username, uint32_t permissionMask);
   bool clearAll();
 
@@ -64,12 +65,13 @@ private:
   TSafePreferences* billsStorage = NULL;
   TSafePreferences* settings = NULL;
 
+  static bool verifyCookieHash(const char* cookie);
+  static bool checkCookieMinimalLength(const char* cookie);
+  static bool parseCookie(const char* cookie, char* username, char* displayname, uint32_t* permissions, struct tm* timeInfo, char* cookieHexHash, char* permissionsValidityHexHash);
+  static void composeCookieBase(const char* username, const char* displayname, uint32_t permissions, char* cookieBase, char* hexHash);
+  static void composeCookieBase(const char* username, const char* displayname, uint32_t permissions, struct tm& timeInfo, char* cookieBase, char* hexHash);
+
   void getPermissionsValidityHexHash(const char* username, uint32_t permissions, const unsigned char* passwordHash, char* hexHash);
-  void composeCookieBase(const char* username, const char* displayname, uint32_t permissions, char* cookieBase, char* hexHash);
-  void composeCookieBase(const char* username, const char* displayname, uint32_t permissions, struct tm& timeInfo, char* cookieBase, char* hexHash);
   bool verifyPermissionsHash(const char* cookie);
-  bool verifyCookieHash(const char* cookie);
-  bool parseCookie(const char* cookie, char* username, char* displayname, uint32_t* permissions, struct tm* timeInfo, char* cookieHexHash, char* permissionsValidityHexHash);
-  bool checkCookieMinimalLength(const char* cookie);
 };
 #endif

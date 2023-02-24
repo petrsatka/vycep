@@ -3,7 +3,7 @@
 /*
   Sdružuje výpisy notifikací a chyb.
 */
-let notify = {};
+var notify = {};
 /*
   Vypíše chybu do okna.
 */
@@ -64,7 +64,7 @@ notify.message = function(message, error = false, timeout = 0) {
 /*
   Volání zařízení - nejnižší vrstva
 */
-let api = {};
+var api = {};
 
 /*
   Vytvoření administrátorského účtu.
@@ -377,7 +377,7 @@ api.connect = function(ssid, securityKey, callback) {
 /*
 Správa cookies
 */
-let cookies = {};
+var cookies = {};
 
 /*
 Vrátí jmnéno aktuálně přihlášeného uživatele
@@ -390,7 +390,7 @@ cookies.getUsername = function() {
   Vrstva nad voláním api
   Řeší validaci vstupů a obsluhu chyb
 */
-let gui = {};
+var gui = {};
 
 /*
   Přechod na jinou stránku
@@ -856,17 +856,17 @@ gui.resetDefaultValues = function() {
 }
 
 ///////////Metody jednotlivých stránek. Získají vstupní hodnoty a volají metody gui//////////////////////////
-let firstRegistration = {};
+var firstRegistration = {};
 firstRegistration.createAdmin = function() {
   gui.createAdmin($('#name').val(), $('#password').val(), $('#password-verification').val(), 'settings.html');
 }
 
-let registration = {};
+var registration = {};
   registration.createUser = function() {
   gui.createUser($('#name').val(), $('#password').val(), $('#password-verification').val(), 'orders.html');
 }
 
-let login = {};
+var login = {};
 login.login = function() {
   gui.login($('#name').val(), $('#password').val(), 'orders.html');
 }
@@ -875,7 +875,7 @@ login.logout = function() {
   gui.logout('login.html');
 }
 
-let passwordChange = {};
+var passwordChange = {};
 passwordChange.clearValues = function() {
    gui.clearSensitiveInputs();
 }
@@ -890,7 +890,7 @@ passwordChange.cancel = function() {
   gui.navigateToReferrer();
 }
 
-let orders = {};
+var orders = {};
 orders.loadQCount = function() {
   gui.loadValue(api.getQueueCount, "#q-count");
 }
@@ -916,7 +916,7 @@ orders.onPageShow = function() {
   orders.loadValues();
 }
 
-let payment = {};
+var payment = {};
 payment.setCountValue = function(count) {
   $("#count").val(count || 0);  
 }
@@ -972,7 +972,7 @@ payment.onPageShow = function() {
   payment.loadValues();
 }
 
-let users = {}
+var users = {}
 users.generateCheckboxCell = function(item, propertyName) {
   return `<td> <input ${item[propertyName+'CheckboxEnabled'] ? '' : 'disabled'} type="checkbox" onchange="users.handleCheckboxChange('${item.username}', '${propertyName}', event)" ${item[propertyName] ? ' checked' : ''}> </td>`;
 }
@@ -1102,7 +1102,7 @@ users.onPageShow = function() {
   users.loadAllowPayment();
 }
 
-let settings = {};
+var settings = {};
 
 settings.loadNetworkInfo = function() {
   gui.loadValue(api.getGateway, '#gateway');
