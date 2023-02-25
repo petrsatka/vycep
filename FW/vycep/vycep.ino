@@ -8,6 +8,7 @@
 AsyncWebServer server(80);
 SemaphoreHandle_t xSemaphore = xSemaphoreCreateMutex();
 User user(xSemaphore);
+Api api(user);
 
 AsyncCallbackWebHandler *firstRegistrationRedirectHandler = NULL;
 
@@ -37,41 +38,87 @@ void serverInit() {
 
   //Rozdělení obsahu podle práv
   server.on("/rolespecific/menu-content.js", HTTP_GET, [](AsyncWebServerRequest *request) {
-    if (Utils::isAuthorized(request, User::PERMISSIONS_ADMIN)) {
-      request->send(LittleFS, "/www/rolespecific/menu-content-admin.js");
-    } else {
-      request->send(LittleFS, "/www/rolespecific/menu-content.js");
-    }
+    api.serveAuth(
+    request, User::PERMISSIONS_ADMIN, [request]() {
+      return request->beginResponse(LittleFS, "/www/rolespecific/menu-content-admin.js");
+    },[request]() {
+      return request->beginResponse(LittleFS, "/www/rolespecific/menu-content.js");
+    },
+    [request]() {
+      request->send(401);
+    });
   });
 
   //Vlastní podmínka místo filtrů - je to efektivnější
   //Přihlášený uživatel
   server.on("/orders.html", HTTP_GET, [](AsyncWebServerRequest *request) {
-    Utils::serveStaticAuth(request, "/www/orders.html", User::PERMISSIONS_ANY_PERMISSIONS);
+    api.serveStaticAuth(request, "/www/orders.html", User::PERMISSIONS_ANY_PERMISSIONS);
   });
 
   server.on("/payment.html", HTTP_GET, [](AsyncWebServerRequest *request) {
-    Utils::serveStaticAuth(request, "/www/payment.html", User::PERMISSIONS_ANY_PERMISSIONS);
+    api.serveStaticAuth(request, "/www/payment.html", User::PERMISSIONS_ANY_PERMISSIONS);
   });
 
   server.on("/password-change.html", HTTP_GET, [](AsyncWebServerRequest *request) {
-    Utils::serveStaticAuth(request, "/www/password-change.html", User::PERMISSIONS_ANY_PERMISSIONS);
+    api.serveStaticAuth(request, "/www/password-change.html", User::PERMISSIONS_ANY_PERMISSIONS);
   });
 
   //Admin
   server.on("/users.html", HTTP_GET, [](AsyncWebServerRequest *request) {
-    Utils::serveStaticAuth(request, "/www/users.html", User::PERMISSIONS_ADMIN);
+    api.serveStaticAuth(request, "/www/users.html", User::PERMISSIONS_ADMIN);
   });
 
   server.on("/settings.html", HTTP_GET, [](AsyncWebServerRequest *request) {
-    Utils::serveStaticAuth(request, "/www/settings.html", User::PERMISSIONS_ADMIN);
+    api.serveStaticAuth(request, "/www/settings.html", User::PERMISSIONS_ADMIN);
   });
 
   //ZDE API - kontrouje se až uvnitř
-  server.on("/api/test", HTTP_GET, [](AsyncWebServerRequest *request) {
-    AsyncWebServerResponse *response = request->beginResponse(200, "text/plain", String(ESP.getFreeHeap()));
-    response->addHeader("Set-Cookie", "ESPAUTH=abcd; Path=/");
-    request->send(response);
+  server.on("/api/createAdmin", HTTP_POST, [](AsyncWebServerRequest *request) {
+    api.createAdmin(request);
+  });
+
+  server.on("/api/createUser", HTTP_POST, [](AsyncWebServerRequest *request) {
+    api.createUser(request);
+  });
+
+  server.on("/api/changePassword", HTTP_POST, [](AsyncWebServerRequest *request) {
+    api.changePassword(request);
+  });
+
+  server.on("/api/getBillCount", HTTP_POST, [](AsyncWebServerRequest *request) {
+    api.getBillCount(request);
+  });
+
+  server.on("/api/getQueueCount", HTTP_POST, [](AsyncWebServerRequest *request) {
+    api.getQueueCount(request);
+  });
+
+  server.on("/api/getUserBillCount", HTTP_POST, [](AsyncWebServerRequest *request) {
+    api.getUserBillCount(request);
+  });
+
+  server.on("/api/loadUsers", HTTP_POST, [](AsyncWebServerRequest *request) {
+    api.loadUsers(request);
+  });
+
+  server.on("/api/login", HTTP_POST, [](AsyncWebServerRequest *request) {
+    api.login(request);
+  });
+
+  server.on("/api/logout", HTTP_POST, [](AsyncWebServerRequest *request) {
+    api.logout(request);
+  });
+
+  server.on("/api/pay", HTTP_POST, [](AsyncWebServerRequest *request) {
+    api.pay(request);
+  });
+
+  server.on("/api/payForUser", HTTP_POST, [](AsyncWebServerRequest *request) {
+    api.payForUser(request);
+  });
+
+  server.on("/api/makeOrder", HTTP_POST, [](AsyncWebServerRequest *request) {
+    api.makeOrder(request);
   });
 
   server.on("/first-registration.html", HTTP_GET, [](AsyncWebServerRequest *request) {
@@ -83,7 +130,7 @@ void serverInit() {
   });
 
   //Fallback
-  server.onNotFound(Utils::onNotFound);
+  server.onNotFound(Api::onNotFound);
   //Hlavičky
   DefaultHeaders::Instance().addHeader("Cache-Control", "max-age=0, no-cache, no-store, must-revalidate");
   DefaultHeaders::Instance().addHeader("Pragma", "no-cache");

@@ -2,7 +2,6 @@
 
 User::User(SemaphoreHandle_t xSemaphore) {
   this->xSemaphore = xSemaphore;
-  displayNamesStorage = new TSafePreferences(this->xSemaphore, NAMESPACE_DISPLAY_NAMES, NVS_PARTTION);
   hashesStorage = new TSafePreferences(this->xSemaphore, NAMESPACE_HASHES, NVS_PARTTION);
   permissionsStorage = new TSafePreferences(this->xSemaphore, NAMESPACE_PERMISSIONS, NVS_PARTTION);
   billsStorage = new TSafePreferences(this->xSemaphore, NAMESPACE_BILLS, NVS_PARTTION);
@@ -10,7 +9,6 @@ User::User(SemaphoreHandle_t xSemaphore) {
 }
 
 User::~User() {
-  delete (displayNamesStorage);
   delete (hashesStorage);
   delete (permissionsStorage);
   delete (billsStorage);
@@ -19,7 +17,6 @@ User::~User() {
 
 bool User::clearAll() {
   bool res = true;
-  res = displayNamesStorage->clear() && res;
   res = hashesStorage->clear() && res;
   res = permissionsStorage->clear() && res;
   res = billsStorage->clear() && res;
@@ -40,18 +37,16 @@ void User::getPermissionsValidityHexHash(const char* username, uint32_t permissi
   Utils::hexStr(hash, HASH_BUFFER_SIZE, hexHash);
 }
 
-void User::composeCookieBase(const char* username, const char* displayname, uint32_t permissions, char* cookieBase, char* hexHash) {
+void User::composeCookieBase(const char* username, uint32_t permissions, char* cookieBase, char* hexHash) {
   //OTESTOVAT
   struct tm timeInfo;
   Utils::actTime(timeInfo);
-  composeCookieBase(username, displayname, permissions, timeInfo, cookieBase, hexHash);
+  composeCookieBase(username, permissions, timeInfo, cookieBase, hexHash);
 }
 
-void User::composeCookieBase(const char* username, const char* displayname, uint32_t permissions, struct tm& timeInfo, char* cookieBase, char* hexHash) {
+void User::composeCookieBase(const char* username, uint32_t permissions, struct tm& timeInfo, char* cookieBase, char* hexHash) {
   //OTESTOVAT
   strcpy(cookieBase, username);
-  Utils::appendChar(cookieBase, COOKIE_DELIMITER);
-  strcat(cookieBase, displayname);
   Utils::appendChar(cookieBase, COOKIE_DELIMITER);
   utoa(permissions, &cookieBase[strlen(cookieBase)], 10);
   Utils::appendChar(cookieBase, COOKIE_DELIMITER);
@@ -61,7 +56,7 @@ void User::composeCookieBase(const char* username, const char* displayname, uint
   Utils::hexStr(hash, HASH_BUFFER_SIZE, hexHash);
 }
 
-bool User::parseCookie(const char* cookie, char* username, char* displayname, uint32_t* permissions, struct tm* timeInfo, char* cookieHexHash, char* permissionsValidityHexHash) {
+bool User::parseCookie(const char* cookie, char* username, uint32_t* permissions, struct tm* timeInfo, char* cookieHexHash, char* permissionsValidityHexHash) {
   //OTESTOVAT
   if (cookieHexHash != NULL) {
     memcpy(cookieHexHash, cookie, HASH_HEXSTRING_BUFFER_SIZE - 1);
@@ -92,20 +87,6 @@ bool User::parseCookie(const char* cookie, char* username, char* displayname, ui
     return false;
   }
 
-  if (displayname != NULL) {
-    memcpy(displayname, lastStartPos, pos - lastStartPos);
-    displayname[pos - lastStartPos] = 0;
-    if (strlen(displayname) == 0 || strlen(displayname) > USERNAME_MAX_CHAR_COUNT) {
-      return false;
-    }
-  }
-
-  lastStartPos = pos + 1;
-  pos = strchr(lastStartPos, COOKIE_DELIMITER);
-  if (pos == NULL) {
-    return false;
-  }
-
   char* pEnd = NULL;
   if (permissions != NULL) {
     *permissions = (uint32_t)strtoul(lastStartPos, &pEnd, 10);
@@ -126,12 +107,11 @@ bool User::isUserSet() {
   return settings->getBool(KEY_USER_IS_SET);
 }
 
-bool User::createUser(const char* username, const char* displayname, const char* password, uint32_t permissions) {
+bool User::createUser(const char* username, const char* password, uint32_t permissions) {
   //OTESTOVAT
   unsigned char hash[HASH_BUFFER_SIZE];
   Utils::computeHmacHash(password, hash);
-  return displayNamesStorage->putString(username, displayname) > 0
-         && hashesStorage->putBytes(username, hash, HASH_BUFFER_SIZE) > 0
+  return hashesStorage->putBytes(username, hash, HASH_BUFFER_SIZE) > 0
          && permissionsStorage->putUInt(username, permissions) > 0
          && billsStorage->putUShort(username, 0) > 0
          && settings->putBool(KEY_USER_IS_SET, true);
@@ -139,8 +119,7 @@ bool User::createUser(const char* username, const char* displayname, const char*
 
 bool User::delteUser(const char* username) {
   //OTESTOVAT
-  bool res = displayNamesStorage->remove(username);
-  res = hashesStorage->remove(username) && res;
+  bool res = hashesStorage->remove(username) && res;
   res = permissionsStorage->remove(username) && res;
   res = billsStorage->remove(username);
   return res;
@@ -162,14 +141,11 @@ bool User::setPassword(const char* username, const char* password) {
   return hashesStorage->putBytes(username, hash, HASH_BUFFER_SIZE);
 }
 
-bool User::getCookie(const char* username, char* cookie) {
+bool User::getNewCookie(const char* username, char* cookie) {
   //OTESTOVAT
-  char displayname[USERNAME_BUFFER_SIZE] = { 0 };
   unsigned char passwordHash[HASH_BUFFER_SIZE];
   char cookieBase[COOKIE_BUFFER_SIZE] = { 0 };
   bool res = true;
-
-  res = res && displayNamesStorage->getString(username, displayname, USERNAME_BUFFER_SIZE);
   res = res && hashesStorage->getBytes(username, passwordHash, HASH_BUFFER_SIZE);
   if (!res) {
     return false;
@@ -177,7 +153,7 @@ bool User::getCookie(const char* username, char* cookie) {
 
   uint32_t permissions = permissionsStorage->getUInt(username, 0);
   //Hash pro ověření cookie a cookie
-  composeCookieBase(username, displayname, permissions, cookieBase, cookie);
+  composeCookieBase(username, permissions, cookieBase, cookie);
   Utils::appendChar(cookie, COOKIE_DELIMITER);
   //Hash pro ověření změny hesla a práv
   getPermissionsValidityHexHash(username, permissions, passwordHash, &cookie[strlen(cookie)]);
@@ -202,7 +178,7 @@ bool User::verifyPermissionsHash(const char* cookie) {
   char permissionsValidityHexHash[HASH_HEXSTRING_BUFFER_SIZE] = { 0 };
   char username[USERNAME_BUFFER_SIZE] = { 0 };
 
-  if (!parseCookie(cookie, username, NULL, NULL, NULL, NULL, permissionsValidityHexHash)) {
+  if (!parseCookie(cookie, username, NULL, NULL, NULL, permissionsValidityHexHash)) {
     return false;
   }
 
@@ -234,28 +210,28 @@ bool User::verifyCookieHash(const char* cookie) {
   return memcmp(cookie, hexHash, 2 * HASH_BUFFER_SIZE) == 0;
 }
 
-bool User::isAuthenticated(const char* cookie) {
-  //OTESTOVAT
-  return verifyCookieHash(cookie);
-}
+// bool User::isAuthenticated(const char* cookie) {
+//   //OTESTOVAT
+//   return verifyCookieHash(cookie);
+// }
 
-bool User::isAuthorized(const char* cookie, uint32_t permissionMask) {
-  //OTESTOVAT
-  if (!isAuthenticated(cookie)) {
-    return false;
-  }
+// bool User::isAuthorized(const char* cookie, uint32_t permissionMask) {
+//   //OTESTOVAT
+//   if (!isAuthenticated(cookie)) {
+//     return false;
+//   }
 
-  if (permissionMask == 0) {
-    return true;
-  }
+//   if (permissionMask == 0) {
+//     return true;
+//   }
 
-  uint32_t cookiePermissions = 0;
-  if (!parseCookie(cookie, NULL, NULL, &cookiePermissions, NULL, NULL, NULL)) {
-    return false;
-  }
+//   uint32_t cookiePermissions = 0;
+//   if (!parseCookie(cookie, NULL, NULL, &cookiePermissions, NULL, NULL, NULL)) {
+//     return false;
+//   }
 
-  return checkPermissions(cookiePermissions, permissionMask);
-}
+//   return checkPermissions(cookiePermissions, permissionMask);
+// }
 
 User::CookieVerificationResult User::getCookieInfo(const char* cookie, char* username, uint32_t* permissions, char* newCookie) {
   //OTESTOVAT
@@ -264,7 +240,7 @@ User::CookieVerificationResult User::getCookieInfo(const char* cookie, char* use
   }
 
   struct tm timeInfo;
-  if (!parseCookie(cookie, username, NULL, permissions, &timeInfo, NULL, NULL)) {
+  if (!parseCookie(cookie, username, permissions, &timeInfo, NULL, NULL)) {
     return CookieVerificationResult::INVALID_FORMAT;
   }
 
@@ -277,12 +253,13 @@ User::CookieVerificationResult User::getCookieInfo(const char* cookie, char* use
     }
 
     if (newCookie != NULL && username != NULL) {
-      getCookie(username, newCookie);
-    } else {
-      return CookieVerificationResult::UNABLE_TO_REVALIDATE;
+      if (getNewCookie(username, newCookie)) {
+        //Vystaveno nové cookie
+        return CookieVerificationResult::OUT_OF_DATE_REVALIDATED;
+      }
     }
-    //Vystavit nové cookie
-    return CookieVerificationResult::OUT_OF_DATE;
+
+    return CookieVerificationResult::OUT_OF_DATE_UNABLE_TO_REVALIDATE;
   }
 
   return CookieVerificationResult::OK;
@@ -308,7 +285,7 @@ bool User::checkPermissions(uint32_t permissions, uint32_t permissionMask) {
   return permissions & permissionMask;
 }
 
-bool User::isPermited(const char* username, uint32_t permissionMask) {
-  //OTESTOVAT
-  return checkPermissions(permissionsStorage->getUInt(username), permissionMask);
-}
+// bool User::isPermited(const char* username, uint32_t permissionMask) {
+//   //OTESTOVAT
+//   return checkPermissions(permissionsStorage->getUInt(username), permissionMask);
+// }
