@@ -54,9 +54,9 @@ private:
   static constexpr const char* NAMESPACE_PERMISSIONS = "usrs-perms";
   static constexpr const char* NAMESPACE_BILLS = "usrs-bills";
   static constexpr const char* NAMESPACE_SETTINGS = "usrs-sets";
-  static constexpr const char* COOKIE_DELIMITER = " ";
   static constexpr const char* COOKIE_DT_FORMAT = "%Y-%m-%dT%H:%M:%S";
   static constexpr const char* KEY_USER_IS_SET = "usr-is-set";
+  static constexpr const char COOKIE_DELIMITER = ' ';
 
   SemaphoreHandle_t xSemaphore = NULL;
   TSafePreferences* displayNamesStorage = NULL;
@@ -67,6 +67,7 @@ private:
 
   static bool verifyCookieHash(const char* cookie);
   static bool checkCookieMinimalLength(const char* cookie);
+  //!!!DOŘEŠIT KOREKTNÍ VYHEDÁVÁNÍ ODDĚLOVAČE
   static bool parseCookie(const char* cookie, char* username, char* displayname, uint32_t* permissions, struct tm* timeInfo, char* cookieHexHash, char* permissionsValidityHexHash);
   static void composeCookieBase(const char* username, const char* displayname, uint32_t permissions, char* cookieBase, char* hexHash);
   static void composeCookieBase(const char* username, const char* displayname, uint32_t permissions, struct tm& timeInfo, char* cookieBase, char* hexHash);

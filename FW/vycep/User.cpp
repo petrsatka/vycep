@@ -31,9 +31,9 @@ void User::getPermissionsValidityHexHash(const char* username, uint32_t permissi
   //OTESTOVAT
   char message[USERNAME_BUFFER_SIZE + INT32_CHAR_BUFFER_SIZE + HASH_HEXSTRING_BUFFER_SIZE] = { 0 };
   strcpy(message, username);
-  strcat(message, COOKIE_DELIMITER);
+  Utils::appendChar(message, COOKIE_DELIMITER);
   utoa(permissions, &message[strlen(message)], 10);
-  strcat(message, COOKIE_DELIMITER);
+  Utils::appendChar(message, COOKIE_DELIMITER);
   Utils::hexStr(passwordHash, HASH_BUFFER_SIZE, &message[strlen(message)]);
   unsigned char hash[HASH_BUFFER_SIZE];
   Utils::computeHmacHash(message, hash);
@@ -50,11 +50,11 @@ void User::composeCookieBase(const char* username, const char* displayname, uint
 void User::composeCookieBase(const char* username, const char* displayname, uint32_t permissions, struct tm& timeInfo, char* cookieBase, char* hexHash) {
   //OTESTOVAT
   strcpy(cookieBase, username);
-  strcat(cookieBase, COOKIE_DELIMITER);
+  Utils::appendChar(cookieBase, COOKIE_DELIMITER);
   strcat(cookieBase, displayname);
-  strcat(cookieBase, COOKIE_DELIMITER);
+  Utils::appendChar(cookieBase, COOKIE_DELIMITER);
   utoa(permissions, &cookieBase[strlen(cookieBase)], 10);
-  strcat(cookieBase, COOKIE_DELIMITER);
+  Utils::appendChar(cookieBase, COOKIE_DELIMITER);
   strftime(&cookieBase[strlen(cookieBase)], UTC_TIME_STRING_BUFFER_SIZE, COOKIE_DT_FORMAT, &timeInfo);  //2023-02-11T07:37:40
   unsigned char hash[HASH_BUFFER_SIZE];
   Utils::computeHmacHash(cookieBase, hash);
@@ -72,41 +72,43 @@ bool User::parseCookie(const char* cookie, char* username, char* displayname, ui
     memcpy(permissionsValidityHexHash, &cookie[HASH_HEXSTRING_BUFFER_SIZE], HASH_HEXSTRING_BUFFER_SIZE - 1);
     permissionsValidityHexHash[HASH_HEXSTRING_BUFFER_SIZE - 1] = 0;
   }
-
-  size_t l = strcspn(&cookie[2 * HASH_HEXSTRING_BUFFER_SIZE], COOKIE_DELIMITER);
-  if (l == 0) {
+  const char* lastStartPos = &cookie[2 * HASH_HEXSTRING_BUFFER_SIZE];
+  char* pos = strchr(lastStartPos, COOKIE_DELIMITER);
+  if (pos == NULL) {
     return false;
   }
 
   if (username != NULL) {
-    memcpy(username, cookie, l);
-    username[l] = 0;
+    memcpy(username, lastStartPos, pos - lastStartPos);
+    username[pos - lastStartPos] = 0;
     if (strlen(username) == 0 || strlen(username) > USERNAME_MAX_CHAR_COUNT) {
       return false;
     }
   }
 
-  l = strcspn(&cookie[l], COOKIE_DELIMITER);
-  if (l == 0) {
+  lastStartPos = pos + 1;
+  pos = strchr(lastStartPos, COOKIE_DELIMITER);
+  if (pos == NULL) {
     return false;
   }
 
   if (displayname != NULL) {
-    memcpy(displayname, &cookie[l], l);
-    displayname[l] = 0;
+    memcpy(displayname, lastStartPos, pos - lastStartPos);
+    displayname[pos - lastStartPos] = 0;
     if (strlen(displayname) == 0 || strlen(displayname) > USERNAME_MAX_CHAR_COUNT) {
       return false;
     }
   }
 
-  l = strcspn(&cookie[l], COOKIE_DELIMITER);
-  if (l == 0) {
+  lastStartPos = pos + 1;
+  pos = strchr(lastStartPos, COOKIE_DELIMITER);
+  if (pos == NULL) {
     return false;
   }
 
   char* pEnd = NULL;
   if (permissions != NULL) {
-    *permissions = (uint32_t)strtoul(&cookie[l], &pEnd, 10);
+    *permissions = (uint32_t)strtoul(lastStartPos, &pEnd, 10);
   }
 
   if (pEnd == NULL || *pEnd == 0) {
@@ -176,10 +178,10 @@ bool User::getCookie(const char* username, char* cookie) {
   uint32_t permissions = permissionsStorage->getUInt(username, 0);
   //Hash pro ověření cookie a cookie
   composeCookieBase(username, displayname, permissions, cookieBase, cookie);
-  strcat(cookie, COOKIE_DELIMITER);
+  Utils::appendChar(cookie, COOKIE_DELIMITER);
   //Hash pro ověření změny hesla a práv
   getPermissionsValidityHexHash(username, permissions, passwordHash, &cookie[strlen(cookie)]);
-  strcat(cookie, COOKIE_DELIMITER);
+  Utils::appendChar(cookie, COOKIE_DELIMITER);
   strcat(cookie, cookieBase);
 
   return true;
