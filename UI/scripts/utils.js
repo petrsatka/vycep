@@ -65,6 +65,33 @@ notify.message = function(message, error = false, timeout = 0) {
   Volání zařízení - nejnižší vrstva
 */
 let api = {};
+api.parseResponseData = function (data) {
+  if (data) {
+    return text.split("&");
+  }
+  
+  return [];
+}
+
+api.post = function(url, reqData, callback) {
+  $.ajax({
+    method: "POST",
+    url: url,
+    data:reqData,
+    success: function(data, textStatus, xhr) {
+        callback(data, null)
+    },
+    error: function(xhr, textStatus, errorText) {
+         callback(null, errorText)
+    }, 
+    statusCode: {
+      401: function() {
+      //Otestovat
+        gui.navigate("login.html");
+      }
+    }
+  });
+}
 
 /*
   Vytvoření administrátorského účtu.
@@ -79,7 +106,11 @@ api.createAdmin = function(username, password, callback) {
   //Test neplatné návratové hodnty
   //setTimeout(() => callback(null, null, "500 - bad request"), 1000);
   //setTimeout(() => callback(username,"user_exists", null), 1000);
-  setTimeout(() => callback(username,"ok", null), 1000);
+  //setTimeout(() => callback(username,"ok", null), 1000);
+  api.post("/api/createAdmin", {username: username, password: password}, (resData, errorText) => {
+    var results = api.parseResponseData(resData, errorText);
+    callback(results[1], results[0], errorText);
+  })
 }
 
 /*
@@ -513,8 +544,8 @@ gui.setInProgress = function(inProgress) {
   Vytvoření administrátorského účtu
 */
 gui.createAdmin = function(username, password, passwordVerification, navigationTarget) {
-  gui.validateUsername(username) &&
-  gui.validatePassword(password) &&
+  //gui.validateUsername(username) &&
+  //gui.validatePassword(password) &&
   gui.verifyPassword(password, passwordVerification) &&
   gui.setInProgress(true) &&
   api.createAdmin(username, password, (result, resultCode, errorMessage) => {
