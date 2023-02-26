@@ -8,7 +8,7 @@ class User {
 public:
   User(SemaphoreHandle_t xSemaphore);
   ~User();
-  enum CookieVerificationResult {
+  enum class CookieVerificationResult {
     OK = 0,
     OUT_OF_DATE_REVALIDATED = 1,
     INVALID_HASH = 2,
@@ -17,6 +17,23 @@ public:
     OUT_OF_DATE_UNABLE_TO_REVALIDATE = 5,
   };
 
+  enum class CredentialsVerificationResult {
+    OK = 0,
+    USERNAME_SHORT = 1,
+    USERNAME_LONG = 2,
+    USERNAME_INVALID_CHARACTERS = 3,
+    USERNAME_EMPTY = 4,
+    PASSWORD_SHORT = 5,
+    PASSWORD_LONG = 6,
+    PASSWORD_EMPTY = 7,
+    USERNAME_EXISTS = 8,
+    UNKNOWN_ERROR = 9,
+    ANY_USER_EXISTS = 10,
+  };
+
+  static constexpr int USERNAME_MIN_CHAR_COUNT = 5;
+  static constexpr int PASSWORD_MIN_CHAR_COUNT = 6;
+  static constexpr int PASSWORD_MAX_CHAR_COUNT = 30;
   static constexpr double AUTH_TIMEOUT_SEC = 24 * 60 * 60 * 1;  //24h
   static constexpr size_t INT32_CHAR_BUFFER_SIZE = 11;
   static constexpr size_t UTC_TIME_STRING_BUFFER_SIZE = 20;
@@ -34,16 +51,17 @@ public:
   //static bool isAuthorized(const char* cookie, uint32_t permissionMask);
   static bool checkPermissions(uint32_t permissions, uint32_t permissionMask);
 
-  bool isUserSet();
-  bool createUser(const char* username, const char* password, uint32_t permissions);
-  bool delteUser(const char* username);
-  bool verifyPassword(const char* username, const char* password);
-  bool setPassword(const char* username, const char* password);
-  bool getNewCookie(const char* username, char* cookie);
+  bool isAnyUserSet();
+  bool delteUser(char* username);
+  bool verifyPassword(char* username, const char* password);
+  bool setPassword(char* username, const char* password);
+  bool getNewCookie(char* username, char* cookie);
   CookieVerificationResult getCookieInfo(const char* cookie, char* username, uint32_t* permissions, char* newCookie);
-  int16_t getUserBill(const char* username);
-  bool setUserBill(const char* username, uint16_t bill);
-  bool addUserBill(const char* username, uint16_t add, uint16_t& res);
+  int16_t getUserBill(char* username);
+  bool setUserBill(char* username, uint16_t bill);
+  bool addUserBill(char* username, uint16_t add, uint16_t& res);
+  User::CredentialsVerificationResult registerUser(char* username, const char* password);
+  User::CredentialsVerificationResult registerFisrtAdmin(char* username, const char* password);
   //bool isPermited(const char* username, uint32_t permissionMask);
   bool clearAll();
 
@@ -65,12 +83,14 @@ private:
 
   static bool verifyCookieHash(const char* cookie);
   static bool checkCookieMinimalLength(const char* cookie);
-  //!!!DOŘEŠIT KOREKTNÍ VYHEDÁVÁNÍ ODDĚLOVAČE
   static bool parseCookie(const char* cookie, char* username, uint32_t* permissions, struct tm* timeInfo, char* cookieHexHash, char* permissionsValidityHexHash);
-  static void composeCookieBase(const char* username, uint32_t permissions, char* cookieBase, char* hexHash);
-  static void composeCookieBase(const char* username, uint32_t permissions, struct tm& timeInfo, char* cookieBase, char* hexHash);
+  static void composeCookieBase(char* username, uint32_t permissions, char* cookieBase, char* hexHash);
+  static void composeCookieBase(char* username, uint32_t permissions, struct tm& timeInfo, char* cookieBase, char* hexHash);
+  static CredentialsVerificationResult validateUsername(const char* username);
+  static CredentialsVerificationResult validatePassword(const char* password);
 
-  void getPermissionsValidityHexHash(const char* username, uint32_t permissions, const unsigned char* passwordHash, char* hexHash);
+  User::CredentialsVerificationResult createUser(char* username, const char* password, uint32_t permissions);
+  void getPermissionsValidityHexHash(char* username, uint32_t permissions, const unsigned char* passwordHash, char* hexHash);
   bool verifyPermissionsHash(const char* cookie);
 };
 #endif

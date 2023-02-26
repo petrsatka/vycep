@@ -21,7 +21,7 @@ void serverInit() {
   server.serveStatic("/registration.html", LittleFS, "/www/registration.html");
 
   //Pouze pokud nejsou uživatelé
-  if (!user.isUserSet()) {
+  if (!user.isAnyUserSet()) {
     firstRegistrationRedirectHandler = &server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
       request->redirect("/first-registration.html");
     });
@@ -122,7 +122,7 @@ void serverInit() {
   });
 
   server.on("/first-registration.html", HTTP_GET, [](AsyncWebServerRequest *request) {
-    if (user.isUserSet()) {
+    if (user.isAnyUserSet()) {
       request->redirect("/login.html");
     } else {
       request->send(LittleFS, "/www/first-registration.html");

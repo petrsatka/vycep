@@ -25,3 +25,40 @@ size_t Utils::appendChar(char* str, char a) {
 int Utils::computeHmacHash(const char* message, unsigned char* hash) {
   return mbedtls_md_hmac(mbedtls_md_info_from_type(MBEDTLS_MD_SHA256), (unsigned char*)HMAC_KEY, strlen(HMAC_KEY), (unsigned char*)message, strlen(message), hash);
 }
+
+bool Utils::isAlphaNumericStr(const char* str) {
+  if (str == NULL) {
+    return false;
+  }
+
+  bool res = true;
+  for (int i = 0; str[i] != 0; i++) {
+    res = res && isAlphaNumeric(str[i]);
+  }
+
+  return res;
+}
+
+bool Utils::toLowerStr(char* str) {
+  if (str != NULL) {
+    for (int i = 0; str[i] != 0; i++) {
+      str[i] = tolower(str[i]);
+    }
+
+    return true;
+  }
+
+  return false;
+}
+
+int Utils::strLenUTF8(const char* str) {
+  int len = 0;
+  if (str != NULL) {
+    while (*str) {
+      //Spočítá první bajty
+      len += (*str++ & 0xc0) != 0x80;
+    }
+  }
+
+  return len;
+}

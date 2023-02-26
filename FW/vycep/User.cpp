@@ -24,8 +24,12 @@ bool User::clearAll() {
   return res;
 }
 
-void User::getPermissionsValidityHexHash(const char* username, uint32_t permissions, const unsigned char* passwordHash, char* hexHash) {
+void User::getPermissionsValidityHexHash(char* username, uint32_t permissions, const unsigned char* passwordHash, char* hexHash) {
   //OTESTOVAT
+  if (!Utils::toLowerStr(username)) {
+    return;
+  }
+
   char message[USERNAME_BUFFER_SIZE + INT32_CHAR_BUFFER_SIZE + HASH_HEXSTRING_BUFFER_SIZE] = { 0 };
   strcpy(message, username);
   Utils::appendChar(message, COOKIE_DELIMITER);
@@ -37,15 +41,19 @@ void User::getPermissionsValidityHexHash(const char* username, uint32_t permissi
   Utils::hexStr(hash, HASH_BUFFER_SIZE, hexHash);
 }
 
-void User::composeCookieBase(const char* username, uint32_t permissions, char* cookieBase, char* hexHash) {
+void User::composeCookieBase(char* username, uint32_t permissions, char* cookieBase, char* hexHash) {
   //OTESTOVAT
   struct tm timeInfo;
   Utils::actTime(timeInfo);
   composeCookieBase(username, permissions, timeInfo, cookieBase, hexHash);
 }
 
-void User::composeCookieBase(const char* username, uint32_t permissions, struct tm& timeInfo, char* cookieBase, char* hexHash) {
+void User::composeCookieBase(char* username, uint32_t permissions, struct tm& timeInfo, char* cookieBase, char* hexHash) {
   //OTESTOVAT
+  if (!Utils::toLowerStr(username)) {
+    return;
+  }
+
   strcpy(cookieBase, username);
   Utils::appendChar(cookieBase, COOKIE_DELIMITER);
   utoa(permissions, &cookieBase[strlen(cookieBase)], 10);
@@ -103,30 +111,109 @@ bool User::parseCookie(const char* cookie, char* username, uint32_t* permissions
   return true;
 }
 
-bool User::isUserSet() {
+bool User::isAnyUserSet() {
   return settings->getBool(KEY_USER_IS_SET);
 }
 
-bool User::createUser(const char* username, const char* password, uint32_t permissions) {
-  //OTESTOVAT
-  unsigned char hash[HASH_BUFFER_SIZE];
-  Utils::computeHmacHash(password, hash);
-  return hashesStorage->putBytes(username, hash, HASH_BUFFER_SIZE) > 0
-         && permissionsStorage->putUInt(username, permissions) > 0
-         && billsStorage->putUShort(username, 0) > 0
-         && settings->putBool(KEY_USER_IS_SET, true);
+User::CredentialsVerificationResult User::validateUsername(const char* username) {
+  if (username == NULL || username[0] == 0) {
+    return User::CredentialsVerificationResult::USERNAME_EMPTY;
+  }
+
+  int len = Utils::strLenUTF8(username);
+  if (len < USERNAME_MIN_CHAR_COUNT) {
+    return User::CredentialsVerificationResult::USERNAME_SHORT;
+  }
+
+  if (len > USERNAME_MAX_CHAR_COUNT) {
+    return User::CredentialsVerificationResult::USERNAME_LONG;
+  }
+
+  if (!Utils::isAlphaNumericStr(username)) {
+    return User::CredentialsVerificationResult::USERNAME_INVALID_CHARACTERS;
+  }
+
+  return User::CredentialsVerificationResult::OK;
 }
 
-bool User::delteUser(const char* username) {
+User::CredentialsVerificationResult User::validatePassword(const char* password) {
+  if (password == NULL || password[0] == 0) {
+    return User::CredentialsVerificationResult::PASSWORD_EMPTY;
+  }
+
+  int len = Utils::strLenUTF8(password);
+  if (len < PASSWORD_MIN_CHAR_COUNT) {
+    return User::CredentialsVerificationResult::PASSWORD_SHORT;
+  }
+
+  if (len > PASSWORD_MAX_CHAR_COUNT) {
+    return User::CredentialsVerificationResult::PASSWORD_LONG;
+  }
+
+  return User::CredentialsVerificationResult::OK;
+}
+
+User::CredentialsVerificationResult User::registerUser(char* username, const char* password) {
+  return createUser(username, password, 0);
+}
+
+User::CredentialsVerificationResult User::registerFisrtAdmin(char* username, const char* password) {
+  if (isAnyUserSet()) {
+    return User::CredentialsVerificationResult::ANY_USER_EXISTS;
+  }
+
+  return createUser(username, password, User::PERMISSIONS_ADMIN);
+}
+
+User::CredentialsVerificationResult User::createUser(char* username, const char* password, uint32_t permissions) {
+  User::CredentialsVerificationResult verificationResult = validateUsername(username);
+  if (verificationResult != User::CredentialsVerificationResult::OK) {
+    return verificationResult;
+  }
+
+  verificationResult = validateUsername(username);
+  if (verificationResult != User::CredentialsVerificationResult::OK) {
+    return verificationResult;
+  }
+
+  Utils::toLowerStr(username);
+
+  if (hashesStorage->isKey(username)) {
+    return User::CredentialsVerificationResult::USERNAME_EXISTS;
+  }
+
+  unsigned char hash[HASH_BUFFER_SIZE];
+  Utils::computeHmacHash(password, hash);
+  int res = hashesStorage->putBytes(username, hash, HASH_BUFFER_SIZE) > 0
+            && permissionsStorage->putUInt(username, permissions) > 0
+            && billsStorage->putUShort(username, 0) > 0
+            && settings->putBool(KEY_USER_IS_SET, true);
+
+  if (!res) {
+    return User::CredentialsVerificationResult::UNKNOWN_ERROR;
+  }
+
+  return User::CredentialsVerificationResult::OK;
+}
+
+bool User::delteUser(char* username) {
   //OTESTOVAT
+  if (!Utils::toLowerStr(username)) {
+    return false;
+  }
+
   bool res = hashesStorage->remove(username) && res;
   res = permissionsStorage->remove(username) && res;
   res = billsStorage->remove(username);
   return res;
 }
 
-bool User::verifyPassword(const char* username, const char* password) {
+bool User::verifyPassword(char* username, const char* password) {
   //OTESTOVAT
+  if (!Utils::toLowerStr(username)) {
+    return false;
+  }
+
   unsigned char hash1[HASH_BUFFER_SIZE];
   unsigned char hash2[HASH_BUFFER_SIZE];
   Utils::computeHmacHash(password, hash1);
@@ -134,15 +221,23 @@ bool User::verifyPassword(const char* username, const char* password) {
   return memcmp(hash1, hash2, HASH_BUFFER_SIZE) == 0;
 }
 
-bool User::setPassword(const char* username, const char* password) {
+bool User::setPassword(char* username, const char* password) {
   //OTESTOVAT
+  if (!Utils::toLowerStr(username)) {
+    return false;
+  }
+
   unsigned char hash[HASH_BUFFER_SIZE];
   Utils::computeHmacHash(password, hash);
   return hashesStorage->putBytes(username, hash, HASH_BUFFER_SIZE);
 }
 
-bool User::getNewCookie(const char* username, char* cookie) {
+bool User::getNewCookie(char* username, char* cookie) {
   //OTESTOVAT
+  if (!Utils::toLowerStr(username)) {
+    return false;
+  }
+
   unsigned char passwordHash[HASH_BUFFER_SIZE];
   char cookieBase[COOKIE_BUFFER_SIZE] = { 0 };
   bool res = true;
@@ -265,18 +360,30 @@ User::CookieVerificationResult User::getCookieInfo(const char* cookie, char* use
   return CookieVerificationResult::OK;
 }
 
-int16_t User::getUserBill(const char* username) {
+int16_t User::getUserBill(char* username) {
   //OTESTOVAT
-  return billsStorage->getUShort(username) > 0;
+  if (!Utils::toLowerStr(username)) {
+    return 0;
+  }
+
+  return billsStorage->getUShort(username);
 }
 
-bool User::setUserBill(const char* username, uint16_t bill) {
+bool User::setUserBill(char* username, uint16_t bill) {
   //OTESTOVAT
+  if (!Utils::toLowerStr(username)) {
+    return false;
+  }
+
   return billsStorage->putUShort(username, 0) > 0;
 }
 
-bool User::addUserBill(const char* username, uint16_t add, uint16_t& res) {
+bool User::addUserBill(char* username, uint16_t add, uint16_t& res) {
   //OTESTOVAT
+  if (!Utils::toLowerStr(username)) {
+    return false;
+  }
+
   return billsStorage->addUShort(username, add, 0, res);
 }
 
@@ -285,7 +392,10 @@ bool User::checkPermissions(uint32_t permissions, uint32_t permissionMask) {
   return permissions & permissionMask;
 }
 
-// bool User::isPermited(const char* username, uint32_t permissionMask) {
+// bool User::isPermited(char* username, uint32_t permissionMask) {
 //   //OTESTOVAT
+//if (!Utils::toLowerStr(username)) {
+//    return false;
+//  }
 //   return checkPermissions(permissionsStorage->getUInt(username), permissionMask);
 // }

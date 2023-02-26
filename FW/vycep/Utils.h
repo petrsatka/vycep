@@ -12,6 +12,9 @@ public:
   static void hexStr(const unsigned char* data, int len, char* buffer);
   static size_t appendChar(char* str, char a);
   static int computeHmacHash(const char* message, unsigned char* hash);
+  static bool isAlphaNumericStr(const char* str);
+  static bool toLowerStr(char* str);
+  static int strLenUTF8(const char* str);
 
 private:
   static constexpr const char* HMAC_KEY = "iR8sPr11YLDR1Ij7bw2ec70YvpJrt3gK";
