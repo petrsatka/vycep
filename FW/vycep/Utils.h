@@ -13,7 +13,7 @@ public:
   static size_t appendChar(char* str, char a);
   static int computeHmacHash(const char* message, unsigned char* hash);
   static bool isAlphaNumericStr(const char* str);
-  static bool toLowerStr(char* str);
+  static bool toLowerStr(const char* inStr, char* outStr, size_t bufferSize);
   static int strLenUTF8(const char* str);
 
 private:

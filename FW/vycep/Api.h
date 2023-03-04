@@ -18,7 +18,7 @@ public:
   void serveStaticAuth(AsyncWebServerRequest* request, const char* path, uint32_t permissionMask);
   void serveDynamicAuth(AsyncWebServerRequest* request, ResponseGetterFunction responseGetter, uint32_t permissionMask);
   void serveAuth(AsyncWebServerRequest* request, uint32_t permissionMask, ResponseGetterFunction responseGetter, ResponseGetterFunction noPermissionsresponseGetter, ErrorResponseFunction);
-  void createAdmin(AsyncWebServerRequest* request);
+  bool createFirstAdmin(AsyncWebServerRequest* request);
   void createUser(AsyncWebServerRequest* request);
   void changePassword(AsyncWebServerRequest* request);
   void login(AsyncWebServerRequest* request);

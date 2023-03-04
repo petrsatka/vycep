@@ -26,9 +26,9 @@ public:
     PASSWORD_SHORT = 5,
     PASSWORD_LONG = 6,
     PASSWORD_EMPTY = 7,
-    USERNAME_EXISTS = 8,
+    USERNAME_EXISTS = 8, //Otestovat
     UNKNOWN_ERROR = 9,
-    ANY_USER_EXISTS = 10,
+    ANY_USER_EXISTS = 10, //Otestovat
   };
 
   static constexpr int USERNAME_MIN_CHAR_COUNT = 5;
@@ -52,17 +52,17 @@ public:
   static bool checkPermissions(uint32_t permissions, uint32_t permissionMask);
 
   bool isAnyUserSet();
-  bool delteUser(char* username);
-  bool verifyPassword(char* username, const char* password);
-  bool setPassword(char* username, const char* password);
-  bool getNewCookie(char* username, char* cookie);
+  bool delteUser(const char* lCaseUsername);
+  bool verifyPassword(const char* lCaseUsername, const char* password);
+  bool setPassword(const char* lCaseUsername, const char* password);
+  bool getNewCookie(const char* lCaseUsername, char* cookie);
   CookieVerificationResult getCookieInfo(const char* cookie, char* username, uint32_t* permissions, char* newCookie);
-  int16_t getUserBill(char* username);
-  bool setUserBill(char* username, uint16_t bill);
-  bool addUserBill(char* username, uint16_t add, uint16_t& res);
-  User::CredentialsVerificationResult registerUser(char* username, const char* password);
-  User::CredentialsVerificationResult registerFisrtAdmin(char* username, const char* password);
-  //bool isPermited(const char* username, uint32_t permissionMask);
+  int16_t getUserBill(const char* lCaseUsername);
+  bool setUserBill(const char* lCaseUsername, uint16_t bill);
+  bool addUserBill(const char* lCaseUsername, uint16_t add, uint16_t& res);
+  User::CredentialsVerificationResult registerUser(const char* lCaseUsername, const char* password);
+  User::CredentialsVerificationResult registerFirstAdmin(const char* username, const char* password);
+  //bool isPermited(const char* lCaseUsername, uint32_t permissionMask);
   bool clearAll();
 
 private:
@@ -84,13 +84,13 @@ private:
   static bool verifyCookieHash(const char* cookie);
   static bool checkCookieMinimalLength(const char* cookie);
   static bool parseCookie(const char* cookie, char* username, uint32_t* permissions, struct tm* timeInfo, char* cookieHexHash, char* permissionsValidityHexHash);
-  static void composeCookieBase(char* username, uint32_t permissions, char* cookieBase, char* hexHash);
-  static void composeCookieBase(char* username, uint32_t permissions, struct tm& timeInfo, char* cookieBase, char* hexHash);
-  static CredentialsVerificationResult validateUsername(const char* username);
+  static void composeCookieBase(const char* lCaseUsername, uint32_t permissions, char* cookieBase, char* hexHash);
+  static void composeCookieBase(const char* lCaseUsername, uint32_t permissions, struct tm& timeInfo, char* cookieBase, char* hexHash);
+  static CredentialsVerificationResult validateUsername(const char* lCaseUsername);
   static CredentialsVerificationResult validatePassword(const char* password);
 
-  User::CredentialsVerificationResult createUser(char* username, const char* password, uint32_t permissions);
-  void getPermissionsValidityHexHash(char* username, uint32_t permissions, const unsigned char* passwordHash, char* hexHash);
+  User::CredentialsVerificationResult createUser(const char* username, const char* password, uint32_t permissions);
+  void getPermissionsValidityHexHash(const char* lCaseUsername, uint32_t permissions, const unsigned char* passwordHash, char* hexHash);
   bool verifyPermissionsHash(const char* cookie);
 };
 #endif

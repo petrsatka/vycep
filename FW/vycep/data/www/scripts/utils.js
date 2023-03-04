@@ -65,11 +65,38 @@ notify.message = function(message, error = false, timeout = 0) {
   Volání zařízení - nejnižší vrstva
 */
 let api = {};
+api.parseResponseData = function (data) {
+  if (data) {
+    return data.split("&");
+  }
+  
+  return [];
+}
+
+api.post = function(url, reqData, callback) {
+  $.ajax({
+    method: "POST",
+    url: url,
+    data:reqData,
+    success: function(data, textStatus, xhr) {
+        callback(data, null)
+    },
+    error: function(xhr, textStatus, errorText) {
+         callback(null, errorText)
+    }, 
+    statusCode: {
+      401: function() {
+      //Otestovat
+        gui.navigate("login.html");
+      }
+    }
+  });
+}
 
 /*
   Vytvoření administrátorského účtu.
 */
-api.createAdmin = function(username, password, callback) {
+api.createFirstAdmin = function(username, password, callback) {
   //DEBUG
   //Validace délek na serveru? - alespoň username
   //Odladit speciállní znaky v hesle
@@ -79,7 +106,11 @@ api.createAdmin = function(username, password, callback) {
   //Test neplatné návratové hodnty
   //setTimeout(() => callback(null, null, "500 - bad request"), 1000);
   //setTimeout(() => callback(username,"user_exists", null), 1000);
-  setTimeout(() => callback(username,"ok", null), 1000);
+  //setTimeout(() => callback(username,"OK", null), 1000);
+  api.post("/api/createFirstAdmin", {username: username, password: password}, (resData, errorText) => {
+    var results = api.parseResponseData(resData, errorText);
+    callback(null, results[0], errorText);
+  })
 }
 
 /*
@@ -93,7 +124,7 @@ api.createUser = function(username, password, callback) {
   if (username.toLowerCase() == 'franta') {
      setTimeout(() => callback(username,"user_exists", null), 1000);
   } else {
-    setTimeout(() => callback(username,"ok", null), 1000);
+    setTimeout(() => callback(username,"OK", null), 1000);
   }
 }
 
@@ -105,8 +136,8 @@ api.changePassword = function(oldPassword, password, callback) {
     setTimeout(() => callback(false,"invalid_password", null), 1000);
   } else {
     //setTimeout(() => callback(null, null, "500 - bad request"), 1000);
-    setTimeout(() => callback(true,"ok", null), 1000); 
-    //setTimeout(() => callback(false,"ok", null), 1000);
+    setTimeout(() => callback(true,"OK", null), 1000); 
+    //setTimeout(() => callback(false,"OK", null), 1000);
   }  
 }
 
@@ -117,7 +148,7 @@ api.login = function(username, password, callback) {
   if (!username || !password) {
     setTimeout(() => callback(username,"bad_username_or_password", null), 1000);
   } else {
-    setTimeout(() => callback(username,"ok", null), 1000);
+    setTimeout(() => callback(username,"OK", null), 1000);
   }
 }
 
@@ -127,7 +158,7 @@ api.billCountDEBUG = 20;
   Získá aktuální počet nápojů ve frontě zařízení
 */
 api.getQueueCount = function(callback) {
-  setTimeout(() => callback(api.qCountDEBUG,"ok", null), 1000);
+  setTimeout(() => callback(api.qCountDEBUG,"OK", null), 1000);
   //setTimeout(() => callback(-1,"unable_to_get_qcount", null), 1000);
   //setTimeout(() => callback(null, null, "500 - bad request"), 1000); 
 }
@@ -136,7 +167,7 @@ api.getQueueCount = function(callback) {
   Získá aktuální počet nápojů na účtě přihlášeného uživatele
 */
 api.getCurrentUserBillCount = function(callback) {
-  setTimeout(() => callback(api.billCountDEBUG,"ok", null), 1000);
+  setTimeout(() => callback(api.billCountDEBUG,"OK", null), 1000);
   //setTimeout(() => callback(-1,"unable_to_get_bcount", null), 1000);
   //setTimeout(() => callback(null, null, "500 - bad request"), 1000);
 }
@@ -145,7 +176,7 @@ api.getCurrentUserBillCount = function(callback) {
   Získá aktuální počet nápojů na účtě uživatele
 */
 api.getUserBillCount = function(username, callback) {
-  setTimeout(() => callback(api.billCountDEBUG,"ok", null), 1000);
+  setTimeout(() => callback(api.billCountDEBUG,"OK", null), 1000);
   //setTimeout(() => callback(-1,"unable_to_get_bcount", null), 1000);
   //setTimeout(() => callback(null, null, "500 - bad request"), 1000);
 }
@@ -157,7 +188,7 @@ api.makeOrder = function(callback) {
   setTimeout(() => callback({
    queueCount: ++api.qCountDEBUG,
    billCount: ++api.billCountDEBUG, 
-  },"ok", null), 1000);
+  },"OK", null), 1000);
 
   /*setTimeout(() => callback({
     queueCount: api.qCountDEBUG,
@@ -181,7 +212,7 @@ api.pay = function(username, count, callback) {
     setTimeout(() => callback({
       paid: paid,
       billCount: api.billCountDEBUG
-    },"ok", null), 1000);
+    },"OK", null), 1000);
   }   
   /*setTimeout(() => callback({
      paid: 0,
@@ -204,7 +235,7 @@ api.debugUsers = [
   Načte uživatele
 */
 api.loadUsers = function(callback) {
-  setTimeout(() => callback(api.debugUsers,"ok", null), 1000);
+  setTimeout(() => callback(api.debugUsers,"OK", null), 1000);
   //setTimeout(() => callback(null, "unable_to_get_users", null), 1000);
   //setTimeout(() => callback(null, null, "500 - bad request"), 1000);
 }
@@ -214,7 +245,7 @@ api.loadUsers = function(callback) {
   Odhlášení
 */
 api.logout = function(callback) {
-  setTimeout(() => callback(true,"ok", null), 1000);
+  setTimeout(() => callback(true,"OK", null), 1000);
 }
 
 /*DEBUG*/
@@ -236,7 +267,7 @@ api.setSettingsValue = function(name, value, callback) {
   if (val === undefined) {
     setTimeout(() => callback(null, "unable_to_set_settings_value", null), 1000); 
   } else {
-    setTimeout(() => callback({name: name, value: value}, "ok", null), 1000);  
+    setTimeout(() => callback({name: name, value: value}, "OK", null), 1000);  
   }
   //setTimeout(() => callback(null, null, "500 - bad request"), 1000);  
 }
@@ -249,7 +280,7 @@ api.getSettingsValue = function(name, callback) {
   if (val === undefined) {
     setTimeout(() => callback(null, "unable_to_get_settings_value", null), 1000); 
   } else {
-    setTimeout(() => callback(val,"ok", null), 1000);
+    setTimeout(() => callback(val,"OK", null), 1000);
   }
   //setTimeout(() => callback(null, null, "500 - bad request"), 1000);
 }
@@ -259,7 +290,7 @@ api.getSettingsValue = function(name, callback) {
 */
 api.setPermissionValue = function(username, permissionKey, value, callback) {
   if (permissionKey == 'admin' || permissionKey == 'payment') {
-    setTimeout(() => callback({username : username, permissionKey: permissionKey, value: value}, "ok", null), 1000); 
+    setTimeout(() => callback({username : username, permissionKey: permissionKey, value: value}, "OK", null), 1000); 
   } else {
     setTimeout(() => callback(null, "unable_to_set_permissions_value", null), 1000);
   }
@@ -270,21 +301,21 @@ api.setPermissionValue = function(username, permissionKey, value, callback) {
   Získá IP adresu zařízení
 */
 api.getIP = function(callback) {
-  setTimeout(() => callback('192.168.1.45',"ok", null), 1000);  
+  setTimeout(() => callback('192.168.1.45',"OK", null), 1000);  
 }
 
 /*
   Získá bránu zařízení
 */
 api.getGateway = function(callback) {
-  setTimeout(() => callback('192.168.1.1',"ok", null), 1000);  
+  setTimeout(() => callback('192.168.1.1',"OK", null), 1000);  
 }
 
 /*
   Resetuje heslo
 */
 api.resetPassword = function(username, callback) {
-  setTimeout(() => callback('xyz7abc',"ok", null), 1000);
+  setTimeout(() => callback('xyz7abc',"OK", null), 1000);
   //setTimeout(() => callback(null, "unable_to_reset_password", null), 1000);
   //setTimeout(() => callback(null, null, "500 - bad request"), 1000);
 }
@@ -293,7 +324,7 @@ api.resetPassword = function(username, callback) {
   Vymaže uživatele
 */
 api.deleteUser = function(username, callback) {
-  setTimeout(() => callback(username,"ok", null), 1000);
+  setTimeout(() => callback(username,"OK", null), 1000);
   //setTimeout(() => callback(null, "unable_to_delete_user", null), 1000);
   //setTimeout(() => callback(null, null, "500 - bad request"), 1000);
 }
@@ -313,7 +344,7 @@ api.activateUser = function(username, callback) {
     user["activateButtonEnabled"] =true
   }
   
-  setTimeout(() => callback(username,"ok", null), 1000);
+  setTimeout(() => callback(username,"OK", null), 1000);
   //setTimeout(() => callback(null, "unable_to_activate_user", null), 1000);
   //setTimeout(() => callback(null, null, "500 - bad request"), 1000);
 }
@@ -324,7 +355,7 @@ api.activateUser = function(username, callback) {
 api.startCalibration = function(callback) {
   api.settings['pcount'] = 330;
   console.log("calibration start");
-  setTimeout(() => callback(true,"ok", null), 1000);
+  setTimeout(() => callback(true,"OK", null), 1000);
   //setTimeout(() => callback(false, "unable_to_start_calibration", null), 1000);
   //setTimeout(() => callback(null, null, "500 - bad request"), 1000);
 }
@@ -334,7 +365,7 @@ api.startCalibration = function(callback) {
 */
 api.stopCalibration = function(callback) {
   console.log("calibration stop");
-  setTimeout(() => callback(true,"ok", null), 1000);
+  setTimeout(() => callback(true,"OK", null), 1000);
   //setTimeout(() => callback(false, "unable_to_stop_calibration", null), 1000);
   //setTimeout(() => callback(null, null, "500 - bad request"), 1000);
 }
@@ -344,7 +375,7 @@ api.stopCalibration = function(callback) {
 */
 api.runTest = function(callback) {
   console.log("test");
-  setTimeout(() => callback(true,"ok", null), 1000);
+  setTimeout(() => callback(true,"OK", null), 1000);
   //setTimeout(() => callback(false, "unable_to_run_test", null), 1000);
   //setTimeout(() => callback(null, null, "500 - bad request"), 1000);
 }
@@ -354,7 +385,7 @@ api.runTest = function(callback) {
 */
 api.restart = function(callback) {
   console.log("restart");
-  setTimeout(() => callback(true,"ok", null), 1000);
+  setTimeout(() => callback(true,"OK", null), 1000);
   //setTimeout(() => callback(false, "unable_to_run_test", null), 1000);
   //setTimeout(() => callback(null, null, "500 - bad request"), 1000);
 }
@@ -367,7 +398,7 @@ api.connect = function(ssid, securityKey, callback) {
   if (!ssid || !securityKey) {
     setTimeout(() => callback(null,"unnable_to_connect", null), 1000);
   } else {
-    setTimeout(() => callback('192.168.1.25',"ok", null), 1000);
+    setTimeout(() => callback('192.168.1.25',"OK", null), 1000);
   }
   //setTimeout(() => callback(false, "unable_to_run_connect", null), 1000);
   //setTimeout(() => callback(null, null, "500 - bad request"), 1000);
@@ -468,17 +499,44 @@ gui.handleError = function(resultCode, errorMessage, popupWindow = false) {
     return false;
   }
   
-  if (resultCode == 'ok') {
+  if (resultCode == "OK") {
       return true;
   }
-  
   //vlastní chyby
-  let message = '';; 
+  let message = ''; 
   switch(resultCode) {
-    case 'user_exists':
+    case 'USERNAME_SHORT':
+      message = 'Uživatelské jméno musí obsahovat alespoň 5 znaků.';
+      break;  
+    case 'USERNAME_LONG':
+      message = 'Uživatelské jméno může obsahovat maximálně 15 znaků.';
+      break;  
+    case 'USERNAME_INVALID_CHARACTERS':
+      message = 'Uživatelské jméno může obsahovat pouze číslice a písmena.';
+      break;  
+    case 'USERNAME_EMPTY':
+      message = 'Uživatelské jméno musí být vyplněno.';
+      break;  
+    case 'PASSWORD_SHORT':
+      message = 'Heslo musí obsahovat alespoň 6 znaků.';
+      break;  
+    case 'PASSWORD_LONG':
+      message = 'Heslo může obsahovat maximálně 30 znaků.';
+      break;  
+    case 'PASSWORD_EMPTY':
+      message = 'Heslo musí být vyplněno.';
+      break;
+    case 'USERNAME_EXISTS':
       message = 'Uživatel s tímto jménem už existuje.';
       break;
-    case 'bad_username_or_password':
+    case 'UNKNOWN_ERROR':
+      message = 'Neznámá chyba.';
+      break;  
+    case 'ANY_USER_EXISTS':
+      message = 'V systému už existuje alespoň jeden uživatel.';
+      break;  
+      
+    /*case 'bad_username_or_password':
       message = 'Neplatné jméno nebo heslo.';
       break;
     case 'invalid_password':
@@ -488,7 +546,7 @@ gui.handleError = function(resultCode, errorMessage, popupWindow = false) {
       message = 'Nelze zaplatit neplatné množství.';
     case 'unnable_to_connect':
       message = 'Připojení se nezdařilo';
-      break;
+      break;  */
   }
   
   if (message) {
@@ -512,12 +570,12 @@ gui.setInProgress = function(inProgress) {
 /*
   Vytvoření administrátorského účtu
 */
-gui.createAdmin = function(username, password, passwordVerification, navigationTarget) {
-  gui.validateUsername(username) &&
-  gui.validatePassword(password) &&
+gui.createFirstAdmin = function(username, password, passwordVerification, navigationTarget) {
+  //gui.validateUsername(username) &&
+  //gui.validatePassword(password) &&
   gui.verifyPassword(password, passwordVerification) &&
   gui.setInProgress(true) &&
-  api.createAdmin(username, password, (result, resultCode, errorMessage) => {
+  api.createFirstAdmin(username, password, (result, resultCode, errorMessage) => {
     gui.setInProgress(false);
     if (gui.handleError(resultCode, errorMessage)) {
       gui.navigate(navigationTarget);
@@ -667,7 +725,7 @@ gui.makeOrder = function(qCountTargetSelector, bCountTargetSelector) {
         $(bCountTargetSelector).text(result.billCount);
       }
       
-      gui.validate(resultCode == 'ok', null, "Objednáno", 5000);
+      gui.validate(resultCode == "OK", null, "Objednáno", 5000);
     }
   });
 }
@@ -857,8 +915,8 @@ gui.resetDefaultValues = function() {
 
 ///////////Metody jednotlivých stránek. Získají vstupní hodnoty a volají metody gui//////////////////////////
 let firstRegistration = {};
-firstRegistration.createAdmin = function() {
-  gui.createAdmin($('#name').val(), $('#password').val(), $('#password-verification').val(), 'settings.html');
+firstRegistration.createFirstAdmin = function() {
+  gui.createFirstAdmin($('#name').val(), $('#password').val(), $('#password-verification').val(), 'settings.html');
 }
 
 let registration = {};

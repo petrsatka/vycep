@@ -39,11 +39,15 @@ bool Utils::isAlphaNumericStr(const char* str) {
   return res;
 }
 
-bool Utils::toLowerStr(char* str) {
-  if (str != NULL) {
-    for (int i = 0; str[i] != 0; i++) {
-      str[i] = tolower(str[i]);
+bool Utils::toLowerStr(const char* inStr, char* outStr, size_t bufferSize) {
+  if (inStr != NULL) {
+    int i = 0;
+    while (inStr[i] != 0 && i < bufferSize - 1) {
+      outStr[i] = tolower(inStr[i]);
+      i++;
     }
+
+    outStr[i] = 0;
 
     return true;
   }

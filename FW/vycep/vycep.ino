@@ -25,10 +25,6 @@ void serverInit() {
     firstRegistrationRedirectHandler = &server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
       request->redirect("/first-registration.html");
     });
-
-    //Po registraci odstranit handler
-    //server.removeHandler(firstRegistrationRedirectHandler);
-    //firstRegistrationRedirectHandler = NULL;
   }
 
   //Default webpage
@@ -39,14 +35,15 @@ void serverInit() {
   //Rozdělení obsahu podle práv
   server.on("/rolespecific/menu-content.js", HTTP_GET, [](AsyncWebServerRequest *request) {
     api.serveAuth(
-    request, User::PERMISSIONS_ADMIN, [request]() {
-      return request->beginResponse(LittleFS, "/www/rolespecific/menu-content-admin.js");
-    },[request]() {
-      return request->beginResponse(LittleFS, "/www/rolespecific/menu-content.js");
-    },
-    [request]() {
-      request->send(401);
-    });
+      request, User::PERMISSIONS_ADMIN, [request]() {
+        return request->beginResponse(LittleFS, "/www/rolespecific/menu-content-admin.js");
+      },
+      [request]() {
+        return request->beginResponse(LittleFS, "/www/rolespecific/menu-content.js");
+      },
+      [request]() {
+        request->send(401);
+      });
   });
 
   //Vlastní podmínka místo filtrů - je to efektivnější
@@ -73,8 +70,12 @@ void serverInit() {
   });
 
   //ZDE API - kontrouje se až uvnitř
-  server.on("/api/createAdmin", HTTP_POST, [](AsyncWebServerRequest *request) {
-    api.createAdmin(request);
+  server.on("/api/createFirstAdmin", HTTP_POST, [](AsyncWebServerRequest *request) {
+    if (api.createFirstAdmin(request)) {
+      server.removeHandler(firstRegistrationRedirectHandler);
+      firstRegistrationRedirectHandler = NULL;
+      Serial.println("First admin created");
+    }
   });
 
   server.on("/api/createUser", HTTP_POST, [](AsyncWebServerRequest *request) {
@@ -163,6 +164,7 @@ void setup() {
   }
 
   Serial.println(WiFi.localIP().toString());
+  user.clearAll(); //DEBUG odstranit !!!!
   serverInit();
   Serial.println("Start");
 }

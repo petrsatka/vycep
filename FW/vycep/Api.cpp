@@ -54,21 +54,22 @@ void Api::serveStaticAuth(AsyncWebServerRequest* request, const char* path, uint
     request, permissionMask, [request, path]() {
       return request->beginResponse(LittleFS, path);
     },
-    NULL,
-    [request]() {
+    NULL, [request]() {
       request->redirect("/login.html");
     });
 }
 
 void Api::serveDynamicAuth(AsyncWebServerRequest* request, ResponseGetterFunction responseGetter, uint32_t permissionMask) {
-  serveAuth(request, permissionMask, responseGetter, [request]() {
-    //Forbidden
-    request->send(403);
-    return nullptr;
-  } ,[request]() {
-    //Unauthorized
-    request->send(401);
-  });
+  serveAuth(
+    request, permissionMask, responseGetter, [request]() {
+      //Forbidden
+      request->send(403);
+      return nullptr;
+    },
+    [request]() {
+      //Unauthorized
+      request->send(401);
+    });
 }
 
 bool Api::extractCookie(AsyncWebServerRequest* request, const char* cookieName, char* cookie) {
@@ -124,11 +125,62 @@ void Api::onNotFound(AsyncWebServerRequest* request) {
   request->send(404);
 }
 
-void Api::createAdmin(AsyncWebServerRequest* request) {
+bool Api::createFirstAdmin(AsyncWebServerRequest* request) {
   //username, password - ověřit validitu
   //username to lower
   //Ověřit zda neexistuje ještě žádný uživatel
   //Nastavit cookie
+  if (request->hasParam("username", true)) {
+    AsyncWebParameter* pUname = request->getParam("username", true);
+    if (request->hasParam("password", true)) {
+      AsyncWebParameter* pPassword = request->getParam("password", true);
+        Serial.println("BeforeRegister");       
+        User::CredentialsVerificationResult res = user.registerFirstAdmin(pUname->value().c_str(), pPassword->value().c_str());
+        switch (res) {
+          case User::CredentialsVerificationResult::OK:
+          {
+            AsyncWebServerResponse* response = request->beginResponse(200, "text/plain", "OK");
+            //response->addHeader("Server", "ESP Async Web Server");
+            request->send(response);
+            return true;
+          }
+          case User::CredentialsVerificationResult::USERNAME_SHORT:
+            request->send(200, "text/plain", "USERNAME_SHORT");
+            break;
+          case User::CredentialsVerificationResult::USERNAME_LONG:
+            request->send(200, "text/plain", "USERNAME_LONG");
+            break;
+          case User::CredentialsVerificationResult::USERNAME_INVALID_CHARACTERS:
+            request->send(200, "text/plain", "USERNAME_INVALID_CHARACTERS");
+            break;
+          case User::CredentialsVerificationResult::USERNAME_EMPTY:
+            request->send(200, "text/plain", "USERNAME_EMPTY");
+            break;
+          case User::CredentialsVerificationResult::PASSWORD_SHORT:
+            request->send(200, "text/plain", "PASSWORD_SHORT");
+            break;
+          case User::CredentialsVerificationResult::PASSWORD_LONG:
+            request->send(200, "text/plain", "PASSWORD_LONG");
+            break;
+          case User::CredentialsVerificationResult::PASSWORD_EMPTY:
+            request->send(200, "text/plain", "PASSWORD_EMPTY");
+            break;
+          case User::CredentialsVerificationResult::USERNAME_EXISTS:
+            request->send(200, "text/plain", "USERNAME_EXISTS");
+            break;
+          case User::CredentialsVerificationResult::ANY_USER_EXISTS:
+            request->send(200, "text/plain", "ANY_USER_EXISTS");
+            break;
+          default:
+            request->send(200, "text/plain", "UNKNOWN_ERROR");
+        }
+
+        return false;
+    }
+  }
+
+  request->send(400);
+  return false;
 }
 
 void Api::createUser(AsyncWebServerRequest* request) {
