@@ -31,6 +31,27 @@ void Utils::test() {
   } else {
     sprintln("computeHmacHash test FAILED");
   }
+
+  if (strLenUTF8(String("ěščřžýáíé 789 / ;.").c_str()) == 18) {
+    sprintln("strLenUTF8 test OK");
+  } else {
+    sprintln("strLenUTF8 test FAILED");
+  }
+
+  char lbuffer[8];
+  toLowerStr("ABCDEFGIJKL", lbuffer, sizeof(lbuffer));
+  if (strcmp(lbuffer, "abcdefg") == 0) {
+    sprintln("toLowerStr 1 test OK");
+  } else {
+    sprintln("toLowerStr 1 test FAILED");
+  }
+
+  toLowerStr("ABC", lbuffer, sizeof(lbuffer));
+  if (strcmp(lbuffer, "abc") == 0) {
+    sprintln("toLowerStr 2 test OK");
+  } else {
+    sprintln("toLowerStr 2 test FAILED");
+  }
 }
 
 void Utils::actTime(struct tm& timeInfo) {
@@ -79,7 +100,7 @@ bool Utils::isAlphaNumericStr(const char* str) {
 }
 
 bool Utils::toLowerStr(const char* inStr, char* outStr, size_t bufferSize) {
-  sprintln("!toLowerStr");
+  dprintln("toLowerStr");
   if (inStr != NULL) {
     int i = 0;
     while (inStr[i] != 0 && i < bufferSize - 1) {
@@ -96,7 +117,7 @@ bool Utils::toLowerStr(const char* inStr, char* outStr, size_t bufferSize) {
 }
 
 int Utils::strLenUTF8(const char* str) {
-  sprintln("!strLenUTF8");
+  dprintln("strLenUTF8");
   int len = 0;
   if (str != NULL) {
     while (*str) {
