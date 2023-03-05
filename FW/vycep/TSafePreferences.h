@@ -4,6 +4,7 @@
 #define TSafePreferences_h
 #include <Arduino.h>
 #include <Preferences.h>
+#include "Debug.h"
 
 class TSafePreferences {
 public:

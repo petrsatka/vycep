@@ -4,6 +4,8 @@
 #include <time.h>
 #include "User.h"
 #include "Api.h"
+#include "Debug.h"
+#include "Utils.h"
 
 AsyncWebServer server(80);
 //Mutex pro řízení přístupu k FLASH
@@ -16,6 +18,7 @@ AsyncCallbackWebHandler *firstRegistrationRedirectHandler = NULL;
 
 //Inicalizace serveru
 void serverInit() {
+  sprintln("!serverInit");
   //Vždy přístupný obsah
   server.serveStatic("/images/", LittleFS, "/www/images/");
   server.serveStatic("/scripts/", LittleFS, "/www/scripts/");
@@ -73,11 +76,17 @@ void serverInit() {
   });
 
   //API - práva se kontroují až uvnitř
+  server.on("/api/test", HTTP_GET, [](AsyncWebServerRequest *request) {
+    user.test();
+    Utils::test();
+    request->send(200, "text/plain", "Test");
+  });
+
   server.on("/api/createFirstAdmin", HTTP_POST, [](AsyncWebServerRequest *request) {
     if (api.createFirstAdmin(request)) {
       server.removeHandler(firstRegistrationRedirectHandler);
       firstRegistrationRedirectHandler = NULL;
-      Serial.println("First admin created");
+      sprintln("First admin created");
     }
   });
 
@@ -149,30 +158,30 @@ void setup() {
   configTime(3600, 3600, "pool.ntp.org");
 
   if (!LittleFS.begin()) {
-    Serial.println("LittleFS Failed");
+    sprintln("LittleFS Failed");
     return;
   }
 
   WiFi.mode(WIFI_STA);
   WiFi.begin("PaPaJ 2.4", "petapajajola");
   if (WiFi.waitForConnectResult() != WL_CONNECTED) {
-    Serial.println("WiFi Failed!");
+    sprintln("WiFi Failed!");
     return;
   }
 
   struct tm timeInfo;
   if (!getLocalTime(&timeInfo)) {
     //čekání na NTP. max 5s;
-    Serial.println("NTP Timeout");
+    sprintln("NTP Timeout");
   }
 
-  Serial.println(WiFi.localIP().toString());
-  user.clearAll(); //DEBUG odstranit !!!!
+  sprintln(WiFi.localIP().toString());
+  user.clearAll();  //DEBUG odstranit !!!!
   serverInit();
-  Serial.println("Start");
+  sprintln("Start");
 }
 
 void loop() {
-  Serial.println(ESP.getFreeHeap());
+  sprintln(ESP.getFreeHeap());
   delay(60 * 1000);
 }

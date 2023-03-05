@@ -4,6 +4,7 @@
 #include <ESPAsyncWebSrv.h>
 #include "User.h"
 #include "Utils.h"
+#include "Debug.h"
 
 typedef std::function<AsyncWebServerResponse*()> ResponseGetterFunction;
 typedef std::function<void()> ErrorResponseFunction;

@@ -8,6 +8,7 @@ Api::~Api() {
 }
 
 void Api::serveAuth(AsyncWebServerRequest* request, uint32_t permissionMask, ResponseGetterFunction responseGetter, ResponseGetterFunction noPermissionsresponseGetter, ErrorResponseFunction errorResponse) {
+  sprintln("!serveAuth");
   ///OTESTOVAT všechny ify !!!!!
   char cookie[User::COOKIE_BUFFER_SIZE] = { 0 };
   if (extractCookie(request, AHUTH_COOKIE_NAME, cookie)) {
@@ -50,6 +51,7 @@ void Api::serveAuth(AsyncWebServerRequest* request, uint32_t permissionMask, Res
 }
 
 void Api::serveStaticAuth(AsyncWebServerRequest* request, const char* path, uint32_t permissionMask) {
+  sprintln("!serveStaticAuth");
   serveAuth(
     request, permissionMask, [request, path]() {
       return request->beginResponse(LittleFS, path);
@@ -60,6 +62,7 @@ void Api::serveStaticAuth(AsyncWebServerRequest* request, const char* path, uint
 }
 
 void Api::serveDynamicAuth(AsyncWebServerRequest* request, ResponseGetterFunction responseGetter, uint32_t permissionMask) {
+  sprintln("!serveDynamicAuth");
   serveAuth(
     request, permissionMask, responseGetter, [request]() {
       //Forbidden
@@ -73,6 +76,7 @@ void Api::serveDynamicAuth(AsyncWebServerRequest* request, ResponseGetterFunctio
 }
 
 bool Api::extractCookie(AsyncWebServerRequest* request, const char* cookieName, char* cookie) {
+  sprintln("!extractCookie");
   if (request->hasHeader("cookie")) {
     char* cookiePos = strstr(request->getHeader("cookie")->value().c_str(), cookieName);
     if (cookiePos != NULL && cookiePos[strlen(cookieName)] != 0) {
@@ -86,6 +90,7 @@ bool Api::extractCookie(AsyncWebServerRequest* request, const char* cookieName, 
 }
 
 bool Api::setCookie(AsyncWebServerResponse* response, const char* name, const char* content, bool httpOnly) {
+  sprintln("!setCookie");
   String cookieStr = String(name);
   bool res = cookieStr.concat(content) && cookieStr.concat(COMMON_COOKIE_ATTRIBUTES);
   if (httpOnly) {
@@ -101,11 +106,13 @@ bool Api::setCookie(AsyncWebServerResponse* response, const char* name, const ch
 }
 
 bool Api::unsetCookies(AsyncWebServerResponse* response) {
+  sprintln("!unsetCookies");
   bool res = unsetCookie(response, AHUTH_COOKIE_NAME);
   return unsetCookie(response, USERNAME_COOKIE_NAME) && res;
 }
 
 bool Api::unsetCookie(AsyncWebServerResponse* response, const char* name) {
+  sprintln("!unsetCookie");
   String cookieStr = String(name);
   bool res = cookieStr.concat(UNSET_COOKIE_ATTRIBUTES);
 
@@ -118,15 +125,17 @@ bool Api::unsetCookie(AsyncWebServerResponse* response, const char* name) {
 }
 
 bool Api::setCookies(AsyncWebServerResponse* response, const char* lCaseUsername, const char* authCookieContent) {
+  sprintln("!setCookies");
   return setCookie(response, USERNAME_COOKIE_NAME, lCaseUsername, false) && setCookie(response, AHUTH_COOKIE_NAME, authCookieContent, true);
 }
 
 void Api::onNotFound(AsyncWebServerRequest* request) {
+  sprintln("!onNotFound");
   request->send(404);
 }
 
 bool Api::createFirstAdmin(AsyncWebServerRequest* request) {
-  //Nastavit cookie
+  sprintln("!createFirstAdmin");
   if (request->hasParam("username", true)) {
     AsyncWebParameter* pUname = request->getParam("username", true);
     if (request->hasParam("password", true)) {
@@ -183,6 +192,7 @@ bool Api::createFirstAdmin(AsyncWebServerRequest* request) {
 }
 
 void Api::createUser(AsyncWebServerRequest* request) {
+  sprintln("!createUser");
   //username, password - ověřit validitu
   //username to lower
   //Ověřit, zda uživatel už neexistuje
@@ -190,6 +200,7 @@ void Api::createUser(AsyncWebServerRequest* request) {
 }
 
 void Api::changePassword(AsyncWebServerRequest* request) {
+  sprintln("!changePassword");
   //oldPassword, password
   //Ověřit zda souhlasí staré heslo
   //Ověřit validitu nového hesla
@@ -197,6 +208,7 @@ void Api::changePassword(AsyncWebServerRequest* request) {
 }
 
 void Api::login(AsyncWebServerRequest* request) {
+  sprintln("!login");
   //username, password
   //username to lower
   //ověřit validitu username, ověřit hash hesla
@@ -204,35 +216,43 @@ void Api::login(AsyncWebServerRequest* request) {
 }
 
 void Api::getQueueCount(AsyncWebServerRequest* request) {
+  sprintln("!getQueueCount");
 }
 
 void Api::getBillCount(AsyncWebServerRequest* request) {
+  sprintln("!getBillCount");
   //Username získat z cookies
 }
 
 void Api::getUserBillCount(AsyncWebServerRequest* request) {
+  sprintln("!getUserBillCount");
   //Ověřit práva admina
 }
 
 void Api::makeOrder(AsyncWebServerRequest* request) {
+  sprintln("!makeOrder");
   //Username získat z cookies
   //Ověřit, zda je uživatel schválen
 }
 
 void Api::pay(AsyncWebServerRequest* request) {
+  sprintln("!pay");
   //Username získat z cookies
   //Ověřit, zda je uživatel schválen a má práva na placení
 }
 
 void Api::payForUser(AsyncWebServerRequest* request) {
+  sprintln("!payForUser");
   //username
   //Ověřit, zda má práva admina
 }
 
 void Api::loadUsers(AsyncWebServerRequest* request) {
+  sprintln("!loadUsers");
   //Ověřit práva admina
 }
 
 void Api::logout(AsyncWebServerRequest* request) {
+  sprintln("!logout");
   //Zrušit cookies
 }

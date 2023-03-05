@@ -4,6 +4,7 @@
 #include <Arduino.h>
 #include "TSafePreferences.h"
 #include "Utils.h"
+#include "Debug.h"
 
 class User {
 public:
@@ -42,13 +43,12 @@ public:
   static constexpr size_t UTC_TIME_STRING_BUFFER_SIZE = 20;
   static constexpr size_t USERNAME_MAX_CHAR_COUNT = 15;
   static constexpr size_t USERNAME_BUFFER_SIZE = USERNAME_MAX_CHAR_COUNT + 1;
-  static constexpr size_t HASH_BUFFER_SIZE = 32;
-  static constexpr size_t HASH_HEXSTRING_BUFFER_SIZE = 2 * HASH_BUFFER_SIZE + 1;
-  static constexpr size_t COOKIE_BUFFER_SIZE = USERNAME_BUFFER_SIZE + INT32_CHAR_BUFFER_SIZE + UTC_TIME_STRING_BUFFER_SIZE + 2 * HASH_HEXSTRING_BUFFER_SIZE;
-  static constexpr uint32_t PERMISSIONS_ANY_PERMISSIONS = 0;
-  static constexpr uint32_t PERMISSIONS_ACTIVE = 0b1;
-  static constexpr uint32_t PERMISSIONS_ADMIN = 0b10;
-  static constexpr uint32_t PERMISSIONS_PAYMENT = 0b100;
+  static constexpr size_t COOKIE_BUFFER_SIZE = USERNAME_BUFFER_SIZE + INT32_CHAR_BUFFER_SIZE + UTC_TIME_STRING_BUFFER_SIZE + 2 * Utils::HASH_HEXSTRING_BUFFER_SIZE;
+  static constexpr uint32_t PERMISSIONS_ANY_PERMISSIONS = -1;
+  static constexpr uint32_t PERMISSIONS_INACTIVE = 0b1;
+  static constexpr uint32_t PERMISSIONS_ACTIVE = 0b10;
+  static constexpr uint32_t PERMISSIONS_ADMIN = 0b100;
+  static constexpr uint32_t PERMISSIONS_PAYMENT = 0b1000;
 
   static bool checkPermissions(uint32_t permissions, uint32_t permissionMask);
 
@@ -64,6 +64,8 @@ public:
   User::CredentialsVerificationResult registerUser(const char* username, const char* password, char* lCaseUsername); //Očekává jméno, heslo. Vrací result a lower case jméno.
   User::CredentialsVerificationResult registerFirstAdmin(const char* username, const char* password, char* lCaseUsername);
   bool clearAll();
+
+  void test();
 
 private:
   static constexpr const char* NVS_PARTTION = "nvs_ext";
