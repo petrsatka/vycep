@@ -6,12 +6,15 @@
 #include "Api.h"
 
 AsyncWebServer server(80);
+//Mutex pro řízení přístupu k FLASH
 SemaphoreHandle_t xSemaphore = xSemaphoreCreateMutex();
 User user(xSemaphore);
 Api api(user);
 
+//Callback handler registrace prvního admina. Po vytvořaní admina bude odstraněn.
 AsyncCallbackWebHandler *firstRegistrationRedirectHandler = NULL;
 
+//Inicalizace serveru
 void serverInit() {
   //Vždy přístupný obsah
   server.serveStatic("/images/", LittleFS, "/www/images/");
@@ -69,7 +72,7 @@ void serverInit() {
     api.serveStaticAuth(request, "/www/settings.html", User::PERMISSIONS_ADMIN);
   });
 
-  //ZDE API - kontrouje se až uvnitř
+  //API - práva se kontroují až uvnitř
   server.on("/api/createFirstAdmin", HTTP_POST, [](AsyncWebServerRequest *request) {
     if (api.createFirstAdmin(request)) {
       server.removeHandler(firstRegistrationRedirectHandler);
@@ -130,7 +133,7 @@ void serverInit() {
     }
   });
 
-  //Fallback
+  //Fallback 404
   server.onNotFound(Api::onNotFound);
   //Hlavičky
   DefaultHeaders::Instance().addHeader("Cache-Control", "max-age=0, no-cache, no-store, must-revalidate");

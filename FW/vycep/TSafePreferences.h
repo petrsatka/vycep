@@ -1,12 +1,15 @@
+//Thread safe ukládání do NVS
+
 #ifndef TSafePreferences_h
 #define TSafePreferences_h
 #include <Arduino.h>
 #include <Preferences.h>
+
 class TSafePreferences {
 public:
   TSafePreferences(SemaphoreHandle_t xMutex, const char* nmspce, const char* partitionName);
-  bool clear();
-  bool remove(const char* key);
+  bool clear(); //Vymaže celý namespace
+  bool remove(const char* key); //Odstraní klíč
   size_t putChar(const char* key, int8_t value);
   size_t putUChar(const char* key, uint8_t value);
   size_t putShort(const char* key, int16_t value);
@@ -24,7 +27,7 @@ public:
   size_t putString(const char* key, String value);
   size_t putBytes(const char* key, const void* value, size_t len);
 
-  bool isKey(const char* key);
+  bool isKey(const char* key); //Je uložena hodnota pod tímto klíčem?
   PreferenceType getType(const char* key);
   int8_t getChar(const char* key, int8_t defaultValue = 0);
   uint8_t getUChar(const char* key, uint8_t defaultValue = 0);
@@ -44,6 +47,7 @@ public:
   size_t getBytesLength(const char* key);
   size_t getBytes(const char* key, void* buf, size_t maxLen);
 
+  //Metody pro thread safe navýšení uložené hodnoty
   bool addChar(const char* key, int8_t add, int8_t defaultInitValue, int8_t& result);
   bool addUChar(const char* key, uint8_t add, uint8_t defaultInitValue, uint8_t& result);
   bool addShort(const char* key, int16_t add, int16_t defaultInitValue, int16_t& result);
