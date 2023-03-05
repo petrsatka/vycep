@@ -146,27 +146,26 @@ User::CredentialsVerificationResult User::validatePassword(const char* password)
   return User::CredentialsVerificationResult::OK;
 }
 
-User::CredentialsVerificationResult User::registerUser(const char* lCaseUsername, const char* password) {
-  return createUser(lCaseUsername, password, 0);
+User::CredentialsVerificationResult User::registerUser(const char* username, const char* password, char* lCaseUsername) {
+  return createUser(username, password, 0, lCaseUsername);
 }
 
-User::CredentialsVerificationResult User::registerFirstAdmin(const char* username, const char* password) {
+User::CredentialsVerificationResult User::registerFirstAdmin(const char* username, const char* password, char* lCaseUsername) {
   Serial.println("InRegister");
   if (isAnyUserSet()) {
     return User::CredentialsVerificationResult::ANY_USER_EXISTS;
   }
-Serial.println("Before create");
-  return createUser(username, password, User::PERMISSIONS_ADMIN);
+  Serial.println("Before create");
+  return createUser(username, password, User::PERMISSIONS_ADMIN, lCaseUsername);
 }
 
-User::CredentialsVerificationResult User::createUser(const char* username, const char* password, uint32_t permissions) {
+User::CredentialsVerificationResult User::createUser(const char* username, const char* password, uint32_t permissions, char* lCaseUsername) {
   User::CredentialsVerificationResult verificationResult = validateUsername(username);
 
   if (verificationResult != User::CredentialsVerificationResult::OK) {
     return verificationResult;
   }
 
-  char lCaseUsername[USERNAME_BUFFER_SIZE] = {0};
   Utils::toLowerStr(username, lCaseUsername, USERNAME_BUFFER_SIZE);
 
   verificationResult = validateUsername(password);

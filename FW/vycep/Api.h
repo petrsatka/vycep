@@ -41,7 +41,7 @@ private:
   static constexpr const char* UNSET_COOKIE_ATTRIBUTES = "; Max-Age=-1; Path=/";
 
   static bool extractCookie(AsyncWebServerRequest* request, const char* cookieName, char* cookie);
-  static bool setCookies(AsyncWebServerResponse* response, const char* username, const char* authCookieContent);
+  static bool setCookies(AsyncWebServerResponse* response, const char* lCaseUsername, const char* authCookieContent);
   static bool unsetCookies(AsyncWebServerResponse* response);
   static bool setCookie(AsyncWebServerResponse* response, const char* name, const char* content, bool httpOnly);
   static bool unsetCookie(AsyncWebServerResponse* response, const char* name);

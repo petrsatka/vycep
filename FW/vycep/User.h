@@ -26,7 +26,7 @@ public:
     PASSWORD_SHORT = 5,
     PASSWORD_LONG = 6,
     PASSWORD_EMPTY = 7,
-    USERNAME_EXISTS = 8, //Otestovat
+    USERNAME_EXISTS = 8,
     UNKNOWN_ERROR = 9,
     ANY_USER_EXISTS = 10, //Otestovat
   };
@@ -60,8 +60,8 @@ public:
   int16_t getUserBill(const char* lCaseUsername);
   bool setUserBill(const char* lCaseUsername, uint16_t bill);
   bool addUserBill(const char* lCaseUsername, uint16_t add, uint16_t& res);
-  User::CredentialsVerificationResult registerUser(const char* lCaseUsername, const char* password);
-  User::CredentialsVerificationResult registerFirstAdmin(const char* username, const char* password);
+  User::CredentialsVerificationResult registerUser(const char* username, const char* password, char* lCaseUsername);
+  User::CredentialsVerificationResult registerFirstAdmin(const char* username, const char* password, char* lCaseUsername);
   //bool isPermited(const char* lCaseUsername, uint32_t permissionMask);
   bool clearAll();
 
@@ -89,7 +89,7 @@ private:
   static CredentialsVerificationResult validateUsername(const char* lCaseUsername);
   static CredentialsVerificationResult validatePassword(const char* password);
 
-  User::CredentialsVerificationResult createUser(const char* username, const char* password, uint32_t permissions);
+  User::CredentialsVerificationResult createUser(const char* username, const char* password, uint32_t permissions, char* lCaseUsername);
   void getPermissionsValidityHexHash(const char* lCaseUsername, uint32_t permissions, const unsigned char* passwordHash, char* hexHash);
   bool verifyPermissionsHash(const char* cookie);
 };

@@ -117,8 +117,8 @@ bool Api::unsetCookie(AsyncWebServerResponse* response, const char* name) {
   return false;
 }
 
-bool Api::setCookies(AsyncWebServerResponse* response, const char* username, const char* authCookieContent) {
-  return setCookie(response, USERNAME_COOKIE_NAME, username, false) && setCookie(response, AHUTH_COOKIE_NAME, authCookieContent, true);
+bool Api::setCookies(AsyncWebServerResponse* response, const char* lCaseUsername, const char* authCookieContent) {
+  return setCookie(response, USERNAME_COOKIE_NAME, lCaseUsername, false) && setCookie(response, AHUTH_COOKIE_NAME, authCookieContent, true);
 }
 
 void Api::onNotFound(AsyncWebServerRequest* request) {
@@ -126,56 +126,56 @@ void Api::onNotFound(AsyncWebServerRequest* request) {
 }
 
 bool Api::createFirstAdmin(AsyncWebServerRequest* request) {
-  //username, password - ověřit validitu
-  //username to lower
-  //Ověřit zda neexistuje ještě žádný uživatel
   //Nastavit cookie
   if (request->hasParam("username", true)) {
     AsyncWebParameter* pUname = request->getParam("username", true);
     if (request->hasParam("password", true)) {
       AsyncWebParameter* pPassword = request->getParam("password", true);
-        Serial.println("BeforeRegister");       
-        User::CredentialsVerificationResult res = user.registerFirstAdmin(pUname->value().c_str(), pPassword->value().c_str());
-        switch (res) {
-          case User::CredentialsVerificationResult::OK:
+      Serial.println("BeforeRegister");
+      char lCaseUsername[User::USERNAME_BUFFER_SIZE] = { 0 };
+      User::CredentialsVerificationResult res = user.registerFirstAdmin(pUname->value().c_str(), pPassword->value().c_str(), lCaseUsername);
+      switch (res) {
+        case User::CredentialsVerificationResult::OK:
           {
             AsyncWebServerResponse* response = request->beginResponse(200, "text/plain", "OK");
-            //response->addHeader("Server", "ESP Async Web Server");
+            char authCookieContent[User::COOKIE_BUFFER_SIZE] = { 0 };
+            user.getNewCookie(lCaseUsername, authCookieContent);
+            setCookies(response, lCaseUsername, authCookieContent);
             request->send(response);
             return true;
           }
-          case User::CredentialsVerificationResult::USERNAME_SHORT:
-            request->send(200, "text/plain", "USERNAME_SHORT");
-            break;
-          case User::CredentialsVerificationResult::USERNAME_LONG:
-            request->send(200, "text/plain", "USERNAME_LONG");
-            break;
-          case User::CredentialsVerificationResult::USERNAME_INVALID_CHARACTERS:
-            request->send(200, "text/plain", "USERNAME_INVALID_CHARACTERS");
-            break;
-          case User::CredentialsVerificationResult::USERNAME_EMPTY:
-            request->send(200, "text/plain", "USERNAME_EMPTY");
-            break;
-          case User::CredentialsVerificationResult::PASSWORD_SHORT:
-            request->send(200, "text/plain", "PASSWORD_SHORT");
-            break;
-          case User::CredentialsVerificationResult::PASSWORD_LONG:
-            request->send(200, "text/plain", "PASSWORD_LONG");
-            break;
-          case User::CredentialsVerificationResult::PASSWORD_EMPTY:
-            request->send(200, "text/plain", "PASSWORD_EMPTY");
-            break;
-          case User::CredentialsVerificationResult::USERNAME_EXISTS:
-            request->send(200, "text/plain", "USERNAME_EXISTS");
-            break;
-          case User::CredentialsVerificationResult::ANY_USER_EXISTS:
-            request->send(200, "text/plain", "ANY_USER_EXISTS");
-            break;
-          default:
-            request->send(200, "text/plain", "UNKNOWN_ERROR");
-        }
+        case User::CredentialsVerificationResult::USERNAME_SHORT:
+          request->send(200, "text/plain", "USERNAME_SHORT");
+          break;
+        case User::CredentialsVerificationResult::USERNAME_LONG:
+          request->send(200, "text/plain", "USERNAME_LONG");
+          break;
+        case User::CredentialsVerificationResult::USERNAME_INVALID_CHARACTERS:
+          request->send(200, "text/plain", "USERNAME_INVALID_CHARACTERS");
+          break;
+        case User::CredentialsVerificationResult::USERNAME_EMPTY:
+          request->send(200, "text/plain", "USERNAME_EMPTY");
+          break;
+        case User::CredentialsVerificationResult::PASSWORD_SHORT:
+          request->send(200, "text/plain", "PASSWORD_SHORT");
+          break;
+        case User::CredentialsVerificationResult::PASSWORD_LONG:
+          request->send(200, "text/plain", "PASSWORD_LONG");
+          break;
+        case User::CredentialsVerificationResult::PASSWORD_EMPTY:
+          request->send(200, "text/plain", "PASSWORD_EMPTY");
+          break;
+        case User::CredentialsVerificationResult::USERNAME_EXISTS:
+          request->send(200, "text/plain", "USERNAME_EXISTS");
+          break;
+        case User::CredentialsVerificationResult::ANY_USER_EXISTS:
+          request->send(200, "text/plain", "ANY_USER_EXISTS");
+          break;
+        default:
+          request->send(200, "text/plain", "UNKNOWN_ERROR");
+      }
 
-        return false;
+      return false;
     }
   }
 
