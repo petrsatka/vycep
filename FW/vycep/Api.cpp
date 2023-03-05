@@ -131,7 +131,6 @@ bool Api::createFirstAdmin(AsyncWebServerRequest* request) {
     AsyncWebParameter* pUname = request->getParam("username", true);
     if (request->hasParam("password", true)) {
       AsyncWebParameter* pPassword = request->getParam("password", true);
-      Serial.println("BeforeRegister");
       char lCaseUsername[User::USERNAME_BUFFER_SIZE] = { 0 };
       User::CredentialsVerificationResult res = user.registerFirstAdmin(pUname->value().c_str(), pPassword->value().c_str(), lCaseUsername);
       switch (res) {

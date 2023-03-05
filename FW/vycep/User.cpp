@@ -108,7 +108,6 @@ bool User::isAnyUserSet() {
 }
 
 User::CredentialsVerificationResult User::validateUsername(const char* lCaseUsername) {
-  Serial.println("UserNameValidation");
   if (lCaseUsername == NULL || lCaseUsername[0] == 0) {
     return User::CredentialsVerificationResult::USERNAME_EMPTY;
   }
@@ -151,11 +150,10 @@ User::CredentialsVerificationResult User::registerUser(const char* username, con
 }
 
 User::CredentialsVerificationResult User::registerFirstAdmin(const char* username, const char* password, char* lCaseUsername) {
-  Serial.println("InRegister");
   if (isAnyUserSet()) {
     return User::CredentialsVerificationResult::ANY_USER_EXISTS;
   }
-  Serial.println("Before create");
+  
   return createUser(username, password, User::PERMISSIONS_ADMIN, lCaseUsername);
 }
 
