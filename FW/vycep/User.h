@@ -84,7 +84,6 @@ private:
   TSafePreferences* settings = NULL;
 
   static bool verifyCookieHash(const char* cookie);
-  static bool checkCookieMinimalLength(const char* cookie);
   static bool parseCookie(const char* cookie, char* username, uint32_t* permissions, struct tm* timeInfo, char* cookieHexHash, char* permissionsValidityHexHash);
   static void composeCookieBase(const char* lCaseUsername, uint32_t permissions, char* cookieBase, char* hexHash); //Volá composeCookieBase s aktuálním časem
   static void composeCookieBase(const char* lCaseUsername, uint32_t permissions, struct tm& timeInfo, char* cookieBase, char* hexHash);

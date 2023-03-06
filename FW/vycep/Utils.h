@@ -19,6 +19,7 @@ public:
   static bool isAlphaNumericStr(const char* str);
   static bool toLowerStr(const char* inStr, char* outStr, size_t bufferSize);
   static int strLenUTF8(const char* str);
+  static short getCookiePropsPosition(const char* cookie);
 
   static void test();
 

@@ -16,6 +16,11 @@ Api api(user);
 //Callback handler registrace prvního admina. Po vytvořaní admina bude odstraněn.
 AsyncCallbackWebHandler *firstRegistrationRedirectHandler = NULL;
 
+void test() {
+  user.test();
+  Utils::test();
+}
+
 //Inicalizace serveru
 void serverInit() {
   sprintln("!serverInit");
@@ -77,8 +82,7 @@ void serverInit() {
 
   //API - práva se kontroují až uvnitř
   server.on("/api/test", HTTP_GET, [](AsyncWebServerRequest *request) {
-    user.test();
-    Utils::test();
+    test();
     request->send(200, "text/plain", "Test");
   });
 
@@ -179,6 +183,7 @@ void setup() {
   user.clearAll();  //DEBUG odstranit !!!!
   serverInit();
   sprintln("Start");
+  test();
 }
 
 void loop() {

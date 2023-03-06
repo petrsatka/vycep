@@ -52,10 +52,34 @@ void Utils::test() {
   } else {
     sprintln("toLowerStr 2 test FAILED");
   }
+
+  char teststr[20] = { 0 };
+  appendChar(teststr, 'x');
+  appendChar(teststr, 'y');
+  if (strcmp(teststr, "xy") == 0) {
+    sprintln("appendChar test OK");
+  } else {
+    sprintln("appendChar test FAILED");
+  }
+
+  if (isAlphaNumericStr(NULL) == false && isAlphaNumericStr("abcdef123456789") == true && isAlphaNumericStr("ščřž") == false && isAlphaNumericStr("") == true) {
+    sprintln("isAlphaNumericStr test OK");
+  } else {
+    sprintln("isAlphaNumericStr test FAILED");
+  }
+
+  if (getCookiePropsPosition(NULL) == -1
+      && getCookiePropsPosition("eaf16bc07968e013f3f94ab1342472434a39fc3475f11cf341a6c3965974f8e9 eaf16bc07968e013f3f94ab1342472434a39fc3475f11cf341a6c3965974f8e9") == -1
+      && getCookiePropsPosition("eaf16bc07968e013f3f94ab1342472434a39fc3475f11cf341a6c3965974f8e9 eaf16bc07968e013f3f94ab1342472434a39fc3475f11cf341a6c3965974f8e9") == -1
+      && getCookiePropsPosition("eaf16bc07968e013f3f94ab1342472434a39fc3475f11cf341a6c3965974f8e9 eaf16bc07968e013f3f94ab1342472434a39fc3475f11cf341a6c3965974f8e9 x") == 130) {
+    sprintln("getCookiePropsPosition test OK");
+  } else {
+    sprintln("getCookiePropsPosition test FAILED");
+  }
 }
 
 void Utils::actTime(struct tm& timeInfo) {
-  sprintln("!actTime");
+  dprintln("actTime");
   time_t rawTime;
   time(&rawTime);
   localtime_r(&rawTime, &timeInfo);
@@ -72,7 +96,7 @@ void Utils::hexStr(const unsigned char* data, int len, char* buffer) {
 }
 
 size_t Utils::appendChar(char* str, char a) {
-  sprintln("!appendChar");
+  dprintln("appendChar");
   size_t len = strlen(str);
   str[len] = a;
   str[++len] = 0;
@@ -86,7 +110,7 @@ int Utils::computeHmacHash(const char* message, unsigned char* hash) {
 }
 
 bool Utils::isAlphaNumericStr(const char* str) {
-  sprintln("!isAlphaNumericStr");
+  dprintln("isAlphaNumericStr");
   if (str == NULL) {
     return false;
   }
@@ -127,4 +151,14 @@ int Utils::strLenUTF8(const char* str) {
   }
 
   return len;
+}
+
+short Utils::getCookiePropsPosition(const char* cookie) {
+  dprintln("getCookiePropsPosition");
+  short pos = 2 * Utils::HASH_HEXSTRING_BUFFER_SIZE;
+  if (cookie == NULL || strlen(cookie) <= pos) {
+    return -1;
+  }
+
+  return pos;
 }
