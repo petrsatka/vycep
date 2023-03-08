@@ -53,6 +53,29 @@ void User::test() {
   } else {
     sprintln("getPermissionsValidityHexHash 3 test FAILED");
   }
+
+  if (validatePassword(NULL) == User::CredentialsVerificationResult::PASSWORD_EMPTY
+      && validatePassword("") == User::CredentialsVerificationResult::PASSWORD_EMPTY
+      && validatePassword("ččččč") == User::CredentialsVerificationResult::PASSWORD_SHORT
+      && validatePassword("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa") == User::CredentialsVerificationResult::PASSWORD_LONG
+      && validatePassword("šššššššššššššššššššššššššššššš") == User::CredentialsVerificationResult::OK) {
+    sprintln("validatePassword OK");
+  } else {
+    sprintln("validatePassword FAILED");
+  }
+
+    if (validateUsername(NULL) == User::CredentialsVerificationResult::USERNAME_EMPTY
+      && validateUsername("") == User::CredentialsVerificationResult::USERNAME_EMPTY
+      && validateUsername("aaaa") == User::CredentialsVerificationResult::USERNAME_SHORT
+      && validateUsername("aaaaaaaaaaaaaaaa") == User::CredentialsVerificationResult::USERNAME_LONG
+      && validateUsername("aaaaaaš") == User::CredentialsVerificationResult::USERNAME_INVALID_CHARACTERS
+      && validateUsername("aaaaaa ") == User::CredentialsVerificationResult::USERNAME_INVALID_CHARACTERS
+      && validateUsername("aaaaaa.") == User::CredentialsVerificationResult::USERNAME_INVALID_CHARACTERS
+      && validateUsername("12345qwertzu789") == User::CredentialsVerificationResult::OK) {
+    sprintln("validateUsername OK");
+  } else {
+    sprintln("validateUsername FAILED");
+  }
 }
 
 bool User::clearAll() {
@@ -154,7 +177,7 @@ bool User::isAnyUserSet() {
 }
 
 User::CredentialsVerificationResult User::validateUsername(const char* lCaseUsername) {
-  sprintln("!validateUsername");
+  dprintln("validateUsername");
   if (lCaseUsername == NULL || lCaseUsername[0] == 0) {
     return User::CredentialsVerificationResult::USERNAME_EMPTY;
   }
@@ -176,7 +199,7 @@ User::CredentialsVerificationResult User::validateUsername(const char* lCaseUser
 }
 
 User::CredentialsVerificationResult User::validatePassword(const char* password) {
-  sprintln("!validatePassword");
+  dprintln("validatePassword");
   if (password == NULL || password[0] == 0) {
     return User::CredentialsVerificationResult::PASSWORD_EMPTY;
   }

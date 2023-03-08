@@ -90,7 +90,11 @@ bool Api::extractCookie(AsyncWebServerRequest* request, const char* cookieName, 
 }
 
 bool Api::setCookie(AsyncWebServerResponse* response, const char* name, const char* content, bool httpOnly) {
-  sprintln("!setCookie");
+  dprintln("setCookie");
+  if (name == NULL || name[0] == 0 || content == NULL) {
+    return false;
+  }
+
   String cookieStr = String(name);
   bool res = cookieStr.concat(content) && cookieStr.concat(COMMON_COOKIE_ATTRIBUTES);
   if (httpOnly) {
@@ -125,7 +129,7 @@ bool Api::unsetCookie(AsyncWebServerResponse* response, const char* name) {
 }
 
 bool Api::setCookies(AsyncWebServerResponse* response, const char* lCaseUsername, const char* authCookieContent) {
-  sprintln("!setCookies");
+  dprintln("setCookies");
   return setCookie(response, USERNAME_COOKIE_NAME, lCaseUsername, false) && setCookie(response, AHUTH_COOKIE_NAME, authCookieContent, true);
 }
 
