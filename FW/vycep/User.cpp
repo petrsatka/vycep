@@ -25,7 +25,7 @@ void User::test() {
       && !checkPermissions(PERMISSIONS_INACTIVE, PERMISSIONS_ADMIN)
       && !checkPermissions(PERMISSIONS_INACTIVE, PERMISSIONS_ACTIVE | PERMISSIONS_PAYMENT)
       && !checkPermissions(PERMISSIONS_ACTIVE, PERMISSIONS_ADMIN)) {
-    sprintln("Permissions test OK");
+    //sprintln("Permissions test OK");
   } else {
     sprintln("Permissions test FAILED");
   }
@@ -35,21 +35,21 @@ void User::test() {
   unsigned char pwdhash[Utils::HASH_BUFFER_SIZE] = "abcertyuknfrgterasdefgrtuioplkg";
   getPermissionsValidityHexHash("abc", 123, pwdhash, hexHash);
   if (strcmp(hexHash, "7e8cf5119ae6119a16cf62046ab311c9646167cfe4cc91bd4f729f485f5696b2") == 0) {
-    sprintln("getPermissionsValidityHexHash 1 test OK");
+    //sprintln("getPermissionsValidityHexHash 1 test OK");
   } else {
     sprintln("getPermissionsValidityHexHash 1 test FAILED");
   }
 
   getPermissionsValidityHexHash("", 123, pwdhash, hexHash);
   if (strcmp(hexHash, "bf55cd839748e334db52549ec2b4c81c51cf37ba0134a46332cef6eb4365d5d3") == 0) {
-    sprintln("getPermissionsValidityHexHash 2 test OK");
+    //sprintln("getPermissionsValidityHexHash 2 test OK");
   } else {
     sprintln("getPermissionsValidityHexHash 2 test FAILED");
   }
 
   getPermissionsValidityHexHash("asdfghjklpoiuyt", 4294967295, pwdhash, hexHash);
   if (strcmp(hexHash, "66d26b0ff123d569ebb03f9b60ded79cc9438b9c7ead18200c8b8e6d02745820") == 0) {
-    sprintln("getPermissionsValidityHexHash 3 test OK");
+    //sprintln("getPermissionsValidityHexHash 3 test OK");
   } else {
     sprintln("getPermissionsValidityHexHash 3 test FAILED");
   }
@@ -59,12 +59,12 @@ void User::test() {
       && validatePassword("ččččč") == User::CredentialsVerificationResult::PASSWORD_SHORT
       && validatePassword("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa") == User::CredentialsVerificationResult::PASSWORD_LONG
       && validatePassword("šššššššššššššššššššššššššššššš") == User::CredentialsVerificationResult::OK) {
-    sprintln("validatePassword OK");
+    //sprintln("validatePassword test OK");
   } else {
-    sprintln("validatePassword FAILED");
+    sprintln("validatePassword test FAILED");
   }
 
-    if (validateUsername(NULL) == User::CredentialsVerificationResult::USERNAME_EMPTY
+  if (validateUsername(NULL) == User::CredentialsVerificationResult::USERNAME_EMPTY
       && validateUsername("") == User::CredentialsVerificationResult::USERNAME_EMPTY
       && validateUsername("aaaa") == User::CredentialsVerificationResult::USERNAME_SHORT
       && validateUsername("aaaaaaaaaaaaaaaa") == User::CredentialsVerificationResult::USERNAME_LONG
@@ -72,9 +72,19 @@ void User::test() {
       && validateUsername("aaaaaa ") == User::CredentialsVerificationResult::USERNAME_INVALID_CHARACTERS
       && validateUsername("aaaaaa.") == User::CredentialsVerificationResult::USERNAME_INVALID_CHARACTERS
       && validateUsername("12345qwertzu789") == User::CredentialsVerificationResult::OK) {
-    sprintln("validateUsername OK");
+    //sprintln("validateUsername test OK");
   } else {
-    sprintln("validateUsername FAILED");
+    sprintln("validateUsername test FAILED");
+  }
+
+  char cookieBase[COOKIE_BUFFER_SIZE] = { 0 };
+  if (!composeCookieBase(NULL, 4294967295, NULL, NULL)
+      && !composeCookieBase("aaaaaaaaaaaaaaaa", 4294967295, cookieBase, hexHash)
+      && composeCookieBase("aaaaaaaaaaaaaaa", 4294967295, cookieBase, hexHash)
+      && composeCookieBase("", 4294967295, cookieBase, hexHash)) {
+    //sprintln("composeCookieBase test OK");
+  } else {
+    sprintln("composeCookieBase test FAILED");
   }
 }
 
@@ -105,15 +115,19 @@ void User::getPermissionsValidityHexHash(const char* lCaseUsername, uint32_t per
   Utils::hexStr(hash, Utils::HASH_BUFFER_SIZE, hexHash);
 }
 
-void User::composeCookieBase(const char* lCaseUsername, uint32_t permissions, char* cookieBase, char* hexHash) {
-  sprintln("!composeCookieBase1");
+bool User::composeCookieBase(const char* lCaseUsername, uint32_t permissions, char* cookieBase, char* hexHash) {
+  dprintln("composeCookieBase1");
   struct tm timeInfo;
   Utils::actTime(timeInfo);
-  composeCookieBase(lCaseUsername, permissions, timeInfo, cookieBase, hexHash);
+  return composeCookieBase(lCaseUsername, permissions, timeInfo, cookieBase, hexHash);
 }
 
-void User::composeCookieBase(const char* lCaseUsername, uint32_t permissions, struct tm& timeInfo, char* cookieBase, char* hexHash) {
-  sprintln("!composeCookieBase2");
+bool User::composeCookieBase(const char* lCaseUsername, uint32_t permissions, struct tm& timeInfo, char* cookieBase, char* hexHash) {
+  dprintln("composeCookieBase2");
+  if (lCaseUsername == NULL || strlen(lCaseUsername) > USERNAME_MAX_CHAR_COUNT || cookieBase == NULL || hexHash == NULL) {
+    return false;
+  }
+
   strcpy(cookieBase, lCaseUsername);
   Utils::appendChar(cookieBase, COOKIE_DELIMITER);
   utoa(permissions, &cookieBase[strlen(cookieBase)], 10);
@@ -122,6 +136,7 @@ void User::composeCookieBase(const char* lCaseUsername, uint32_t permissions, st
   unsigned char hash[Utils::HASH_BUFFER_SIZE];
   Utils::computeHmacHash(cookieBase, hash);
   Utils::hexStr(hash, Utils::HASH_BUFFER_SIZE, hexHash);
+  return true;
 }
 
 bool User::parseCookie(const char* cookie, char* username, uint32_t* permissions, struct tm* timeInfo, char* cookieHexHash, char* permissionsValidityHexHash) {
@@ -299,7 +314,10 @@ bool User::getNewCookie(const char* lCaseUsername, char* cookie) {
 
   uint32_t permissions = permissionsStorage->getUInt(lCaseUsername, 0);
   //Hash pro ověření cookie a cookie
-  composeCookieBase(lCaseUsername, permissions, cookieBase, cookie);
+  if (!composeCookieBase(lCaseUsername, permissions, cookieBase, cookie)) {
+    return false;
+  }
+
   Utils::appendChar(cookie, COOKIE_DELIMITER);
   //Hash pro ověření změny hesla a práv
   getPermissionsValidityHexHash(lCaseUsername, permissions, passwordHash, &cookie[strlen(cookie)]);

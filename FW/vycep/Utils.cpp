@@ -9,7 +9,7 @@ void Utils::test() {
   char buff[256 * 2 + 1];
   Utils::hexStr(tArr, sizeof(tArr), buff);
   if (strcmp(buff, refStr) == 0) {
-    sprintln("HexStr test 1 OK");
+    //sprintln("HexStr test 1 OK");
   } else {
     sprintln("HexStr test 1 FAILED");
   }
@@ -17,7 +17,7 @@ void Utils::test() {
   char buff2[1000];
   Utils::hexStr(tArr, sizeof(tArr), buff2);
   if (strcmp(buff2, refStr) == 0) {
-    sprintln("HexStr test 2 OK");
+    //sprintln("HexStr test 2 OK");
   } else {
     sprintln("HexStr test 2 FAILED");
   }
@@ -27,13 +27,13 @@ void Utils::test() {
   char hexhash[Utils::HASH_HEXSTRING_BUFFER_SIZE];
   Utils::hexStr(hash, sizeof(hash), hexhash);
   if (strcmp(hexhash, "97ee2acc08dd69ac9879e5b22b71544b79ea3997bc28dfd878948a125f857928") == 0) {
-    sprintln("computeHmacHash test OK");
+    //sprintln("computeHmacHash test OK");
   } else {
     sprintln("computeHmacHash test FAILED");
   }
 
   if (strLenUTF8(String("ěščřžýáíé 789 / ;.").c_str()) == 18) {
-    sprintln("strLenUTF8 test OK");
+    //sprintln("strLenUTF8 test OK");
   } else {
     sprintln("strLenUTF8 test FAILED");
   }
@@ -41,14 +41,14 @@ void Utils::test() {
   char lbuffer[8];
   toLowerStr("ABCDEFGIJKL", lbuffer, sizeof(lbuffer));
   if (strcmp(lbuffer, "abcdefg") == 0) {
-    sprintln("toLowerStr 1 test OK");
+    //sprintln("toLowerStr 1 test OK");
   } else {
     sprintln("toLowerStr 1 test FAILED");
   }
 
   toLowerStr("ABC", lbuffer, sizeof(lbuffer));
   if (strcmp(lbuffer, "abc") == 0) {
-    sprintln("toLowerStr 2 test OK");
+    //sprintln("toLowerStr 2 test OK");
   } else {
     sprintln("toLowerStr 2 test FAILED");
   }
@@ -57,13 +57,13 @@ void Utils::test() {
   appendChar(teststr, 'x');
   appendChar(teststr, 'y');
   if (strcmp(teststr, "xy") == 0) {
-    sprintln("appendChar test OK");
+    //sprintln("appendChar test OK");
   } else {
     sprintln("appendChar test FAILED");
   }
 
   if (isAlphaNumericStr(NULL) == false && isAlphaNumericStr("abcdef123456789") == true && isAlphaNumericStr("ščřž") == false && isAlphaNumericStr("") == true) {
-    sprintln("isAlphaNumericStr test OK");
+    //sprintln("isAlphaNumericStr test OK");
   } else {
     sprintln("isAlphaNumericStr test FAILED");
   }
@@ -72,7 +72,7 @@ void Utils::test() {
       && getCookiePropsPosition("eaf16bc07968e013f3f94ab1342472434a39fc3475f11cf341a6c3965974f8e9 eaf16bc07968e013f3f94ab1342472434a39fc3475f11cf341a6c3965974f8e9") == -1
       && getCookiePropsPosition("eaf16bc07968e013f3f94ab1342472434a39fc3475f11cf341a6c3965974f8e9 eaf16bc07968e013f3f94ab1342472434a39fc3475f11cf341a6c3965974f8e9") == -1
       && getCookiePropsPosition("eaf16bc07968e013f3f94ab1342472434a39fc3475f11cf341a6c3965974f8e9 eaf16bc07968e013f3f94ab1342472434a39fc3475f11cf341a6c3965974f8e9 x") == 130) {
-    sprintln("getCookiePropsPosition test OK");
+    //sprintln("getCookiePropsPosition test OK");
   } else {
     sprintln("getCookiePropsPosition test FAILED");
   }

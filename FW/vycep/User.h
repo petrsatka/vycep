@@ -85,8 +85,8 @@ private:
 
   static bool verifyCookieHash(const char* cookie);
   static bool parseCookie(const char* cookie, char* username, uint32_t* permissions, struct tm* timeInfo, char* cookieHexHash, char* permissionsValidityHexHash);
-  static void composeCookieBase(const char* lCaseUsername, uint32_t permissions, char* cookieBase, char* hexHash); //Volá composeCookieBase s aktuálním časem
-  static void composeCookieBase(const char* lCaseUsername, uint32_t permissions, struct tm& timeInfo, char* cookieBase, char* hexHash);
+  static bool composeCookieBase(const char* lCaseUsername, uint32_t permissions, char* cookieBase, char* hexHash); //Volá composeCookieBase s aktuálním časem
+  static bool composeCookieBase(const char* lCaseUsername, uint32_t permissions, struct tm& timeInfo, char* cookieBase, char* hexHash); //Sestaví obsah cookie a vrátí obsah a hash obsahu
   static CredentialsVerificationResult validateUsername(const char* lCaseUsername);
   static CredentialsVerificationResult validatePassword(const char* password);
 
