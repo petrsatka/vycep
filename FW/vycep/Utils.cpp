@@ -125,7 +125,7 @@ bool Utils::isAlphaNumericStr(const char* str) {
 
 bool Utils::toLowerStr(const char* inStr, char* outStr, size_t bufferSize) {
   dprintln("toLowerStr");
-  if (inStr != NULL) {
+  if (inStr != NULL || outStr != NULL) {
     int i = 0;
     while (inStr[i] != 0 && i < bufferSize - 1) {
       outStr[i] = tolower(inStr[i]);

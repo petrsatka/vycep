@@ -96,8 +96,37 @@ void User::test() {
     sprintln("getNewCookie test FAILED");
   }
 
-  if (registerFirstAdmin(NULL, "aaaaaaaaa", NULL)) {
+  char lCaseUsername[USERNAME_BUFFER_SIZE];
+  if (registerFirstAdmin(NULL, "aaaaaaaaaaaaaaab", lCaseUsername) != User::CredentialsVerificationResult::OK
+      && registerFirstAdmin("", "aaaaaaaaaaaaaaab", lCaseUsername) != User::CredentialsVerificationResult::OK
+      && registerFirstAdmin("aaaaaaaaab", NULL, lCaseUsername) != User::CredentialsVerificationResult::OK
+      && registerFirstAdmin("aaaaaaaaab", "", lCaseUsername) != User::CredentialsVerificationResult::OK
+      && registerFirstAdmin("aaaaaaaaab", "bbbbbbbbbc", NULL) != User::CredentialsVerificationResult::OK
+      && registerFirstAdmin("aab", "bbbbbbbbbc", lCaseUsername) != User::CredentialsVerificationResult::OK
+      && registerFirstAdmin("aaaaaaaaaaaaaaab", "bbbbbbbbbc", lCaseUsername) != User::CredentialsVerificationResult::OK
+      && registerFirstAdmin("aaaaaaaaaaaaaab", "bbbbc", lCaseUsername) != User::CredentialsVerificationResult::OK
+      && registerFirstAdmin("aaaaaaaaaaaaaab", "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc", lCaseUsername) != User::CredentialsVerificationResult::OK
+      && registerFirstAdmin("aaaaaaaaaaaaaab", "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbc", lCaseUsername) == User::CredentialsVerificationResult::OK
+      && registerFirstAdmin("aaaaaaaaaaaaaac", "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbc", lCaseUsername) != User::CredentialsVerificationResult::OK) {
+  //sprintln("registerFirstAdmin test OK");
+  } else {
+    sprintln("registerFirstAdmin test FAILED");
+  }
 
+  if (createUser(NULL, "aaaaaaaaaaaaaaaa", 4294967295, lCaseUsername) != User::CredentialsVerificationResult::OK
+      && createUser("", "aaaaaaaaaaaaaaaa", 4294967295, lCaseUsername) != User::CredentialsVerificationResult::OK
+      && createUser("aaaaaaaaaa", NULL, 4294967295, lCaseUsername) != User::CredentialsVerificationResult::OK
+      && createUser("aaaaaaaaaa", "", 4294967295, lCaseUsername) != User::CredentialsVerificationResult::OK
+      && createUser("aaaaaaaaaa", "bbbbbbbbbb", 4294967295, NULL) != User::CredentialsVerificationResult::OK
+      && createUser("aaa", "bbbbbbbbbb", 4294967295, lCaseUsername) != User::CredentialsVerificationResult::OK
+      && createUser("aaaaaaaaaaaaaaaa", "bbbbbbbbbb", 4294967295, lCaseUsername) != User::CredentialsVerificationResult::OK
+      && createUser("aaaaaaaaaaaaaaa", "bbbbb", 4294967295, lCaseUsername) != User::CredentialsVerificationResult::OK
+      && createUser("aaaaaaaaaaaaaaa", "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", 4294967295, lCaseUsername) != User::CredentialsVerificationResult::OK
+      && createUser("aaaaaaaaaaaaaaa", "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", 4294967295, lCaseUsername) == User::CredentialsVerificationResult::OK
+      && createUser("aaaaaaaaaaaaaaa", "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", 4294967295, lCaseUsername) != User::CredentialsVerificationResult::OK) {
+  //sprintln("createUser test OK");
+  } else {
+    sprintln("createUser test FAILED");
   }
 }
 
@@ -250,7 +279,7 @@ User::CredentialsVerificationResult User::registerUser(const char* username, con
 }
 
 User::CredentialsVerificationResult User::registerFirstAdmin(const char* username, const char* password, char* lCaseUsername) {
-  sprintln("!registerFirstAdmin");
+  dprintln("registerFirstAdmin");
   if (isAnyUserSet()) {
     return User::CredentialsVerificationResult::ANY_USER_EXISTS;
   }
@@ -259,14 +288,20 @@ User::CredentialsVerificationResult User::registerFirstAdmin(const char* usernam
 }
 
 User::CredentialsVerificationResult User::createUser(const char* username, const char* password, uint32_t permissions, char* lCaseUsername) {
-  sprintln("!createUser");
+  dprintln("createUser");
+  if (lCaseUsername == NULL) {
+    return User::CredentialsVerificationResult::UNKNOWN_ERROR;
+  }
+
   User::CredentialsVerificationResult verificationResult = validateUsername(username);
 
   if (verificationResult != User::CredentialsVerificationResult::OK) {
     return verificationResult;
   }
 
-  Utils::toLowerStr(username, lCaseUsername, USERNAME_BUFFER_SIZE);
+  if (!Utils::toLowerStr(username, lCaseUsername, USERNAME_BUFFER_SIZE)) {
+    return User::CredentialsVerificationResult::UNKNOWN_ERROR;
+  };
 
   verificationResult = validatePassword(password);
   if (verificationResult != User::CredentialsVerificationResult::OK) {

@@ -90,7 +90,7 @@ void serverInit() {
     if (api.createFirstAdmin(request)) {
       server.removeHandler(firstRegistrationRedirectHandler);
       firstRegistrationRedirectHandler = NULL;
-      sprintln("First admin created");
+      dprintln("First admin created");
     }
   });
 
@@ -184,6 +184,7 @@ void setup() {
   serverInit();
   sprintln("Start");
   test();
+  user.clearAll();  //DEBUG odstranit !!!!
 }
 
 void loop() {

@@ -192,7 +192,7 @@ size_t TSafePreferences::putBytes(const char* key, const void* value, size_t len
 }
 
 bool TSafePreferences::isKey(const char* key) {
-  sprintln("!isKey");
+  dprintln("isKey");
   bool res = 0;
   if (this->xMutex != NULL && xSemaphoreTake(this->xMutex, portMAX_DELAY)) {
     res = preferences.isKey(key);

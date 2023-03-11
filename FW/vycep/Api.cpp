@@ -139,7 +139,7 @@ void Api::onNotFound(AsyncWebServerRequest* request) {
 }
 
 bool Api::createFirstAdmin(AsyncWebServerRequest* request) {
-  sprintln("!createFirstAdmin");
+  dprintln("createFirstAdmin");
   if (request->hasParam("username", true)) {
     AsyncWebParameter* pUname = request->getParam("username", true);
     if (request->hasParam("password", true)) {
