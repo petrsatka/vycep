@@ -181,7 +181,7 @@ size_t TSafePreferences::putString(const char* key, String value) {
 }
 
 size_t TSafePreferences::putBytes(const char* key, const void* value, size_t len) {
-  sprintln("!putBytes");
+  dprintln("putBytes");
   size_t res = 0;
   if (this->xMutex != NULL && xSemaphoreTake(this->xMutex, portMAX_DELAY)) {
     res = preferences.putBytes(key, value, len);
@@ -390,7 +390,7 @@ size_t TSafePreferences::getBytesLength(const char* key) {
 }
 
 size_t TSafePreferences::getBytes(const char* key, void* buf, size_t maxLen) {
-  sprintln("!getBytes");
+  dprintln("getBytes");
   size_t res = 0;
   if (this->xMutex != NULL && xSemaphoreTake(this->xMutex, portMAX_DELAY)) {
     res = preferences.getBytes(key, buf, maxLen);

@@ -77,14 +77,27 @@ void User::test() {
     sprintln("validateUsername test FAILED");
   }
 
-  char cookieBase[COOKIE_BUFFER_SIZE] = { 0 };
+  char cookie[COOKIE_BUFFER_SIZE] = { 0 };
   if (!composeCookieBase(NULL, 4294967295, NULL, NULL)
-      && !composeCookieBase("aaaaaaaaaaaaaaaa", 4294967295, cookieBase, hexHash)
-      && composeCookieBase("aaaaaaaaaaaaaaa", 4294967295, cookieBase, hexHash)
-      && composeCookieBase("", 4294967295, cookieBase, hexHash)) {
+      && !composeCookieBase("aaaaaaaaaaaaaaaa", 4294967295, cookie, hexHash)
+      && composeCookieBase("aaaaaaaaaaaaaaa", 4294967295, cookie, hexHash)
+      && composeCookieBase("", 4294967295, cookie, hexHash)) {
     //sprintln("composeCookieBase test OK");
   } else {
     sprintln("composeCookieBase test FAILED");
+  }
+
+  if (!getNewCookie(NULL, NULL)
+      && !getNewCookie("aaaaaaaaaaaaaaaa", cookie)
+      && !getNewCookie("aaaaaaaaaaaaaaa", cookie)
+      && !getNewCookie("", cookie)) {
+    //sprintln("getNewCookie test OK");
+  } else {
+    sprintln("getNewCookie test FAILED");
+  }
+
+  if (registerFirstAdmin(NULL, "aaaaaaaaa", NULL)) {
+
   }
 }
 
@@ -303,7 +316,11 @@ bool User::setPassword(const char* lCaseUsername, const char* password) {
 }
 
 bool User::getNewCookie(const char* lCaseUsername, char* cookie) {
-  sprintln("!getNewCookie");
+  dprintln("getNewCookie");
+  if (lCaseUsername == NULL || lCaseUsername[0] == 0 || cookie == NULL) {
+    return false;
+  }
+
   unsigned char passwordHash[Utils::HASH_BUFFER_SIZE];
   char cookieBase[COOKIE_BUFFER_SIZE] = { 0 };
   bool res = true;
