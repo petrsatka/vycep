@@ -108,7 +108,7 @@ void User::test() {
       && registerFirstAdmin("aaaaaaaaaaaaaab", "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc", lCaseUsername) != User::CredentialsVerificationResult::OK
       && registerFirstAdmin("aaaaaaaaaaaaaab", "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbc", lCaseUsername) == User::CredentialsVerificationResult::OK
       && registerFirstAdmin("aaaaaaaaaaaaaac", "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbc", lCaseUsername) != User::CredentialsVerificationResult::OK) {
-  //sprintln("registerFirstAdmin test OK");
+    //sprintln("registerFirstAdmin test OK");
   } else {
     sprintln("registerFirstAdmin test FAILED");
   }
@@ -124,9 +124,31 @@ void User::test() {
       && createUser("aaaaaaaaaaaaaaa", "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", 4294967295, lCaseUsername) != User::CredentialsVerificationResult::OK
       && createUser("aaaaaaaaaaaaaaa", "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", 4294967295, lCaseUsername) == User::CredentialsVerificationResult::OK
       && createUser("aaaaaaaaaaaaaaa", "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", 4294967295, lCaseUsername) != User::CredentialsVerificationResult::OK) {
-  //sprintln("createUser test OK");
+    //sprintln("createUser test OK");
   } else {
     sprintln("createUser test FAILED");
+  }
+
+  char username[USERNAME_BUFFER_SIZE];
+  uint32_t permissions = 0;
+  struct tm timeInfo;
+  char cookieHexHash[Utils::HASH_HEXSTRING_BUFFER_SIZE];
+  char permissionsHash[Utils::HASH_HEXSTRING_BUFFER_SIZE];
+
+  //ba59c6e6760031958a3a598b3afc772a91ebda9f0de4344bbbad314eb65eeabc e7623fbae5eabb2c891a5574d444fbfce3c8e9e51080f634b13443675cbad170 brumbal 14 2023-03-12T20:50:15
+  if (!parseCookie(NULL, username, &permissions, &timeInfo, cookieHexHash, permissionsHash)
+      && !parseCookie("", username, &permissions, &timeInfo, cookieHexHash, permissionsHash)
+      && !parseCookie("ba59c6e6760031958a3a598b3afc772a91ebda9f0de4344bbbad314eb65eeabc e7623fbae5eabb2c891a5574d444fbfce3c8e9e51080f634b13443675cbad170 brumbal 14 ", username, &permissions, &timeInfo, cookieHexHash, permissionsHash)
+      && !parseCookie("ba59c6e6760031958a3a598b3afc772a91ebda9f0de4344bbbad314eb65eeabc e7623fbae5eabb2c891a5574d444fbfce3c8e9e51080f634b13443675cbad170 brumbal", username, &permissions, &timeInfo, cookieHexHash, permissionsHash)
+      && !parseCookie("ba59c6e6760031958a3a598b3afc772a91ebda9f0de4344bbbad314eb65eeabc e7623fbae5eabb2c891a5574d444fbfce3c8e9e51080f634b13443675cbad170", username, &permissions, &timeInfo, cookieHexHash, permissionsHash)
+      && !parseCookie("ba59c6e6760031958a3a598b3afc772a91ebda9f0de4344bbbad314eb65eeabc e7623fbae5eabb2c891a5574d444fbfce3c8e9e51080f634b13443675cbad17", username, &permissions, &timeInfo, cookieHexHash, permissionsHash)
+      && parseCookie("ba59c6e6760031958a3a598b3afc772a91ebda9f0de4344bbbad314eb65eeabc e7623fbae5eabb2c891a5574d444fbfce3c8e9e51080f634b13443675cbad170 brumbal 14 2023-03-12T20:50:15", NULL, NULL, NULL, NULL, NULL)
+      && parseCookie("ba59c6e6760031958a3a598b3afc772a91ebda9f0de4344bbbad314eb65eeabc e7623fbae5eabb2c891a5574d444fbfce3c8e9e51080f634b13443675cbad170 brumbal 14 2023-03-12T20:50:15", username, &permissions, &timeInfo, cookieHexHash, permissionsHash)
+      && strcmp(username, "brumbal") == 0 && permissions == 14 && strcmp(cookieHexHash, "ba59c6e6760031958a3a598b3afc772a91ebda9f0de4344bbbad314eb65eeabc") == 0 && strcmp(permissionsHash, "e7623fbae5eabb2c891a5574d444fbfce3c8e9e51080f634b13443675cbad170") == 0
+      && timeInfo.tm_year == 2023 - 1900 && timeInfo.tm_mon == 2 && timeInfo.tm_mday == 12 && timeInfo.tm_hour == 20 && timeInfo.tm_min == 50 && timeInfo.tm_sec == 15) {
+    //sprintln("parseCookie test OK");
+  } else {
+    sprintln("parseCookie test FAILED");
   }
 }
 
@@ -182,7 +204,11 @@ bool User::composeCookieBase(const char* lCaseUsername, uint32_t permissions, st
 }
 
 bool User::parseCookie(const char* cookie, char* username, uint32_t* permissions, struct tm* timeInfo, char* cookieHexHash, char* permissionsValidityHexHash) {
-  sprintln("!parseCookie");
+  dprintln("parseCookie");
+  if (cookie == NULL || cookie[0] == 0 || Utils::getCookiePropsPosition(cookie) < 0) {
+    return false;
+  }
+
   if (cookieHexHash != NULL) {
     memcpy(cookieHexHash, cookie, Utils::HASH_HEXSTRING_BUFFER_SIZE - 1);
     cookieHexHash[Utils::HASH_HEXSTRING_BUFFER_SIZE - 1] = 0;
@@ -213,8 +239,9 @@ bool User::parseCookie(const char* cookie, char* username, uint32_t* permissions
   }
 
   char* pEnd = NULL;
+  uint32_t perm = (uint32_t)strtoul(lastStartPos, &pEnd, 10);
   if (permissions != NULL) {
-    *permissions = (uint32_t)strtoul(lastStartPos, &pEnd, 10);
+    *permissions = perm;
   }
 
   if (pEnd == NULL || *pEnd == 0) {
