@@ -135,7 +135,6 @@ void User::test() {
   char cookieHexHash[Utils::HASH_HEXSTRING_BUFFER_SIZE];
   char permissionsHash[Utils::HASH_HEXSTRING_BUFFER_SIZE];
 
-  //ba59c6e6760031958a3a598b3afc772a91ebda9f0de4344bbbad314eb65eeabc e7623fbae5eabb2c891a5574d444fbfce3c8e9e51080f634b13443675cbad170 brumbal 14 2023-03-12T20:50:15
   if (!parseCookie(NULL, username, &permissions, &timeInfo, cookieHexHash, permissionsHash)
       && !parseCookie("", username, &permissions, &timeInfo, cookieHexHash, permissionsHash)
       && !parseCookie("ba59c6e6760031958a3a598b3afc772a91ebda9f0de4344bbbad314eb65eeabc e7623fbae5eabb2c891a5574d444fbfce3c8e9e51080f634b13443675cbad170 brumbal 14 ", username, &permissions, &timeInfo, cookieHexHash, permissionsHash)
@@ -149,6 +148,17 @@ void User::test() {
     //sprintln("parseCookie test OK");
   } else {
     sprintln("parseCookie test FAILED");
+  }
+
+  if (!verifyCookieHash(NULL)
+      && !verifyCookieHash("")
+      && !verifyCookieHash("ba59c6e6760031958a3a598b3afc772a91ebda9f0de4344bbbad314eb65eeabc e7623fbae5eabb2c891a5574d444fbfce3c8e9e51080f634b13443675cbad170 brumbal 14 2023-03-12T20:50:16")
+      && !verifyCookieHash("ba59c6e6760031958a3a598b3afc772a91ebda9f0de4344bbbad314eb65eeabc e7623fbae5eabb2c891a5574d444fbfce3c8e9e51080f634b13443675cbad170 brumbal 13 2023-03-12T20:50:15")
+      && !verifyCookieHash("ba59c6e6760031958a3a598b3afc772a91ebda9f0de4344bbbad314eb65eeabc e7623fbae5eabb2c891a5574d444fbfce3c8e9e51080f634b13443675cbad170 brumbax 14 2023-03-12T20:50:15")
+      && verifyCookieHash("ba59c6e6760031958a3a598b3afc772a91ebda9f0de4344bbbad314eb65eeabc e7623fbae5eabb2c891a5574d444fbfce3c8e9e51080f634b13443675cbad170 brumbal 14 2023-03-12T20:50:15")) {
+    //sprintln("verifyCookieHash test OK");
+  } else {
+    sprintln("verifyCookieHash test FAILED");
   }
 }
 
@@ -431,7 +441,7 @@ bool User::verifyPermissionsHash(const char* cookie) {
 }
 
 bool User::verifyCookieHash(const char* cookie) {
-  sprintln("!verifyCookieHash");
+  dprintln("verifyCookieHash");
   short propPartPos = Utils::getCookiePropsPosition(cookie);
   if (propPartPos < 0) {
     return false;
