@@ -76,13 +76,17 @@ void Api::serveDynamicAuth(AsyncWebServerRequest* request, ResponseGetterFunctio
 }
 
 bool Api::extractCookie(AsyncWebServerRequest* request, const char* cookieName, char* cookie) {
-  sprintln("!extractCookie");
+  dprintln("extractCookie");
   if (request->hasHeader("cookie")) {
     char* cookiePos = strstr(request->getHeader("cookie")->value().c_str(), cookieName);
     if (cookiePos != NULL && cookiePos[strlen(cookieName)] != 0) {
       cookiePos += strlen(cookieName);
-      strcpy(cookie, cookiePos);
-      return true;
+      if (strlen(cookiePos) < User::COOKIE_BUFFER_SIZE) {
+        strcpy(cookie, cookiePos);
+        return true;
+      } else {
+        return false;
+      }
     }
   }
 

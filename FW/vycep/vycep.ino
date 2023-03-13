@@ -174,8 +174,8 @@ void setup() {
   }
 
   struct tm timeInfo;
-  if (!getLocalTime(&timeInfo)) {
-    //čekání na NTP. max 5s;
+  if (!getLocalTime(&timeInfo, 10000)) {
+    //čekání na NTP. max 10s;
     sprintln("NTP Timeout");
   }
 
