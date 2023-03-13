@@ -49,7 +49,7 @@ void Api::serveAuth(AsyncWebServerRequest* request, uint32_t permissionMask, Res
 }
 
 void Api::serveStaticAuth(AsyncWebServerRequest* request, const char* path, uint32_t permissionMask) {
-  sprintln("!serveStaticAuth");
+  dprintln("serveStaticAuth");
   serveAuth(
     request, permissionMask, [request, path]() {
       return request->beginResponse(LittleFS, path);

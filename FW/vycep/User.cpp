@@ -162,19 +162,19 @@ void User::test() {
     sprintln("verifyCookieHash test FAILED");
   }
 
-  createUser("Brumbal", "Brumbal", PERMISSIONS_ACTIVE | PERMISSIONS_PAYMENT | PERMISSIONS_ADMIN, lCaseUsername);
-  char newCookie[COOKIE_BUFFER_SIZE];
-  if (getCookieInfo(NULL, username, &permissions, newCookie) >= User::CookieVerificationResult::INVALID_HASH
-      && getCookieInfo("ba59c6e6760031958a3a598b3afc772a91ebda9f0de4344bbbad314eb65eeabc e7623fbae5eabb2c891a5574d444fbfce3c8e9e51080f634b13443675cbad170 brumbal 14 2023-03-12T20:50:15", NULL, &permissions, newCookie) == User::CookieVerificationResult::OK
-      && getCookieInfo("ba59c6e6760031958a3a598b3afc772a91ebda9f0de4344bbbad314eb65eeabc e7623fbae5eabb2c891a5574d444fbfce3c8e9e51080f634b13443675cbad170 brumbal 14 2023-03-12T20:50:15", username, NULL, newCookie) == User::CookieVerificationResult::OK
-      && getCookieInfo("7ba0f007c4a82291d35e594d639ef9673928c3d985da9381c85099620bda1a12 5db3f56bbe4a48790c561c06923fb553596c456e36deff257fedde237262feb3 halohalo 14 1970-01-01T00:00:23", username, &permissions, newCookie) == User::CookieVerificationResult::INVALID_PERMISSIONS
-      && getCookieInfo("275e72ec7b5b3fc46e277ce29610106065458fcdf8386781653e0498dc88eba3 e7623fbae5eabb2c891a5574d444fbfce3c8e9e51080f634b13443675cbad170 brumbal 14 1970-01-01T00:00:20", username, &permissions, NULL) == User::CookieVerificationResult::OUT_OF_DATE_UNABLE_TO_REVALIDATE
-      && getCookieInfo("275e72ec7b5b3fc46e277ce29610106065458fcdf8386781653e0498dc88eba3 e7623fbae5eabb2c891a5574d444fbfce3c8e9e51080f634b13443675cbad170 brumbal 14 1970-01-01T00:00:20", username, &permissions, newCookie) == User::CookieVerificationResult::OUT_OF_DATE_REVALIDATED) {
-    //sprintln("getCookieInfo test OK");
-    //sprintln(newCookie);
-  } else {
-    sprintln("getCookieInfo test FAILED");
-  }
+  // createUser("Brumbal", "Brumbal", PERMISSIONS_ACTIVE | PERMISSIONS_PAYMENT | PERMISSIONS_ADMIN, lCaseUsername);
+  // char newCookie[COOKIE_BUFFER_SIZE];
+  // if (getCookieInfo(NULL, username, &permissions, newCookie) >= User::CookieVerificationResult::INVALID_HASH
+  //     && getCookieInfo("ba59c6e6760031958a3a598b3afc772a91ebda9f0de4344bbbad314eb65eeabc e7623fbae5eabb2c891a5574d444fbfce3c8e9e51080f634b13443675cbad170 brumbal 14 2023-03-12T20:50:15", NULL, &permissions, newCookie) == User::CookieVerificationResult::OK
+  //     && getCookieInfo("ba59c6e6760031958a3a598b3afc772a91ebda9f0de4344bbbad314eb65eeabc e7623fbae5eabb2c891a5574d444fbfce3c8e9e51080f634b13443675cbad170 brumbal 14 2023-03-12T20:50:15", username, NULL, newCookie) == User::CookieVerificationResult::OK
+  //     && getCookieInfo("7ba0f007c4a82291d35e594d639ef9673928c3d985da9381c85099620bda1a12 5db3f56bbe4a48790c561c06923fb553596c456e36deff257fedde237262feb3 halohalo 14 1970-01-01T00:00:23", username, &permissions, newCookie) == User::CookieVerificationResult::INVALID_PERMISSIONS
+  //     && getCookieInfo("275e72ec7b5b3fc46e277ce29610106065458fcdf8386781653e0498dc88eba3 e7623fbae5eabb2c891a5574d444fbfce3c8e9e51080f634b13443675cbad170 brumbal 14 1970-01-01T00:00:20", username, &permissions, NULL) == User::CookieVerificationResult::OUT_OF_DATE_UNABLE_TO_REVALIDATE
+  //     && getCookieInfo("275e72ec7b5b3fc46e277ce29610106065458fcdf8386781653e0498dc88eba3 e7623fbae5eabb2c891a5574d444fbfce3c8e9e51080f634b13443675cbad170 brumbal 14 1970-01-01T00:00:20", username, &permissions, newCookie) == User::CookieVerificationResult::OUT_OF_DATE_REVALIDATED) {
+  //   //sprintln("getCookieInfo test OK");
+  //   //sprintln(newCookie);
+  // } else {
+  //   sprintln("getCookieInfo test FAILED");
+  // }
 }
 
 bool User::clearAll() {

@@ -25,7 +25,7 @@ void test() {
 
 //Inicalizace serveru
 void serverInit() {
-  sprintln("!serverInit");
+  dprintln("serverInit");
   //Vždy přístupný obsah
   server.serveStatic("/images/", LittleFS, "/www/images/");
   server.serveStatic("/scripts/", LittleFS, "/www/scripts/");
@@ -206,6 +206,7 @@ void setup() {
   }
 
   sprintln(WiFi.localIP().toString());
+  user.clearAll(); //Debug - odstranit !!!!
   serverInit();
   sprintln("Start");
   test();  //Debug - odstranit !!!!!
