@@ -8,8 +8,7 @@ Api::~Api() {
 }
 
 void Api::serveAuth(AsyncWebServerRequest* request, uint32_t permissionMask, ResponseGetterFunction responseGetter, ResponseGetterFunction noPermissionsresponseGetter, ErrorResponseFunction errorResponse) {
-  sprintln("!serveAuth");
-  ///OTESTOVAT všechny ify !!!!!
+  dprintln("serveAuth");
   char cookie[User::COOKIE_BUFFER_SIZE] = { 0 };
   if (extractCookie(request, AHUTH_COOKIE_NAME, cookie)) {
     char username[User::USERNAME_BUFFER_SIZE] = { 0 };
@@ -36,7 +35,6 @@ void Api::serveAuth(AsyncWebServerRequest* request, uint32_t permissionMask, Res
             request->send(response);
             return;
           } else {
-            //OTESTOVAT!!!!!
             delete (response);
           }
         } else {

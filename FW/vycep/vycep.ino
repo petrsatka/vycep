@@ -17,8 +17,10 @@ Api api(user);
 AsyncCallbackWebHandler *firstRegistrationRedirectHandler = NULL;
 
 void test() {
+  user.clearAll();
   user.test();
   Utils::test();
+  user.clearAll();
 }
 
 //Inicalizace serveru
@@ -28,8 +30,6 @@ void serverInit() {
   server.serveStatic("/images/", LittleFS, "/www/images/");
   server.serveStatic("/scripts/", LittleFS, "/www/scripts/");
   server.serveStatic("/styles/", LittleFS, "/www/styles/");
-  server.serveStatic("/login.html", LittleFS, "/www/login.html");
-  server.serveStatic("/registration.html", LittleFS, "/www/registration.html");
 
   //Pouze pokud nejsou uživatelé
   if (!user.isAnyUserSet()) {
@@ -41,6 +41,32 @@ void serverInit() {
   //Default webpage
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
     request->redirect("/orders.html");
+  });
+
+  //Pokud jde dotaz na login a uživatel je přilášen, pak přesměrovat na objednávky
+  server.on("/login.html", HTTP_GET, [](AsyncWebServerRequest *request) {
+    api.serveAuth(
+      request, User::PERMISSIONS_ANY_PERMISSIONS, [request]() {
+        AsyncWebServerResponse *response = request->beginResponse(302);
+        response->addHeader("Location", "/orders.html");
+        return response;
+      },
+      NULL, [request]() {
+        request->send(LittleFS, "/www/login.html");
+      });
+  });
+
+  //Pokud jde dotaz na registraci a uživatel je přilášen, pak přesměrovat na objednávky
+  server.on("/registration.html", HTTP_GET, [](AsyncWebServerRequest *request) {
+    api.serveAuth(
+      request, User::PERMISSIONS_ANY_PERMISSIONS, [request]() {
+        AsyncWebServerResponse *response = request->beginResponse(302);
+        response->addHeader("Location", "/orders.html");
+        return response;
+      },
+      NULL, [request]() {
+        request->send(LittleFS, "/www/registration.html");
+      });
   });
 
   //Rozdělení obsahu podle práv
@@ -81,10 +107,10 @@ void serverInit() {
   });
 
   //API - práva se kontroují až uvnitř
-  server.on("/api/test", HTTP_GET, [](AsyncWebServerRequest *request) {
-    test();
-    request->send(200, "text/plain", "Test");
-  });
+  // server.on("/api/test", HTTP_GET, [](AsyncWebServerRequest *request) {
+  //   test();
+  //   request->send(200, "text/plain", "Test");
+  // });
 
   server.on("/api/createFirstAdmin", HTTP_POST, [](AsyncWebServerRequest *request) {
     if (api.createFirstAdmin(request)) {
@@ -180,11 +206,9 @@ void setup() {
   }
 
   sprintln(WiFi.localIP().toString());
-  user.clearAll();  //DEBUG odstranit !!!!
   serverInit();
   sprintln("Start");
-  test();
-  user.clearAll();  //DEBUG odstranit !!!!
+  test();  //Debug - odstranit !!!!!
 }
 
 void loop() {
