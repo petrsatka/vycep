@@ -121,7 +121,10 @@ void serverInit() {
   });
 
   server.on("/api/createUser", HTTP_POST, [](AsyncWebServerRequest *request) {
-    api.createUser(request);
+    dprintln("Call createUser");
+    if (api.createUser(request)) {
+      dprintln("user created");
+    }
   });
 
   server.on("/api/changePassword", HTTP_POST, [](AsyncWebServerRequest *request) {

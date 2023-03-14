@@ -20,7 +20,7 @@ public:
   void serveDynamicAuth(AsyncWebServerRequest* request, ResponseGetterFunction responseGetter, uint32_t permissionMask);
   void serveAuth(AsyncWebServerRequest* request, uint32_t permissionMask, ResponseGetterFunction responseGetter, ResponseGetterFunction noPermissionsresponseGetter, ErrorResponseFunction);
   bool createFirstAdmin(AsyncWebServerRequest* request);
-  void createUser(AsyncWebServerRequest* request);
+  bool createUser(AsyncWebServerRequest* request);
   void changePassword(AsyncWebServerRequest* request);
   void login(AsyncWebServerRequest* request);
   void getQueueCount(AsyncWebServerRequest* request);

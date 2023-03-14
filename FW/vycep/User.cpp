@@ -15,6 +15,8 @@ User::~User() {
   delete (settings);
 }
 
+constexpr const char User::credentialsVerificationResultNames[CRED_VERIF_ERR_COUNT][CRED_VERIF_ERR_BUFFER_SIZE];
+
 void User::test() {
   if (checkPermissions(PERMISSIONS_ANY_PERMISSIONS, PERMISSIONS_ANY_PERMISSIONS)
       && checkPermissions(PERMISSIONS_ACTIVE, PERMISSIONS_ACTIVE)
@@ -523,4 +525,12 @@ bool User::addUserBill(const char* lCaseUsername, uint16_t add, uint16_t& res) {
 bool User::checkPermissions(uint32_t permissions, uint32_t permissionMask) {
   dprintln("checkPermissions");
   return permissions & permissionMask;
+}
+
+const char* User::getCredentialsVerificationResultName(User::CredentialsVerificationResult res) {
+  if (static_cast<int>(res) < 0 || static_cast<int>(res) >= CRED_VERIF_ERR_COUNT) {
+    return User::credentialsVerificationResultNames[static_cast<int>(User::CredentialsVerificationResult::UNKNOWN_ERROR)];
+  }
+
+  return User::credentialsVerificationResultNames[static_cast<int>(res)];
 }

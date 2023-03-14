@@ -110,7 +110,7 @@ api.createFirstAdmin = function(username, password, callback) {
   api.post("/api/createFirstAdmin", {username: username, password: password}, (resData, errorText) => {
     var results = api.parseResponseData(resData, errorText);
     callback(null, results[0], errorText);
-  })
+  });
 }
 
 /*
@@ -121,11 +121,15 @@ api.createUser = function(username, password, callback) {
   //setTimeout(() => callback(username,"user_exists", null), 1000);
   //setTimeout(() => callback(null, null, "500 - bad request"), 1000);
   //setTimeout(() => callback(username,"unknown_error", null), 1000);
-  if (username.toLowerCase() == 'franta') {
-     setTimeout(() => callback(username,"user_exists", null), 1000);
-  } else {
-    setTimeout(() => callback(username,"OK", null), 1000);
-  }
+  //if (username.toLowerCase() == 'franta') {
+  //   setTimeout(() => callback(username,"user_exists", null), 1000);
+  //} else {
+  //  setTimeout(() => callback(username,"OK", null), 1000);
+  //}
+  api.post("/api/createUser", {username: username, password: password}, (resData, errorText) => {
+    var results = api.parseResponseData(resData, errorText);
+    callback(null, results[0], errorText);
+  });
 }
 
 /*
@@ -587,8 +591,8 @@ gui.createFirstAdmin = function(username, password, passwordVerification, naviga
   Vytvoření běžného účtu
 */
 gui.createUser = function(username, password, passwordVerification, navigationTarget) {
-  gui.validateUsername(username) &&
-  gui.validatePassword(password) &&
+  //gui.validateUsername(username) &&
+  //gui.validatePassword(password) &&
   gui.verifyPassword(password, passwordVerification) &&
   gui.setInProgress(true) &&
   api.createUser(username, password, (result, resultCode, errorMessage) => {

@@ -14,11 +14,11 @@ public:
   //Výsledek ověření cookie
   enum class CookieVerificationResult {
     OK = 0,
-    OUT_OF_DATE_REVALIDATED = 1, //Cookie mimo platnost, nezměnilo se oprávnění ani heslo, úspěšně vystaveno nové cookie. Není nutné nové přihlášení
+    OUT_OF_DATE_REVALIDATED = 1,  //Cookie mimo platnost, nezměnilo se oprávnění ani heslo, úspěšně vystaveno nové cookie. Není nutné nové přihlášení
     INVALID_HASH = 2,
-    INVALID_PERMISSIONS = 3, //Změnilo se oprávnění, nebo heslo. Je nutné nové přihlášení
+    INVALID_PERMISSIONS = 3,  //Změnilo se oprávnění, nebo heslo. Je nutné nové přihlášení
     INVALID_FORMAT = 4,
-    OUT_OF_DATE_UNABLE_TO_REVALIDATE = 5, //Cookie mimo platnost, nezměnilo se oprávnění ani heslo, nové cookie nebylo možné vystavit
+    OUT_OF_DATE_UNABLE_TO_REVALIDATE = 5,  //Cookie mimo platnost, nezměnilo se oprávnění ani heslo, nové cookie nebylo možné vystavit
   };
 
   enum class CredentialsVerificationResult {
@@ -32,9 +32,11 @@ public:
     PASSWORD_EMPTY = 7,
     USERNAME_EXISTS = 8,
     UNKNOWN_ERROR = 9,
-    ANY_USER_EXISTS = 10, //Otestovat
+    ANY_USER_EXISTS = 10,  //Otestovat
   };
 
+  static constexpr int CRED_VERIF_ERR_COUNT = 11;
+  static constexpr int CRED_VERIF_ERR_BUFFER_SIZE = 32;
   static constexpr int USERNAME_MIN_CHAR_COUNT = 5;
   static constexpr int PASSWORD_MIN_CHAR_COUNT = 6;
   static constexpr int PASSWORD_MAX_CHAR_COUNT = 30;
@@ -50,18 +52,33 @@ public:
   static constexpr uint32_t PERMISSIONS_ADMIN = 0b100;
   static constexpr uint32_t PERMISSIONS_PAYMENT = 0b1000;
 
+  static constexpr const char credentialsVerificationResultNames[CRED_VERIF_ERR_COUNT][CRED_VERIF_ERR_BUFFER_SIZE] = {
+    "OK",
+    "USERNAME_SHORT",
+    "USERNAME_LONG",
+    "USERNAME_INVALID_CHARACTERS",
+    "USERNAME_EMPTY",
+    "PASSWORD_SHORT",
+    "PASSWORD_LONG",
+    "PASSWORD_EMPTY",
+    "USERNAME_EXISTS",
+    "UNKNOWN_ERROR",
+    "ANY_USER_EXISTS",
+  };
+
   static bool checkPermissions(uint32_t permissions, uint32_t permissionMask);
+  static const char* getCredentialsVerificationResultName(User::CredentialsVerificationResult res);
 
   bool isAnyUserSet();
   bool delteUser(const char* lCaseUsername);
   bool verifyPassword(const char* lCaseUsername, const char* password);
   bool setPassword(const char* lCaseUsername, const char* password);
   bool getNewCookie(const char* lCaseUsername, char* cookie);
-  CookieVerificationResult getCookieInfo(const char* cookie, char* username, uint32_t* permissions, char* newCookie); //Získá infromace o cookie. Případně vypršeného ccokie, revaliduje a v případě úspěchu vytvoří nové cookie.
+  CookieVerificationResult getCookieInfo(const char* cookie, char* username, uint32_t* permissions, char* newCookie);  //Získá infromace o cookie. Případně vypršeného ccokie, revaliduje a v případě úspěchu vytvoří nové cookie.
   int16_t getUserBill(const char* lCaseUsername);
   bool setUserBill(const char* lCaseUsername, uint16_t bill);
   bool addUserBill(const char* lCaseUsername, uint16_t add, uint16_t& res);
-  User::CredentialsVerificationResult registerUser(const char* username, const char* password, char* lCaseUsername); //Očekává jméno, heslo. Vrací result a lower case jméno.
+  User::CredentialsVerificationResult registerUser(const char* username, const char* password, char* lCaseUsername);  //Očekává jméno, heslo. Vrací result a lower case jméno.
   User::CredentialsVerificationResult registerFirstAdmin(const char* username, const char* password, char* lCaseUsername);
   bool clearAll();
 
@@ -85,13 +102,13 @@ private:
 
   static bool verifyCookieHash(const char* cookie);
   static bool parseCookie(const char* cookie, char* username, uint32_t* permissions, struct tm* timeInfo, char* cookieHexHash, char* permissionsValidityHexHash);
-  static bool composeCookieBase(const char* lCaseUsername, uint32_t permissions, char* cookieBase, char* hexHash); //Volá composeCookieBase s aktuálním časem
-  static bool composeCookieBase(const char* lCaseUsername, uint32_t permissions, struct tm& timeInfo, char* cookieBase, char* hexHash); //Sestaví obsah cookie a vrátí obsah a hash obsahu
+  static bool composeCookieBase(const char* lCaseUsername, uint32_t permissions, char* cookieBase, char* hexHash);                       //Volá composeCookieBase s aktuálním časem
+  static bool composeCookieBase(const char* lCaseUsername, uint32_t permissions, struct tm& timeInfo, char* cookieBase, char* hexHash);  //Sestaví obsah cookie a vrátí obsah a hash obsahu
   static CredentialsVerificationResult validateUsername(const char* lCaseUsername);
   static CredentialsVerificationResult validatePassword(const char* password);
 
   User::CredentialsVerificationResult createUser(const char* username, const char* password, uint32_t permissions, char* lCaseUsername);
-  void getPermissionsValidityHexHash(const char* lCaseUsername, uint32_t permissions, const unsigned char* passwordHash, char* hexHash); //Vrací hash pro ověření změny hesla a oprávnění
+  void getPermissionsValidityHexHash(const char* lCaseUsername, uint32_t permissions, const unsigned char* passwordHash, char* hexHash);  //Vrací hash pro ověření změny hesla a oprávnění
   bool verifyPermissionsHash(const char* cookie);
 };
 #endif

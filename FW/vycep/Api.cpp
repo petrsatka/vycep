@@ -148,48 +148,17 @@ bool Api::createFirstAdmin(AsyncWebServerRequest* request) {
       AsyncWebParameter* pPassword = request->getParam("password", true);
       char lCaseUsername[User::USERNAME_BUFFER_SIZE] = { 0 };
       User::CredentialsVerificationResult res = user.registerFirstAdmin(pUname->value().c_str(), pPassword->value().c_str(), lCaseUsername);
-      switch (res) {
-        case User::CredentialsVerificationResult::OK:
-          {
-            AsyncWebServerResponse* response = request->beginResponse(200, "text/plain", "OK");
-            char authCookieContent[User::COOKIE_BUFFER_SIZE] = { 0 };
-            user.getNewCookie(lCaseUsername, authCookieContent);
-            setCookies(response, lCaseUsername, authCookieContent);
-            request->send(response);
-            return true;
-          }
-        case User::CredentialsVerificationResult::USERNAME_SHORT:
-          request->send(200, "text/plain", "USERNAME_SHORT");
-          break;
-        case User::CredentialsVerificationResult::USERNAME_LONG:
-          request->send(200, "text/plain", "USERNAME_LONG");
-          break;
-        case User::CredentialsVerificationResult::USERNAME_INVALID_CHARACTERS:
-          request->send(200, "text/plain", "USERNAME_INVALID_CHARACTERS");
-          break;
-        case User::CredentialsVerificationResult::USERNAME_EMPTY:
-          request->send(200, "text/plain", "USERNAME_EMPTY");
-          break;
-        case User::CredentialsVerificationResult::PASSWORD_SHORT:
-          request->send(200, "text/plain", "PASSWORD_SHORT");
-          break;
-        case User::CredentialsVerificationResult::PASSWORD_LONG:
-          request->send(200, "text/plain", "PASSWORD_LONG");
-          break;
-        case User::CredentialsVerificationResult::PASSWORD_EMPTY:
-          request->send(200, "text/plain", "PASSWORD_EMPTY");
-          break;
-        case User::CredentialsVerificationResult::USERNAME_EXISTS:
-          request->send(200, "text/plain", "USERNAME_EXISTS");
-          break;
-        case User::CredentialsVerificationResult::ANY_USER_EXISTS:
-          request->send(200, "text/plain", "ANY_USER_EXISTS");
-          break;
-        default:
-          request->send(200, "text/plain", "UNKNOWN_ERROR");
+      if (res == User::CredentialsVerificationResult::OK) {
+        AsyncWebServerResponse* response = request->beginResponse(200, "text/plain", User::getCredentialsVerificationResultName(res));
+        char authCookieContent[User::COOKIE_BUFFER_SIZE] = { 0 };
+        user.getNewCookie(lCaseUsername, authCookieContent);
+        setCookies(response, lCaseUsername, authCookieContent);
+        request->send(response);
+        return true;
+      } else {
+        request->send(200, "text/plain", User::getCredentialsVerificationResultName(res));
+        return false;
       }
-
-      return false;
     }
   }
 
@@ -197,12 +166,30 @@ bool Api::createFirstAdmin(AsyncWebServerRequest* request) {
   return false;
 }
 
-void Api::createUser(AsyncWebServerRequest* request) {
+bool Api::createUser(AsyncWebServerRequest* request) {
   sprintln("!createUser");
-  //username, password - ověřit validitu
-  //username to lower
-  //Ověřit, zda uživatel už neexistuje
-  //Nastavit cookie
+    if (request->hasParam("username", true)) {
+    AsyncWebParameter* pUname = request->getParam("username", true);
+    if (request->hasParam("password", true)) {
+      AsyncWebParameter* pPassword = request->getParam("password", true);
+      char lCaseUsername[User::USERNAME_BUFFER_SIZE] = { 0 };
+      User::CredentialsVerificationResult res = user.registerUser(pUname->value().c_str(), pPassword->value().c_str(), lCaseUsername);
+      if (res == User::CredentialsVerificationResult::OK) {
+        AsyncWebServerResponse* response = request->beginResponse(200, "text/plain", User::getCredentialsVerificationResultName(res));
+        char authCookieContent[User::COOKIE_BUFFER_SIZE] = { 0 };
+        user.getNewCookie(lCaseUsername, authCookieContent);
+        setCookies(response, lCaseUsername, authCookieContent);
+        request->send(response);
+        return true;
+      } else {
+        request->send(200, "text/plain", User::getCredentialsVerificationResultName(res));
+        return false;
+      }
+    }
+  }
+
+  request->send(400);
+  return false;
 }
 
 void Api::changePassword(AsyncWebServerRequest* request) {
