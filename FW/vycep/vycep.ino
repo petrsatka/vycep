@@ -121,7 +121,6 @@ void serverInit() {
   });
 
   server.on("/api/createUser", HTTP_POST, [](AsyncWebServerRequest *request) {
-    dprintln("Call createUser");
     if (api.createUser(request)) {
       dprintln("user created");
     }
@@ -148,7 +147,9 @@ void serverInit() {
   });
 
   server.on("/api/login", HTTP_POST, [](AsyncWebServerRequest *request) {
-    api.login(request);
+    if (api.login(request)) {
+      dprintln("Logged in");
+    }
   });
 
   server.on("/api/logout", HTTP_POST, [](AsyncWebServerRequest *request) {
