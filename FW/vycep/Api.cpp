@@ -167,8 +167,8 @@ bool Api::createFirstAdmin(AsyncWebServerRequest* request) {
 }
 
 bool Api::createUser(AsyncWebServerRequest* request) {
-  sprintln("!createUser");
-    if (request->hasParam("username", true)) {
+  dprintln("createUser");
+  if (request->hasParam("username", true)) {
     AsyncWebParameter* pUname = request->getParam("username", true);
     if (request->hasParam("password", true)) {
       AsyncWebParameter* pPassword = request->getParam("password", true);
@@ -246,6 +246,8 @@ void Api::loadUsers(AsyncWebServerRequest* request) {
 }
 
 void Api::logout(AsyncWebServerRequest* request) {
-  sprintln("!logout");
-  //Zrušit cookies
+  dprintln("logout");
+  AsyncWebServerResponse* response = request->beginResponse(200, "text/plain", GENERAL_SUCCESS_RESULT_CODE);
+  unsetCookies(response);
+  request->send(response);
 }

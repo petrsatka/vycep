@@ -249,7 +249,11 @@ api.loadUsers = function(callback) {
   Odhlášení
 */
 api.logout = function(callback) {
-  setTimeout(() => callback(true,"OK", null), 1000);
+  //setTimeout(() => callback(true,"OK", null), 1000);
+  api.post("/api/logout", null, (resData, errorText) => {
+    var results = api.parseResponseData(resData, errorText);
+    callback(null, results[0], errorText);
+  });
 }
 
 /*DEBUG*/
