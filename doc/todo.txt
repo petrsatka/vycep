@@ -1,8 +1,37 @@
 Nějak rozumě nastavit cache pro js a css
-Otestovat brownout při výsledné konfiguraci. Možná přidat nějaký kondenzátor.
-
-cookies
 Promyslet optimalizace
 Postupně otestovat
 
 nedovolit smazat všechny uživatele
+Tlačítko pro opuštění registrace
+
+--Active user
+changePassword
+getQueueCount
+getCurrentUserBillCount
+makeOrder
+
+-- active, payment
+pay
+
+-- admin
+payForUser
+pokud platí za sebe, pak ověřit práva na platbu
+
+
+--Active Admin
+getUserBillCount
+loadUsers
+setSettingsValue
+getSettingsValue
+setPermissionValue
+getIP
+getGateway
+resetPassword
+deleteUser
+activateUser
+startCalibration
+stopCalibration
+runTest
+restart
+connect
