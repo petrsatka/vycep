@@ -16,6 +16,7 @@ public:
   static constexpr const char* AHUTH_COOKIE_NAME = "ESPAUTH=";
   static constexpr const char* USERNAME_COOKIE_NAME = "ESPUNAME=";
   static constexpr const char* GENERAL_SUCCESS_RESULT_CODE = "OK";
+  static constexpr const char* INVALID_USERNAME_OR_PASSWORD_RESULT_CODE = "INVALID_USERNAME_OR_PASSWORD";
 
   void serveStaticAuth(AsyncWebServerRequest* request, const char* path, uint32_t permissionMask);
   void serveDynamicAuth(AsyncWebServerRequest* request, ResponseGetterFunction responseGetter, uint32_t permissionMask);
@@ -23,7 +24,7 @@ public:
   bool createFirstAdmin(AsyncWebServerRequest* request);
   bool createUser(AsyncWebServerRequest* request);
   void changePassword(AsyncWebServerRequest* request);
-  void login(AsyncWebServerRequest* request);
+  bool login(AsyncWebServerRequest* request);
   void getQueueCount(AsyncWebServerRequest* request);
   void getBillCount(AsyncWebServerRequest* request);
   void getUserBillCount(AsyncWebServerRequest* request);

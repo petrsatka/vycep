@@ -149,11 +149,15 @@ api.changePassword = function(oldPassword, password, callback) {
   Přihlášení
 */
 api.login = function(username, password, callback) {
-  if (!username || !password) {
-    setTimeout(() => callback(username,"bad_username_or_password", null), 1000);
-  } else {
-    setTimeout(() => callback(username,"OK", null), 1000);
-  }
+  //if (!username || !password) {
+  //  setTimeout(() => callback(username,"bad_username_or_password", null), 1000);
+  //} else {
+  //  setTimeout(() => callback(username,"OK", null), 1000);
+  //}
+   api.post("/api/login", {username: username, password: password}, (resData, errorText) => {
+    var results = api.parseResponseData(resData, errorText);
+    callback(null, results[0], errorText);
+  });
 }
 
 api.qCountDEBUG = 5;
@@ -542,7 +546,10 @@ gui.handleError = function(resultCode, errorMessage, popupWindow = false) {
       break;  
     case 'ANY_USER_EXISTS':
       message = 'V systému už existuje alespoň jeden uživatel.';
-      break;  
+      break;
+    case 'INVALID_USERNAME_OR_PASSWORD':
+      message = 'Neplatné jméno nebo heslo.';
+      break;    
       
     /*case 'bad_username_or_password':
       message = 'Neplatné jméno nebo heslo.';

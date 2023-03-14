@@ -32,7 +32,7 @@ public:
     PASSWORD_EMPTY = 7,
     USERNAME_EXISTS = 8,
     UNKNOWN_ERROR = 9,
-    ANY_USER_EXISTS = 10,  //Otestovat
+    ANY_USER_EXISTS = 10,
   };
 
   static constexpr int CRED_VERIF_ERR_COUNT = 11;
@@ -71,7 +71,7 @@ public:
 
   bool isAnyUserSet();
   bool delteUser(const char* lCaseUsername);
-  bool verifyPassword(const char* lCaseUsername, const char* password);
+  bool verifyPassword(const char* username, const char* password, char* lCaseUsername);
   bool setPassword(const char* lCaseUsername, const char* password);
   bool getNewCookie(const char* lCaseUsername, char* cookie);
   CookieVerificationResult getCookieInfo(const char* cookie, char* username, uint32_t* permissions, char* newCookie);  //Získá infromace o cookie. Případně vypršeného ccokie, revaliduje a v případě úspěchu vytvoří nové cookie.

@@ -392,8 +392,13 @@ bool User::delteUser(const char* lCaseUsername) {
   return res;
 }
 
-bool User::verifyPassword(const char* lCaseUsername, const char* password) {
+bool User::verifyPassword(const char* username, const char* password, char* lCaseUsername) {
   sprintln("!verifyPassword");
+
+  if (!Utils::toLowerStr(username, lCaseUsername, USERNAME_BUFFER_SIZE)) {
+    return false;
+  };
+
   unsigned char hash1[Utils::HASH_BUFFER_SIZE];
   unsigned char hash2[Utils::HASH_BUFFER_SIZE];
   Utils::computeHmacHash(password, hash1);

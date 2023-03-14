@@ -200,12 +200,32 @@ void Api::changePassword(AsyncWebServerRequest* request) {
   //Přenastavit cookies
 }
 
-void Api::login(AsyncWebServerRequest* request) {
+bool Api::login(AsyncWebServerRequest* request) {
   sprintln("!login");
-  //username, password
-  //username to lower
-  //ověřit validitu username, ověřit hash hesla
-  //nastavit cookies
+  //AsyncWebServerResponse* response = request->beginResponse(200, "text/plain", GENERAL_SUCCESS_RESULT_CODE);
+  //unsetCookies(response);
+  //request->send(response);
+  if (request->hasParam("username", true)) {
+    AsyncWebParameter* pUname = request->getParam("username", true);
+    if (request->hasParam("password", true)) {
+      AsyncWebParameter* pPassword = request->getParam("password", true);
+      char lCaseUsername[User::USERNAME_BUFFER_SIZE] = { 0 };
+      if (user.verifyPassword(pUname->value().c_str(), pPassword->value().c_str(), lCaseUsername)) {
+        AsyncWebServerResponse* response = request->beginResponse(200, "text/plain", GENERAL_SUCCESS_RESULT_CODE);
+        char authCookieContent[User::COOKIE_BUFFER_SIZE] = { 0 };
+        user.getNewCookie(lCaseUsername, authCookieContent);
+        setCookies(response, lCaseUsername, authCookieContent);
+        request->send(response);
+        return true;
+      } else {
+        request->send(200, "text/plain", INVALID_USERNAME_OR_PASSWORD_RESULT_CODE);
+        return false;
+      }
+    }
+  }
+
+  request->send(400);
+  return false;
 }
 
 void Api::getQueueCount(AsyncWebServerRequest* request) {

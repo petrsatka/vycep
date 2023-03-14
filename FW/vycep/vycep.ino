@@ -209,10 +209,10 @@ void setup() {
   }
 
   sprintln(WiFi.localIP().toString());
-  user.clearAll(); //Debug - odstranit !!!!
+  //user.clearAll(); //Debug - odstranit !!!!
   serverInit();
   sprintln("Start");
-  test();  //Debug - odstranit !!!!!
+  //test();  //Debug - odstranit !!!!!
 }
 
 void loop() {
