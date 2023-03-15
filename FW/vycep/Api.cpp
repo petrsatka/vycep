@@ -228,19 +228,6 @@ void Api::changePassword(AsyncWebServerRequest* request) {
     User::PERMISSIONS_ACTIVE);
 }
 
-void Api::getCurrentUserBillCount(AsyncWebServerRequest* request) {
-  sprintln("!getCurrentUserBillCount");
-  serveDynamicAuth(
-    request, [&](const char* lCaseUsername, const char* cookie, char* newCookie, bool& setCookie) {
-      AsyncWebServerResponse* response = request->beginResponse(
-        200,
-        "text/plain",
-        String(GENERAL_SUCCESS_RESULT_CODE) + "&" + String(user.getUserBill(lCaseUsername)));
-      return response;
-    },
-    User::PERMISSIONS_ANY_PERMISSIONS);
-}
-
 bool Api::login(AsyncWebServerRequest* request) {
   sprintln("!login");
   //AsyncWebServerResponse* response = request->beginResponse(200, "text/plain", GENERAL_SUCCESS_RESULT_CODE);
@@ -275,7 +262,35 @@ void Api::getQueueCount(AsyncWebServerRequest* request) {
 
 void Api::getUserBillCount(AsyncWebServerRequest* request) {
   sprintln("!getUserBillCount");
-  //Ověřit práva admina
+  serveDynamicAuth(
+    request, [&](const char* lCaseUsername, const char* cookie, char* newCookie, bool& setCookie) {
+      if (request->hasParam("username", true)) {
+        AsyncWebParameter* pUname = request->getParam("username", true);
+        char lCaseUsername[User::USERNAME_BUFFER_SIZE] = { 0 };
+        Utils::toLowerStr(pUname->value().c_str(), lCaseUsername, User::USERNAME_BUFFER_SIZE);
+        AsyncWebServerResponse* response = request->beginResponse(
+          200,
+          "text/plain",
+          String(GENERAL_SUCCESS_RESULT_CODE) + "&" + String(user.getUserBill(lCaseUsername)));
+        return response;
+      }
+
+      return request->beginResponse(400);
+    },
+    User::PERMISSIONS_ADMIN);
+}
+
+void Api::getCurrentUserBillCount(AsyncWebServerRequest* request) {
+  sprintln("!getCurrentUserBillCount");
+  serveDynamicAuth(
+    request, [&](const char* lCaseUsername, const char* cookie, char* newCookie, bool& setCookie) {
+      AsyncWebServerResponse* response = request->beginResponse(
+        200,
+        "text/plain",
+        String(GENERAL_SUCCESS_RESULT_CODE) + "&" + String(user.getUserBill(lCaseUsername)));
+      return response;
+    },
+    User::PERMISSIONS_ANY_PERMISSIONS);
 }
 
 void Api::makeOrder(AsyncWebServerRequest* request) {
