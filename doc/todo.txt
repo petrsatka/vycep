@@ -4,11 +4,12 @@ Postupně otestovat
 
 nedovolit smazat všechny uživatele
 Tlačítko pro opuštění registrace
+Neaktivnímu uživateli zašedit objednávku
 
 --Active user
-changePassword
+*changePassword
 getQueueCount
-getCurrentUserBillCount
+*getCurrentUserBillCount
 makeOrder
 
 -- active, payment
@@ -20,18 +21,18 @@ pokud platí za sebe, pak ověřit práva na platbu
 
 
 --Active Admin
-getUserBillCount
-loadUsers
-setSettingsValue
-getSettingsValue
-setPermissionValue
-getIP
-getGateway
-resetPassword
-deleteUser
-activateUser
+*getUserBillCount
+*loadUsers
+*setSettingsValue
+*getSettingsValue
+*setPermissionValue
+*getIP
+*getGateway
+*resetPassword
+*deleteUser
+*activateUser
 startCalibration
 stopCalibration
 runTest
-restart
-connect
+*restart
+*connect

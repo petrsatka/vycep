@@ -6,8 +6,8 @@
 #include "Utils.h"
 #include "Debug.h"
 
-typedef std::function<AsyncWebServerResponse*()> ResponseGetterFunction;
-typedef std::function<void()> ErrorResponseFunction;
+typedef std::function<AsyncWebServerResponse*(const char* lCaseUsername, const char* cookie, char* newCookie, bool &setCookie)> ResponseGetterFunction;
+typedef std::function<AsyncWebServerResponse*()> ErrorResponseGetterFunction;
 
 class Api {
 public:
@@ -20,7 +20,7 @@ public:
 
   void serveStaticAuth(AsyncWebServerRequest* request, const char* path, uint32_t permissionMask);
   void serveDynamicAuth(AsyncWebServerRequest* request, ResponseGetterFunction responseGetter, uint32_t permissionMask);
-  void serveAuth(AsyncWebServerRequest* request, uint32_t permissionMask, ResponseGetterFunction responseGetter, ResponseGetterFunction noPermissionsresponseGetter, ErrorResponseFunction);
+  void serveAuth(AsyncWebServerRequest* request, uint32_t permissionMask, ResponseGetterFunction responseGetter, ErrorResponseGetterFunction noPermissionsresponseGetter, ErrorResponseGetterFunction errorResponseGetter);
   bool createFirstAdmin(AsyncWebServerRequest* request);
   bool createUser(AsyncWebServerRequest* request);
   void changePassword(AsyncWebServerRequest* request);
@@ -39,10 +39,29 @@ public:
 private:
   User& user;
 
+  static constexpr int CRED_VERIF_ERR_COUNT = 13;
+  static constexpr int CRED_VERIF_ERR_BUFFER_SIZE = 32;
   static constexpr const char* HTTPONLY_COOKIE_ATTRIBUTE = "; HttpOnly";
   static constexpr const char* COMMON_COOKIE_ATTRIBUTES = "; Max-Age=1707109200; Path=/";
   static constexpr const char* UNSET_COOKIE_ATTRIBUTES = "; Max-Age=-1; Path=/";
 
+  static constexpr const char credentialsVerificationResultNames[CRED_VERIF_ERR_COUNT][CRED_VERIF_ERR_BUFFER_SIZE] = {
+    "OK",
+    "USERNAME_SHORT",
+    "USERNAME_LONG",
+    "USERNAME_INVALID_CHARACTERS",
+    "USERNAME_EMPTY",
+    "PASSWORD_SHORT",
+    "PASSWORD_LONG",
+    "PASSWORD_EMPTY",
+    "USERNAME_EXISTS",
+    "UNKNOWN_ERROR",
+    "ANY_USER_EXISTS",
+    "USERNAME_NOT_EXISTS",
+    "INVALID_PASSWORD"
+  };
+
+  static const char* getCredentialsVerificationResultName(User::CredentialsVerificationResult res);
   static bool extractCookie(AsyncWebServerRequest* request, const char* cookieName, char* cookie);
   static bool setCookies(AsyncWebServerResponse* response, const char* lCaseUsername, const char* authCookieContent);
   static bool unsetCookies(AsyncWebServerResponse* response);

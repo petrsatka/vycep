@@ -33,10 +33,10 @@ public:
     USERNAME_EXISTS = 8,
     UNKNOWN_ERROR = 9,
     ANY_USER_EXISTS = 10,
+    USERNAME_NOT_EXISTS = 11,
+    INVALID_PASSWORD = 12,
   };
 
-  static constexpr int CRED_VERIF_ERR_COUNT = 11;
-  static constexpr int CRED_VERIF_ERR_BUFFER_SIZE = 32;
   static constexpr int USERNAME_MIN_CHAR_COUNT = 5;
   static constexpr int PASSWORD_MIN_CHAR_COUNT = 6;
   static constexpr int PASSWORD_MAX_CHAR_COUNT = 30;
@@ -52,27 +52,14 @@ public:
   static constexpr uint32_t PERMISSIONS_ADMIN = 0b100;
   static constexpr uint32_t PERMISSIONS_PAYMENT = 0b1000;
 
-  static constexpr const char credentialsVerificationResultNames[CRED_VERIF_ERR_COUNT][CRED_VERIF_ERR_BUFFER_SIZE] = {
-    "OK",
-    "USERNAME_SHORT",
-    "USERNAME_LONG",
-    "USERNAME_INVALID_CHARACTERS",
-    "USERNAME_EMPTY",
-    "PASSWORD_SHORT",
-    "PASSWORD_LONG",
-    "PASSWORD_EMPTY",
-    "USERNAME_EXISTS",
-    "UNKNOWN_ERROR",
-    "ANY_USER_EXISTS",
-  };
-
   static bool checkPermissions(uint32_t permissions, uint32_t permissionMask);
-  static const char* getCredentialsVerificationResultName(User::CredentialsVerificationResult res);
 
   bool isAnyUserSet();
+  bool isUserSet(const char* lCaseUsername);
   bool delteUser(const char* lCaseUsername);
-  bool verifyPassword(const char* username, const char* password, char* lCaseUsername);
-  bool setPassword(const char* lCaseUsername, const char* password);
+  User::CredentialsVerificationResult verifyPassword(const char* username, const char* password, char* lCaseUsername);
+  User::CredentialsVerificationResult setPassword(const char* lCaseUsername, const char* password);
+  User::CredentialsVerificationResult changePassword(const char* username, const char* oldPassword, const char* newPassword);
   bool getNewCookie(const char* lCaseUsername, char* cookie);
   CookieVerificationResult getCookieInfo(const char* cookie, char* username, uint32_t* permissions, char* newCookie);  //Získá infromace o cookie. Případně vypršeného ccokie, revaliduje a v případě úspěchu vytvoří nové cookie.
   int16_t getUserBill(const char* lCaseUsername);

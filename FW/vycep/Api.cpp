@@ -7,8 +7,19 @@ Api::Api(User& user)
 Api::~Api() {
 }
 
-void Api::serveAuth(AsyncWebServerRequest* request, uint32_t permissionMask, ResponseGetterFunction responseGetter, ResponseGetterFunction noPermissionsresponseGetter, ErrorResponseFunction errorResponse) {
-  dprintln("serveAuth");
+constexpr const char Api::credentialsVerificationResultNames[CRED_VERIF_ERR_COUNT][CRED_VERIF_ERR_BUFFER_SIZE];
+
+const char* Api::getCredentialsVerificationResultName(User::CredentialsVerificationResult res) {
+  if (static_cast<int>(res) < 0 || static_cast<int>(res) >= CRED_VERIF_ERR_COUNT) {
+    return Api::credentialsVerificationResultNames[static_cast<int>(User::CredentialsVerificationResult::UNKNOWN_ERROR)];
+  }
+
+  return Api::credentialsVerificationResultNames[static_cast<int>(res)];
+}
+
+void Api::serveAuth(AsyncWebServerRequest* request, uint32_t permissionMask, ResponseGetterFunction responseGetter, ErrorResponseGetterFunction noPermissionsresponseGetter, ErrorResponseGetterFunction errorResponseGetter) {
+  sprintln("!serveAuth");
+  AsyncWebServerResponse* response = NULL;
   char cookie[User::COOKIE_BUFFER_SIZE] = { 0 };
   if (extractCookie(request, AHUTH_COOKIE_NAME, cookie)) {
     char username[User::USERNAME_BUFFER_SIZE] = { 0 };
@@ -17,11 +28,13 @@ void Api::serveAuth(AsyncWebServerRequest* request, uint32_t permissionMask, Res
 
     User::CookieVerificationResult res = this->user.getCookieInfo(cookie, username, &permissions, newCookie);
     if (res == User::CookieVerificationResult::OK || res == User::CookieVerificationResult::OUT_OF_DATE_REVALIDATED) {
+      bool forceSetCookie = false;
       //Cookie prošlo, nebo bylo obnoveno
-      AsyncWebServerResponse* response = NULL;
       if (User::checkPermissions(permissions, permissionMask)) {
         //Má oprávnění
-        response = responseGetter();
+        if (responseGetter != NULL) {
+          response = responseGetter(username, cookie, newCookie, forceSetCookie);
+        }
       } else {
         if (noPermissionsresponseGetter != NULL) {
           //Nemá oprávnění, ale je pro tento případ nastaven fallback
@@ -30,32 +43,37 @@ void Api::serveAuth(AsyncWebServerRequest* request, uint32_t permissionMask, Res
       }
 
       if (response != NULL) {
-        if (res == User::CookieVerificationResult::OUT_OF_DATE_REVALIDATED) {
-          if (setCookies(response, username, newCookie)) {
-            request->send(response);
-            return;
-          } else {
+        if (res == User::CookieVerificationResult::OUT_OF_DATE_REVALIDATED || forceSetCookie) {
+          if (!setCookies(response, username, newCookie)) {
             delete (response);
+            response = NULL;
           }
-        } else {
-          request->send(response);
-          return;
         }
       }
     }
   }
 
-  errorResponse();
+  if (response == NULL && errorResponseGetter != NULL) {
+    response = errorResponseGetter();
+  }
+
+  if (response != NULL) {
+    request->send(response);
+  } else {
+    request->send(401);
+  }
 }
 
 void Api::serveStaticAuth(AsyncWebServerRequest* request, const char* path, uint32_t permissionMask) {
   dprintln("serveStaticAuth");
   serveAuth(
-    request, permissionMask, [request, path]() {
+    request, permissionMask, [request, path](const char* username, const char* cookie, char* newCookie, bool& setCookie) {
       return request->beginResponse(LittleFS, path);
     },
     NULL, [request]() {
-      request->redirect("/login.html");
+      AsyncWebServerResponse* response = request->beginResponse(302);
+      response->addHeader("Location", "/login.html");
+      return response;
     });
 }
 
@@ -64,13 +82,9 @@ void Api::serveDynamicAuth(AsyncWebServerRequest* request, ResponseGetterFunctio
   serveAuth(
     request, permissionMask, responseGetter, [request]() {
       //Forbidden
-      request->send(403);
-      return nullptr;
+      return request->beginResponse(403);
     },
-    [request]() {
-      //Unauthorized
-      request->send(401);
-    });
+    NULL);
 }
 
 bool Api::extractCookie(AsyncWebServerRequest* request, const char* cookieName, char* cookie) {
@@ -149,14 +163,14 @@ bool Api::createFirstAdmin(AsyncWebServerRequest* request) {
       char lCaseUsername[User::USERNAME_BUFFER_SIZE] = { 0 };
       User::CredentialsVerificationResult res = user.registerFirstAdmin(pUname->value().c_str(), pPassword->value().c_str(), lCaseUsername);
       if (res == User::CredentialsVerificationResult::OK) {
-        AsyncWebServerResponse* response = request->beginResponse(200, "text/plain", User::getCredentialsVerificationResultName(res));
+        AsyncWebServerResponse* response = request->beginResponse(200, "text/plain", Api::getCredentialsVerificationResultName(res));
         char authCookieContent[User::COOKIE_BUFFER_SIZE] = { 0 };
         user.getNewCookie(lCaseUsername, authCookieContent);
         setCookies(response, lCaseUsername, authCookieContent);
         request->send(response);
         return true;
       } else {
-        request->send(200, "text/plain", User::getCredentialsVerificationResultName(res));
+        request->send(200, "text/plain", Api::getCredentialsVerificationResultName(res));
         return false;
       }
     }
@@ -175,14 +189,14 @@ bool Api::createUser(AsyncWebServerRequest* request) {
       char lCaseUsername[User::USERNAME_BUFFER_SIZE] = { 0 };
       User::CredentialsVerificationResult res = user.registerUser(pUname->value().c_str(), pPassword->value().c_str(), lCaseUsername);
       if (res == User::CredentialsVerificationResult::OK) {
-        AsyncWebServerResponse* response = request->beginResponse(200, "text/plain", User::getCredentialsVerificationResultName(res));
+        AsyncWebServerResponse* response = request->beginResponse(200, "text/plain", Api::getCredentialsVerificationResultName(res));
         char authCookieContent[User::COOKIE_BUFFER_SIZE] = { 0 };
         user.getNewCookie(lCaseUsername, authCookieContent);
         setCookies(response, lCaseUsername, authCookieContent);
         request->send(response);
         return true;
       } else {
-        request->send(200, "text/plain", User::getCredentialsVerificationResultName(res));
+        request->send(200, "text/plain", Api::getCredentialsVerificationResultName(res));
         return false;
       }
     }
@@ -194,6 +208,25 @@ bool Api::createUser(AsyncWebServerRequest* request) {
 
 void Api::changePassword(AsyncWebServerRequest* request) {
   sprintln("!changePassword");
+  serveDynamicAuth(
+    request, [&](const char* lCaseUsername, const char* cookie, char* newCookie, bool& setCookie) {
+      if (request->hasParam("oldpassword", true)) {
+        AsyncWebParameter* pOldPassword = request->getParam("oldpassword", true);
+        if (request->hasParam("newpassword", true)) {
+          AsyncWebParameter* pNewPassword = request->getParam("newpassword", true);
+          AsyncWebServerResponse* response = request->beginResponse(
+            200,
+            "text/plain",
+            Api::getCredentialsVerificationResultName(user.changePassword(lCaseUsername, pOldPassword->value().c_str(), pNewPassword->value().c_str())));
+          setCookie = user.getNewCookie(lCaseUsername, newCookie);
+          return response;
+        }
+      }
+
+      return request->beginResponse(400);
+    },
+    User::PERMISSIONS_ACTIVE);
+  //Ověřit existenci uživatele?
   //oldPassword, password
   //Ověřit zda souhlasí staré heslo
   //Ověřit validitu nového hesla
@@ -210,7 +243,7 @@ bool Api::login(AsyncWebServerRequest* request) {
     if (request->hasParam("password", true)) {
       AsyncWebParameter* pPassword = request->getParam("password", true);
       char lCaseUsername[User::USERNAME_BUFFER_SIZE] = { 0 };
-      if (user.verifyPassword(pUname->value().c_str(), pPassword->value().c_str(), lCaseUsername)) {
+      if (user.verifyPassword(pUname->value().c_str(), pPassword->value().c_str(), lCaseUsername) == User::CredentialsVerificationResult::OK) {
         AsyncWebServerResponse* response = request->beginResponse(200, "text/plain", GENERAL_SUCCESS_RESULT_CODE);
         char authCookieContent[User::COOKIE_BUFFER_SIZE] = { 0 };
         user.getNewCookie(lCaseUsername, authCookieContent);

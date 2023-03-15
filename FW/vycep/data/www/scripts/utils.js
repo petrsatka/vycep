@@ -135,14 +135,18 @@ api.createUser = function(username, password, callback) {
 /*
   Změna hesla
 */
-api.changePassword = function(oldPassword, password, callback) {
-  if (oldPassword == '') {
-    setTimeout(() => callback(false,"invalid_password", null), 1000);
-  } else {
+api.changePassword = function(oldPassword, newPassword, callback) {
+  //if (oldPassword == '') {
+  //  setTimeout(() => callback(false,"invalid_password", null), 1000);
+  //} else {
     //setTimeout(() => callback(null, null, "500 - bad request"), 1000);
-    setTimeout(() => callback(true,"OK", null), 1000); 
+  //  setTimeout(() => callback(true,"OK", null), 1000); 
     //setTimeout(() => callback(false,"OK", null), 1000);
-  }  
+  //}
+  api.post("/api/changePassword", {oldpassword: oldPassword, newpassword: newPassword}, (resData, errorText) => {
+    var results = api.parseResponseData(resData, errorText);
+    callback(null, results[0], errorText);
+  });  
 }
 
 /*
@@ -558,8 +562,14 @@ gui.handleError = function(resultCode, errorMessage, popupWindow = false) {
       message = 'V systému už existuje alespoň jeden uživatel.';
       break;
     case 'INVALID_USERNAME_OR_PASSWORD':
-      message = 'Neplatné jméno nebo heslo.';
-      break;    
+      message = 'Neplatné jméno nebo heslo';
+      break;
+    case 'USERNAME_NOT_EXISTS':
+      message = 'Neplatný uživatel';
+      break;   
+    case 'INVALID_PASSWORD':
+      message = 'Neplatné heslo';
+      break;  
       
     /*case 'bad_username_or_password':
       message = 'Neplatné jméno nebo heslo.';
@@ -628,13 +638,14 @@ gui.createUser = function(username, password, passwordVerification, navigationTa
   Změna hesla
  */
 gui.changePassword = function(oldPassword, password, passwordVerification) {
-  gui.validatePassword(password) &&
+  //gui.validatePassword(password) &&
   gui.verifyPassword(password, passwordVerification) &&
   gui.setInProgress(true) &&
   api.changePassword(oldPassword, password, (result, resultCode, errorMessage) => {
     gui.setInProgress(false);
     if (gui.handleError(resultCode, errorMessage)) {
-      gui.validate(result, "Heslo nelze změnit.", "Heslo bylo změněno");
+      //gui.validate(result, "Heslo nelze změnit.", "Heslo bylo změněno");
+      notify.message("Heslo bylo změněno", false);
     }
   });  
 }

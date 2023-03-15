@@ -46,41 +46,39 @@ void serverInit() {
   //Pokud jde dotaz na login a uživatel je přilášen, pak přesměrovat na objednávky
   server.on("/login.html", HTTP_GET, [](AsyncWebServerRequest *request) {
     api.serveAuth(
-      request, User::PERMISSIONS_ANY_PERMISSIONS, [request]() {
+      request, User::PERMISSIONS_ANY_PERMISSIONS, [request](const char* lCaseUsername, const char* cookie, char* newCookie, bool &setCookie) {
         AsyncWebServerResponse *response = request->beginResponse(302);
         response->addHeader("Location", "/orders.html");
         return response;
       },
       NULL, [request]() {
-        request->send(LittleFS, "/www/login.html");
+        return request->beginResponse(LittleFS, "/www/login.html");
       });
   });
 
   //Pokud jde dotaz na registraci a uživatel je přilášen, pak přesměrovat na objednávky
   server.on("/registration.html", HTTP_GET, [](AsyncWebServerRequest *request) {
     api.serveAuth(
-      request, User::PERMISSIONS_ANY_PERMISSIONS, [request]() {
+      request, User::PERMISSIONS_ANY_PERMISSIONS, [request](const char* lCaseUsername, const char* cookie, char* newCookie, bool &setCookie) {
         AsyncWebServerResponse *response = request->beginResponse(302);
         response->addHeader("Location", "/orders.html");
         return response;
       },
       NULL, [request]() {
-        request->send(LittleFS, "/www/registration.html");
+        return request->beginResponse(LittleFS, "/www/registration.html");
       });
   });
 
   //Rozdělení obsahu podle práv
   server.on("/rolespecific/menu-content.js", HTTP_GET, [](AsyncWebServerRequest *request) {
     api.serveAuth(
-      request, User::PERMISSIONS_ADMIN, [request]() {
+      request, User::PERMISSIONS_ADMIN, [request](const char* lCaseUsername, const char* cookie, char* newCookie, bool &setCookie) {
         return request->beginResponse(LittleFS, "/www/rolespecific/menu-content-admin.js");
       },
       [request]() {
         return request->beginResponse(LittleFS, "/www/rolespecific/menu-content.js");
       },
-      [request]() {
-        request->send(401);
-      });
+      NULL);
   });
 
   //Vlastní podmínka místo filtrů - je to efektivnější
