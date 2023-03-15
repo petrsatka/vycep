@@ -20,18 +20,37 @@ pokud platí za sebe, pak ověřit práva na platbu
 
 
 --Active Admin
-*getUserBillCount
 *loadUsers
 *setSettingsValue
 *getSettingsValue
 *setPermissionValue
-*getIP
-*getGateway
 *resetPassword
 *deleteUser
 *activateUser
 startCalibration
 stopCalibration
 runTest
-*restart
 *connect
+
+Testy
+serveAuth
+	-oprávnění
+	-obnova cookie
+	-vypršení oprávnění - např změna hesla
+	-403
+	-401
+serveDynamicAuth
+	-403
+	-401
+	-Práva
+
+restart
+getIP
+getgaTewayIP
+login
+changePassword
+getUserBillCount
+getCurrentUserBillCount
+	-Oprávnění
+	-Neplatné parametry
+	
