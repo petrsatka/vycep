@@ -122,7 +122,7 @@ void serverInit() {
 
   server.on("/api/createUser", HTTP_POST, [](AsyncWebServerRequest *request) {
     if (api.createUser(request)) {
-      dprintln("user created");
+      dprintln("User created");
     }
   });
 

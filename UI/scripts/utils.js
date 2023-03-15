@@ -422,11 +422,21 @@ Správa cookies
 */
 let cookies = {};
 
+cookies.getCookieByName = function getCookie(name) {
+  let value = `; ${document.cookie}`;
+  let parts = value.split(`; ${name}=`);
+  if (parts.length === 2){
+    return parts.pop().split(';').shift()
+  }
+  
+  return null;
+}
+
 /*
 Vrátí jmnéno aktuálně přihlášeného uživatele
 */
 cookies.getUsername = function() {
-  return "Franta"; 
+  return cookies.getCookieByName('ESPUNAME') || ''; 
 }
 
 /*
