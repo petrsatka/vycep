@@ -5,10 +5,10 @@ Postupně otestovat
 nedovolit smazat všechny uživatele
 Tlačítko pro opuštění registrace
 Neaktivnímu uživateli zašedit objednávku
+Automatický refresh hodnoty na výčepu.
 
 --Active user
 getQueueCount
-*getCurrentUserBillCount
 makeOrder
 
 -- active, payment

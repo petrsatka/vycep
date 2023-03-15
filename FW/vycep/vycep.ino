@@ -129,8 +129,8 @@ void serverInit() {
     api.changePassword(request);
   });
 
-  server.on("/api/getBillCount", HTTP_POST, [](AsyncWebServerRequest *request) {
-    api.getBillCount(request);
+  server.on("/api/getCurrentUserBillCount", HTTP_POST, [](AsyncWebServerRequest *request) {
+    api.getCurrentUserBillCount(request);
   });
 
   server.on("/api/getQueueCount", HTTP_POST, [](AsyncWebServerRequest *request) {

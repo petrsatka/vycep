@@ -179,9 +179,13 @@ api.getQueueCount = function(callback) {
   Získá aktuální počet nápojů na účtě přihlášeného uživatele
 */
 api.getCurrentUserBillCount = function(callback) {
-  setTimeout(() => callback(api.billCountDEBUG,"OK", null), 1000);
+  //setTimeout(() => callback(api.billCountDEBUG,"OK", null), 1000);
   //setTimeout(() => callback(-1,"unable_to_get_bcount", null), 1000);
   //setTimeout(() => callback(null, null, "500 - bad request"), 1000);
+  api.post("/api/getCurrentUserBillCount", null, (resData, errorText) => {
+    var results = api.parseResponseData(resData, errorText);
+    callback(results[1], results[0], errorText);
+  });
 }
 
 /*

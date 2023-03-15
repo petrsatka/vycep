@@ -26,7 +26,7 @@ public:
   void changePassword(AsyncWebServerRequest* request);
   bool login(AsyncWebServerRequest* request);
   void getQueueCount(AsyncWebServerRequest* request);
-  void getBillCount(AsyncWebServerRequest* request);
+  void getCurrentUserBillCount(AsyncWebServerRequest* request);
   void getUserBillCount(AsyncWebServerRequest* request);
   void makeOrder(AsyncWebServerRequest* request);
   void pay(AsyncWebServerRequest* request);

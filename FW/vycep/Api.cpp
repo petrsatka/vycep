@@ -226,11 +226,19 @@ void Api::changePassword(AsyncWebServerRequest* request) {
       return request->beginResponse(400);
     },
     User::PERMISSIONS_ACTIVE);
-  //Ověřit existenci uživatele?
-  //oldPassword, password
-  //Ověřit zda souhlasí staré heslo
-  //Ověřit validitu nového hesla
-  //Přenastavit cookies
+}
+
+void Api::getCurrentUserBillCount(AsyncWebServerRequest* request) {
+  sprintln("!getCurrentUserBillCount");
+  serveDynamicAuth(
+    request, [&](const char* lCaseUsername, const char* cookie, char* newCookie, bool& setCookie) {
+      AsyncWebServerResponse* response = request->beginResponse(
+        200,
+        "text/plain",
+        String(GENERAL_SUCCESS_RESULT_CODE) + "&" + String(user.getUserBill(lCaseUsername)));
+      return response;
+    },
+    User::PERMISSIONS_ANY_PERMISSIONS);
 }
 
 bool Api::login(AsyncWebServerRequest* request) {
@@ -263,11 +271,6 @@ bool Api::login(AsyncWebServerRequest* request) {
 
 void Api::getQueueCount(AsyncWebServerRequest* request) {
   sprintln("!getQueueCount");
-}
-
-void Api::getBillCount(AsyncWebServerRequest* request) {
-  sprintln("!getBillCount");
-  //Username získat z cookies
 }
 
 void Api::getUserBillCount(AsyncWebServerRequest* request) {
