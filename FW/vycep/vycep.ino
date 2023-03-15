@@ -7,6 +7,7 @@
 #include "Debug.h"
 #include "Utils.h"
 
+uint32_t heapAfterInit = 0;
 AsyncWebServer server(80);
 //Mutex pro řízení přístupu k FLASH
 SemaphoreHandle_t xSemaphore = xSemaphoreCreateMutex();
@@ -212,9 +213,10 @@ void setup() {
   serverInit();
   sprintln("Start");
   //test();  //Debug - odstranit !!!!!
+  heapAfterInit = ESP.getFreeHeap();
 }
 
 void loop() {
-  sprintln(ESP.getFreeHeap());
-  delay(60 * 1000);
+  sprintln((int64_t)ESP.getFreeHeap() - (int64_t)heapAfterInit);
+  delay(10 * 1000);
 }

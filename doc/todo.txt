@@ -7,7 +7,6 @@ Tlačítko pro opuštění registrace
 Neaktivnímu uživateli zašedit objednávku
 
 --Active user
-*changePassword
 getQueueCount
 *getCurrentUserBillCount
 makeOrder
