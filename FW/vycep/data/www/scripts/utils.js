@@ -325,14 +325,22 @@ api.setPermissionValue = function(username, permissionKey, value, callback) {
   Získá IP adresu zařízení
 */
 api.getIP = function(callback) {
-  setTimeout(() => callback('192.168.1.45',"OK", null), 1000);  
+  //setTimeout(() => callback('192.168.1.45',"OK", null), 1000);
+  api.post("/api/getIP", null, (resData, errorText) => {
+    var results = api.parseResponseData(resData, errorText);
+    callback(results[1], results[0], errorText);
+  });  
 }
 
 /*
   Získá bránu zařízení
 */
-api.getGateway = function(callback) {
-  setTimeout(() => callback('192.168.1.1',"OK", null), 1000);  
+api.getGatewayIP = function(callback) {
+  //setTimeout(() => callback('192.168.1.1',"OK", null), 1000);
+  api.post("/api/getGatewayIP", null, (resData, errorText) => {
+    var results = api.parseResponseData(resData, errorText);
+    callback(results[1], results[0], errorText);
+  }); 
 }
 
 /*
@@ -408,10 +416,14 @@ api.runTest = function(callback) {
   Restartuje zařízení
 */
 api.restart = function(callback) {
-  console.log("restart");
-  setTimeout(() => callback(true,"OK", null), 1000);
+  //console.log("restart");
+  //setTimeout(() => callback(true,"OK", null), 1000);
   //setTimeout(() => callback(false, "unable_to_run_test", null), 1000);
   //setTimeout(() => callback(null, null, "500 - bad request"), 1000);
+  api.post("/api/restart", null, (resData, errorText) => {
+    var results = api.parseResponseData(resData, errorText);
+    callback(null, results[0], errorText);
+  }); 
 }
 
 /*
@@ -1207,7 +1219,7 @@ users.onPageShow = function() {
 let settings = {};
 
 settings.loadNetworkInfo = function() {
-  gui.loadValue(api.getGateway, '#gateway');
+  gui.loadValue(api.getGatewayIP, '#gateway');
   gui.loadValue(api.getIP, '#ip');
 }
 
@@ -1263,18 +1275,25 @@ settings.runTest = function() {
 settings.restart = function() {
   gui.callApiAction(api.restart, () => {
     setTimeout(() => {
+      gui.setInProgress(true)}
+    );
+    
+    setTimeout(() => {
+      gui.setInProgress(false);
       location.reload();
-    }, 2000);
+    }, 3000);
   });
 }
 
 settings.connect = function() {
   gui.connect($("#ssid").val(), $("#skey"), (result) => {
+    gui.setInProgress(true);
     notify.alert('Připojeno', `Přidělená IP adresa: ${result}`, () => {
       setTimeout(() => {
+        gui.setInProgress(false);
         let target = `http://${result}`;
         gui.navigate(target);
-      }, 2000);
+      }, 3000);
     });
   });
 }

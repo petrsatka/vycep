@@ -316,6 +316,49 @@ void Api::loadUsers(AsyncWebServerRequest* request) {
   //Ověřit práva admina
 }
 
+void Api::getIP(AsyncWebServerRequest* request) {
+  sprintln("!getIP");
+  serveDynamicAuth(
+    request, [&](const char* lCaseUsername, const char* cookie, char* newCookie, bool& setCookie) {
+      AsyncWebServerResponse* response = request->beginResponse(
+        200,
+        "text/plain",
+        String(GENERAL_SUCCESS_RESULT_CODE) + "&" + WiFi.localIP().toString());
+      return response;
+    },
+    User::PERMISSIONS_ADMIN);
+}
+
+void Api::getGatewayIP(AsyncWebServerRequest* request) {
+  sprintln("!getGateway");
+  serveDynamicAuth(
+    request, [&](const char* lCaseUsername, const char* cookie, char* newCookie, bool& setCookie) {
+      AsyncWebServerResponse* response = request->beginResponse(
+        200,
+        "text/plain",
+        String(GENERAL_SUCCESS_RESULT_CODE) + "&" + WiFi.gatewayIP().toString());
+      return response;
+    },
+    User::PERMISSIONS_ADMIN);
+}
+
+bool Api::restart(AsyncWebServerRequest* request) {
+  sprintln("!restart");
+  bool res = false;
+  serveDynamicAuth(
+    request, [&](const char* lCaseUsername, const char* cookie, char* newCookie, bool& setCookie) {
+      AsyncWebServerResponse* response = request->beginResponse(
+        200,
+        "text/plain",
+        String(GENERAL_SUCCESS_RESULT_CODE));
+      res = true;
+      return response;
+    },
+    User::PERMISSIONS_ADMIN);
+
+  return res;
+}
+
 void Api::logout(AsyncWebServerRequest* request) {
   dprintln("logout");
   AsyncWebServerResponse* response = request->beginResponse(200, "text/plain", GENERAL_SUCCESS_RESULT_CODE);

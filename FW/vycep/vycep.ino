@@ -7,7 +7,11 @@
 #include "Debug.h"
 #include "Utils.h"
 
+unsigned long startMillis;
+unsigned long currentMillis;
+const unsigned long heapPrintPeriod = 20000;
 uint32_t heapAfterInit = 0;
+bool shouldReboot = false;
 AsyncWebServer server(80);
 //Mutex pro řízení přístupu k FLASH
 SemaphoreHandle_t xSemaphore = xSemaphoreCreateMutex();
@@ -47,7 +51,7 @@ void serverInit() {
   //Pokud jde dotaz na login a uživatel je přilášen, pak přesměrovat na objednávky
   server.on("/login.html", HTTP_GET, [](AsyncWebServerRequest *request) {
     api.serveAuth(
-      request, User::PERMISSIONS_ANY_PERMISSIONS, [request](const char* lCaseUsername, const char* cookie, char* newCookie, bool &setCookie) {
+      request, User::PERMISSIONS_ANY_PERMISSIONS, [request](const char *lCaseUsername, const char *cookie, char *newCookie, bool &setCookie) {
         AsyncWebServerResponse *response = request->beginResponse(302);
         response->addHeader("Location", "/orders.html");
         return response;
@@ -60,7 +64,7 @@ void serverInit() {
   //Pokud jde dotaz na registraci a uživatel je přilášen, pak přesměrovat na objednávky
   server.on("/registration.html", HTTP_GET, [](AsyncWebServerRequest *request) {
     api.serveAuth(
-      request, User::PERMISSIONS_ANY_PERMISSIONS, [request](const char* lCaseUsername, const char* cookie, char* newCookie, bool &setCookie) {
+      request, User::PERMISSIONS_ANY_PERMISSIONS, [request](const char *lCaseUsername, const char *cookie, char *newCookie, bool &setCookie) {
         AsyncWebServerResponse *response = request->beginResponse(302);
         response->addHeader("Location", "/orders.html");
         return response;
@@ -73,7 +77,7 @@ void serverInit() {
   //Rozdělení obsahu podle práv
   server.on("/rolespecific/menu-content.js", HTTP_GET, [](AsyncWebServerRequest *request) {
     api.serveAuth(
-      request, User::PERMISSIONS_ADMIN, [request](const char* lCaseUsername, const char* cookie, char* newCookie, bool &setCookie) {
+      request, User::PERMISSIONS_ADMIN, [request](const char *lCaseUsername, const char *cookie, char *newCookie, bool &setCookie) {
         return request->beginResponse(LittleFS, "/www/rolespecific/menu-content-admin.js");
       },
       [request]() {
@@ -167,6 +171,18 @@ void serverInit() {
     api.makeOrder(request);
   });
 
+  server.on("/api/getIP", HTTP_POST, [](AsyncWebServerRequest *request) {
+    api.getIP(request);
+  });
+
+  server.on("/api/getGatewayIP", HTTP_POST, [](AsyncWebServerRequest *request) {
+    api.getGatewayIP(request);
+  });
+
+  server.on("/api/restart", HTTP_POST, [](AsyncWebServerRequest *request) {
+    shouldReboot = api.restart(request);
+  });
+
   server.on("/first-registration.html", HTTP_GET, [](AsyncWebServerRequest *request) {
     if (user.isAnyUserSet()) {
       request->redirect("/login.html");
@@ -217,6 +233,16 @@ void setup() {
 }
 
 void loop() {
-  sprintln((int64_t)ESP.getFreeHeap() - (int64_t)heapAfterInit);
-  delay(10 * 1000);
+  if (shouldReboot) {
+    Serial.println("Rebooting...");
+    delay(200);
+    ESP.restart();
+  }
+
+  currentMillis = millis();
+  if (currentMillis - startMillis >= heapPrintPeriod)
+  {
+    sprintln((int64_t)ESP.getFreeHeap() - (int64_t)heapAfterInit);
+    startMillis = currentMillis;
+  }
 }

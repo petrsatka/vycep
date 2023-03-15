@@ -33,6 +33,9 @@ public:
   void payForUser(AsyncWebServerRequest* request);
   void loadUsers(AsyncWebServerRequest* request);
   void logout(AsyncWebServerRequest* request);
+  void getIP(AsyncWebServerRequest* request);
+  void getGatewayIP(AsyncWebServerRequest* request);
+  bool restart(AsyncWebServerRequest* request);
 
   static void onNotFound(AsyncWebServerRequest* request);
 
