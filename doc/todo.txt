@@ -7,6 +7,7 @@ Tlačítko pro opuštění registrace
 Neaktivnímu uživateli zašedit objednávku
 Uživateli bez oprávnění platby nezobrazovat platbu
 Při přechodu na platbu u čestvě zaregistrovaného uživatel dojde k chybě
+Zohlednit nastavení povolení platby pro nové užovatele - až při aktivaci?
 
 Automatický refresh hodnoty na výčepu.
 

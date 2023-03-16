@@ -218,9 +218,30 @@ api.makeOrder = function(callback) {
 }
   
 /*
-  Provede platbu a vrátí zaplacený počet a počet nápojů na účtě přihlášeného uživatele
+  Provede platbu a vrátí zaplacený počet a počet nápojů na účtě zvoleného uživatele
 */
-api.pay = function(username, count, callback) {
+api.payForUser = function(username, count, callback) {
+  if (count > api.billCountDEBUG || count < 0) {
+    setTimeout(() => callback({
+      paid: 0,
+      billCount: api.billCountDEBUG
+    },"invalid-payment-value", null), 1000);
+  } else { 
+    let paid = Math.min(api.billCountDEBUG, Math.max(0, count));
+    api.billCountDEBUG -= paid;
+    setTimeout(() => callback({
+      paid: paid,
+      billCount: api.billCountDEBUG
+    },"OK", null), 1000);
+  }   
+  /*setTimeout(() => callback({
+     paid: 0,
+     billCount: api.billCountDEBUG,
+  },"unable_to_make_payment", null), 1000);*/
+  //setTimeout(() => callback(null, null, "500 - bad request"), 1000); 
+}
+
+api.pay = function( count, callback) {
   if (count > api.billCountDEBUG || count < 0) {
     setTimeout(() => callback({
       paid: 0,
@@ -618,7 +639,7 @@ gui.handleError = function(resultCode, errorMessage, popupWindow = false) {
 }
 
 gui.setInProgress = function(inProgress) {
-   $(':button.button-large').prop("disabled", inProgress);
+   $(':button.button-large:not(.always-enabled)').prop("disabled", inProgress);
    return true;  
 }
 
@@ -792,14 +813,20 @@ gui.makeOrder = function(qCountTargetSelector, bCountTargetSelector) {
 gui.pay = function(username, count, callback) {
   notify.message();
   gui.setInProgress(true);
-  api.pay(username, count, (result, resultCode, errorMessage) => {
+  let afterPay = (result, resultCode, errorMessage) => {
     let isOK = gui.handleError(resultCode, errorMessage);    
     if (callback) {
       callback(result, !isOK);
     }
     
     gui.setInProgress(false);
-  });
+  };
+  
+  if (username) {
+    api.payForUser(username, count, afterPay);
+  } else {
+    api.pay(count, afterPay);
+  }
 }
 
 /*
@@ -1066,7 +1093,9 @@ payment.goBack = function() {
 
 payment.loadBCount = function() {
   gui.setInProgress(true);
-  gui.loadValue((callback) => {api.getUserBillCount(payment.getUsername(), callback)}, "#count", (count, isError) => {
+  let username = payment.getUsername();
+  let apiMethod = username ? (callback) => {api.getUserBillCount(username, callback)} : (callback) => {api.getCurrentUserBillCount(callback)};
+  gui.loadValue(apiMethod, "#count", (count, isError) => {
     if (!isError) {
       gui.setInProgress(false);
     }
@@ -1074,7 +1103,7 @@ payment.loadBCount = function() {
 }
 
 payment.getUsername = function() {
-  return $(location).attr('hash').replace("#", '') || cookies.getUsername();
+  return $(location).attr('hash').replace("#", '') || '';
 }                                          
 
 payment.loadValues = function() {
@@ -1281,7 +1310,7 @@ settings.restart = function() {
     setTimeout(() => {
       gui.setInProgress(false);
       location.reload();
-    }, 3000);
+    }, 4000);
   });
 }
 
@@ -1293,7 +1322,7 @@ settings.connect = function() {
         gui.setInProgress(false);
         let target = `http://${result}`;
         gui.navigate(target);
-      }, 3000);
+      }, 4000);
     });
   });
 }
