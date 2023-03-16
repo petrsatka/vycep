@@ -6,7 +6,7 @@
 #include "Utils.h"
 #include "Debug.h"
 
-typedef std::function<AsyncWebServerResponse*(const char* lCaseUsername, const char* cookie, char* newCookie, bool &setCookie)> ResponseGetterFunction;
+typedef std::function<AsyncWebServerResponse*(const char* lCaseUsername, uint32_t &permissions, const char* cookie, char* newCookie, bool &setCookie)> ResponseGetterFunction;
 typedef std::function<AsyncWebServerResponse*()> ErrorResponseGetterFunction;
 
 class Api {

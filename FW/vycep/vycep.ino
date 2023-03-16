@@ -51,7 +51,7 @@ void serverInit() {
   //Pokud jde dotaz na login a uživatel je přilášen, pak přesměrovat na objednávky
   server.on("/login.html", HTTP_GET, [](AsyncWebServerRequest *request) {
     api.serveAuth(
-      request, User::PERMISSIONS_ANY_PERMISSIONS, [request](const char *lCaseUsername, const char *cookie, char *newCookie, bool &setCookie) {
+      request, User::PERMISSIONS_ANY_PERMISSIONS, [request](const char *lCaseUsername, uint32_t &permissions, const char *cookie, char *newCookie, bool &setCookie) {
         AsyncWebServerResponse *response = request->beginResponse(302);
         response->addHeader("Location", "/orders.html");
         return response;
@@ -64,7 +64,7 @@ void serverInit() {
   //Pokud jde dotaz na registraci a uživatel je přilášen, pak přesměrovat na objednávky
   server.on("/registration.html", HTTP_GET, [](AsyncWebServerRequest *request) {
     api.serveAuth(
-      request, User::PERMISSIONS_ANY_PERMISSIONS, [request](const char *lCaseUsername, const char *cookie, char *newCookie, bool &setCookie) {
+      request, User::PERMISSIONS_ANY_PERMISSIONS, [request](const char *lCaseUsername, uint32_t &permissions, const char *cookie, char *newCookie, bool &setCookie) {
         AsyncWebServerResponse *response = request->beginResponse(302);
         response->addHeader("Location", "/orders.html");
         return response;
@@ -76,14 +76,22 @@ void serverInit() {
 
   //Rozdělení obsahu podle práv
   server.on("/rolespecific/menu-content.js", HTTP_GET, [](AsyncWebServerRequest *request) {
+    sprintln("!menu-content");
     api.serveAuth(
-      request, User::PERMISSIONS_ADMIN, [request](const char *lCaseUsername, const char *cookie, char *newCookie, bool &setCookie) {
-        return request->beginResponse(LittleFS, "/www/rolespecific/menu-content-admin.js");
+      request, User::PERMISSIONS_ANY_PERMISSIONS, [request](const char *lCaseUsername, uint32_t &permissions, const char *cookie, char *newCookie, bool &setCookie) {
+        if (User::checkPermissions(permissions, User::PERMISSIONS_ACTIVE | User::PERMISSIONS_ADMIN | User::PERMISSIONS_PAYMENT)) {
+          return request->beginResponse(LittleFS, "/www/rolespecific/menu-content-admin-payment.js");
+        } else if (User::checkPermissions(permissions, User::PERMISSIONS_ACTIVE | User::PERMISSIONS_ADMIN)) {
+          return request->beginResponse(LittleFS, "/www/rolespecific/menu-content-admin.js");
+        } else if (User::checkPermissions(permissions, User::PERMISSIONS_ACTIVE | User::PERMISSIONS_PAYMENT)) {
+          return request->beginResponse(LittleFS, "/www/rolespecific/menu-content-user-payment.js");
+        } else if (User::checkPermissions(permissions, User::PERMISSIONS_ACTIVE)) {
+          return request->beginResponse(LittleFS, "/www/rolespecific/menu-content-user.js");
+        } else {
+          return request->beginResponse(LittleFS, "/www/rolespecific/menu-content-inactive.js");
+        }
       },
-      [request]() {
-        return request->beginResponse(LittleFS, "/www/rolespecific/menu-content.js");
-      },
-      NULL);
+      NULL, NULL);
   });
 
   //Vlastní podmínka místo filtrů - je to efektivnější
@@ -93,11 +101,11 @@ void serverInit() {
   });
 
   server.on("/payment.html", HTTP_GET, [](AsyncWebServerRequest *request) {
-    api.serveStaticAuth(request, "/www/payment.html", User::PERMISSIONS_ANY_PERMISSIONS);
+    api.serveStaticAuth(request, "/www/payment.html", User::PERMISSIONS_ACTIVE | User::PERMISSIONS_PAYMENT);
   });
 
   server.on("/password-change.html", HTTP_GET, [](AsyncWebServerRequest *request) {
-    api.serveStaticAuth(request, "/www/password-change.html", User::PERMISSIONS_ANY_PERMISSIONS);
+    api.serveStaticAuth(request, "/www/password-change.html", User::PERMISSIONS_ACTIVE);
   });
 
   //Admin
@@ -240,8 +248,7 @@ void loop() {
   }
 
   currentMillis = millis();
-  if (currentMillis - startMillis >= heapPrintPeriod)
-  {
+  if (currentMillis - startMillis >= heapPrintPeriod) {
     sprintln((int64_t)ESP.getFreeHeap() - (int64_t)heapAfterInit);
     startMillis = currentMillis;
   }

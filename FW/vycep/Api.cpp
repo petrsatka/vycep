@@ -33,7 +33,7 @@ void Api::serveAuth(AsyncWebServerRequest* request, uint32_t permissionMask, Res
       if (User::checkPermissions(permissions, permissionMask)) {
         //Má oprávnění
         if (responseGetter != NULL) {
-          response = responseGetter(username, cookie, newCookie, forceSetCookie);
+          response = responseGetter(username, permissions, cookie, newCookie, forceSetCookie);
         }
       } else {
         if (noPermissionsresponseGetter != NULL) {
@@ -67,7 +67,7 @@ void Api::serveAuth(AsyncWebServerRequest* request, uint32_t permissionMask, Res
 void Api::serveStaticAuth(AsyncWebServerRequest* request, const char* path, uint32_t permissionMask) {
   dprintln("serveStaticAuth");
   serveAuth(
-    request, permissionMask, [request, path](const char* username, const char* cookie, char* newCookie, bool& setCookie) {
+    request, permissionMask, [request, path](const char* lCaseUsername, uint32_t& permissions, const char* cookie, char* newCookie, bool& setCookie) {
       return request->beginResponse(LittleFS, path);
     },
     NULL, [request]() {
@@ -209,7 +209,7 @@ bool Api::createUser(AsyncWebServerRequest* request) {
 void Api::changePassword(AsyncWebServerRequest* request) {
   dprintln("changePassword");
   serveDynamicAuth(
-    request, [&](const char* lCaseUsername, const char* cookie, char* newCookie, bool& setCookie) {
+    request, [&](const char* lCaseUsername, uint32_t& permissions, const char* cookie, char* newCookie, bool& setCookie) {
       if (request->hasParam("oldpassword", true)) {
         AsyncWebParameter* pOldPassword = request->getParam("oldpassword", true);
         if (request->hasParam("newpassword", true)) {
@@ -260,7 +260,7 @@ void Api::getQueueCount(AsyncWebServerRequest* request) {
 void Api::getUserBillCount(AsyncWebServerRequest* request) {
   dprintln("getUserBillCount");
   serveDynamicAuth(
-    request, [&](const char* lCaseUsername, const char* cookie, char* newCookie, bool& setCookie) {
+    request, [&](const char* lCaseUsername, uint32_t& permissions, const char* cookie, char* newCookie, bool& setCookie) {
       if (request->hasParam("username", true)) {
         AsyncWebParameter* pUname = request->getParam("username", true);
         char lCaseUsername[User::USERNAME_BUFFER_SIZE] = { 0 };
@@ -280,7 +280,7 @@ void Api::getUserBillCount(AsyncWebServerRequest* request) {
 void Api::getCurrentUserBillCount(AsyncWebServerRequest* request) {
   dprintln("getCurrentUserBillCount");
   serveDynamicAuth(
-    request, [&](const char* lCaseUsername, const char* cookie, char* newCookie, bool& setCookie) {
+    request, [&](const char* lCaseUsername, uint32_t& permissions, const char* cookie, char* newCookie, bool& setCookie) {
       AsyncWebServerResponse* response = request->beginResponse(
         200,
         "text/plain",
@@ -316,7 +316,7 @@ void Api::loadUsers(AsyncWebServerRequest* request) {
 void Api::getIP(AsyncWebServerRequest* request) {
   dprintln("getIP");
   serveDynamicAuth(
-    request, [&](const char* lCaseUsername, const char* cookie, char* newCookie, bool& setCookie) {
+    request, [&](const char* lCaseUsername, uint32_t& permissions, const char* cookie, char* newCookie, bool& setCookie) {
       AsyncWebServerResponse* response = request->beginResponse(
         200,
         "text/plain",
@@ -329,7 +329,7 @@ void Api::getIP(AsyncWebServerRequest* request) {
 void Api::getGatewayIP(AsyncWebServerRequest* request) {
   dprintln("getGatewayIP");
   serveDynamicAuth(
-    request, [&](const char* lCaseUsername, const char* cookie, char* newCookie, bool& setCookie) {
+    request, [&](const char* lCaseUsername, uint32_t& permissions, const char* cookie, char* newCookie, bool& setCookie) {
       AsyncWebServerResponse* response = request->beginResponse(
         200,
         "text/plain",
@@ -343,7 +343,7 @@ bool Api::restart(AsyncWebServerRequest* request) {
   dprintln("restart");
   bool res = false;
   serveDynamicAuth(
-    request, [&](const char* lCaseUsername, const char* cookie, char* newCookie, bool& setCookie) {
+    request, [&](const char* lCaseUsername, uint32_t& permissions, const char* cookie, char* newCookie, bool& setCookie) {
       AsyncWebServerResponse* response = request->beginResponse(
         200,
         "text/plain",
