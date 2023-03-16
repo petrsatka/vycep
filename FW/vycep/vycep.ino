@@ -6,6 +6,9 @@
 #include "Api.h"
 #include "Debug.h"
 #include "Utils.h"
+#include "Settings.h"
+
+static constexpr const char* NVS_PARTTION = "nvs_ext";
 
 unsigned long startMillis;
 unsigned long currentMillis;
@@ -15,7 +18,7 @@ bool shouldReboot = false;
 AsyncWebServer server(80);
 //Mutex pro řízení přístupu k FLASH
 SemaphoreHandle_t xSemaphore = xSemaphoreCreateMutex();
-User user(xSemaphore);
+User user(xSemaphore, NVS_PARTTION);
 Api api(user);
 
 //Callback handler registrace prvního admina. Po vytvořaní admina bude odstraněn.

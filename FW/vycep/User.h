@@ -8,7 +8,7 @@
 
 class User {
 public:
-  User(SemaphoreHandle_t xSemaphore);
+  User(SemaphoreHandle_t xSemaphore, const char* nvsParttionName);
   ~User();
 
   //Výsledek ověření cookie
@@ -72,7 +72,6 @@ public:
   void test();
 
 private:
-  static constexpr const char* NVS_PARTTION = "nvs_ext";
   static constexpr const char* NAMESPACE_HASHES = "usrs-hashes";
   static constexpr const char* NAMESPACE_PERMISSIONS = "usrs-perms";
   static constexpr const char* NAMESPACE_BILLS = "usrs-bills";

@@ -1,11 +1,11 @@
 #include "User.h"
 
-User::User(SemaphoreHandle_t xSemaphore) {
+User::User(SemaphoreHandle_t xSemaphore, const char* nvsParttionName) {
   this->xSemaphore = xSemaphore;
-  hashesStorage = new TSafePreferences(this->xSemaphore, NAMESPACE_HASHES, NVS_PARTTION);
-  permissionsStorage = new TSafePreferences(this->xSemaphore, NAMESPACE_PERMISSIONS, NVS_PARTTION);
-  billsStorage = new TSafePreferences(this->xSemaphore, NAMESPACE_BILLS, NVS_PARTTION);
-  settings = new TSafePreferences(this->xSemaphore, NAMESPACE_SETTINGS, NVS_PARTTION);
+  hashesStorage = new TSafePreferences(this->xSemaphore, NAMESPACE_HASHES, nvsParttionName);
+  permissionsStorage = new TSafePreferences(this->xSemaphore, NAMESPACE_PERMISSIONS, nvsParttionName);
+  billsStorage = new TSafePreferences(this->xSemaphore, NAMESPACE_BILLS, nvsParttionName);
+  settings = new TSafePreferences(this->xSemaphore, NAMESPACE_SETTINGS, nvsParttionName);
 }
 
 User::~User() {
