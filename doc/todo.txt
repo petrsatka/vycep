@@ -5,6 +5,9 @@ Postupně otestovat
 nedovolit smazat všechny uživatele
 Tlačítko pro opuštění registrace
 Neaktivnímu uživateli zašedit objednávku
+Uživateli bez oprávnění platby nezobrazovat platbu
+Při přechodu na platbu u čestvě zaregistrovaného uživatel dojde k chybě
+
 Automatický refresh hodnoty na výčepu.
 
 --Active user
@@ -31,26 +34,4 @@ startCalibration
 stopCalibration
 runTest
 *connect
-
-Testy
-serveAuth
-	-oprávnění
-	-obnova cookie
-	-vypršení oprávnění - např změna hesla
-	-403
-	-401
-serveDynamicAuth
-	-403
-	-401
-	-Práva
-
-restart
-getIP
-getgaTewayIP
-login
-changePassword
-getUserBillCount
-getCurrentUserBillCount
-	-Oprávnění
-	-Neplatné parametry
 	

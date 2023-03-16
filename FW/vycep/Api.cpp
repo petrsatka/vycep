@@ -18,7 +18,7 @@ const char* Api::getCredentialsVerificationResultName(User::CredentialsVerificat
 }
 
 void Api::serveAuth(AsyncWebServerRequest* request, uint32_t permissionMask, ResponseGetterFunction responseGetter, ErrorResponseGetterFunction noPermissionsresponseGetter, ErrorResponseGetterFunction errorResponseGetter) {
-  sprintln("!serveAuth");
+  dprintln("serveAuth");
   AsyncWebServerResponse* response = NULL;
   char cookie[User::COOKIE_BUFFER_SIZE] = { 0 };
   if (extractCookie(request, AHUTH_COOKIE_NAME, cookie)) {
@@ -78,7 +78,7 @@ void Api::serveStaticAuth(AsyncWebServerRequest* request, const char* path, uint
 }
 
 void Api::serveDynamicAuth(AsyncWebServerRequest* request, ResponseGetterFunction responseGetter, uint32_t permissionMask) {
-  sprintln("!serveDynamicAuth");
+  dprintln("serveDynamicAuth");
   serveAuth(
     request, permissionMask, responseGetter, [request]() {
       //Forbidden
@@ -207,7 +207,7 @@ bool Api::createUser(AsyncWebServerRequest* request) {
 }
 
 void Api::changePassword(AsyncWebServerRequest* request) {
-  sprintln("!changePassword");
+  dprintln("changePassword");
   serveDynamicAuth(
     request, [&](const char* lCaseUsername, const char* cookie, char* newCookie, bool& setCookie) {
       if (request->hasParam("oldpassword", true)) {
@@ -229,10 +229,7 @@ void Api::changePassword(AsyncWebServerRequest* request) {
 }
 
 bool Api::login(AsyncWebServerRequest* request) {
-  sprintln("!login");
-  //AsyncWebServerResponse* response = request->beginResponse(200, "text/plain", GENERAL_SUCCESS_RESULT_CODE);
-  //unsetCookies(response);
-  //request->send(response);
+  dprintln("login");
   if (request->hasParam("username", true)) {
     AsyncWebParameter* pUname = request->getParam("username", true);
     if (request->hasParam("password", true)) {
@@ -261,7 +258,7 @@ void Api::getQueueCount(AsyncWebServerRequest* request) {
 }
 
 void Api::getUserBillCount(AsyncWebServerRequest* request) {
-  sprintln("!getUserBillCount");
+  dprintln("getUserBillCount");
   serveDynamicAuth(
     request, [&](const char* lCaseUsername, const char* cookie, char* newCookie, bool& setCookie) {
       if (request->hasParam("username", true)) {
@@ -281,7 +278,7 @@ void Api::getUserBillCount(AsyncWebServerRequest* request) {
 }
 
 void Api::getCurrentUserBillCount(AsyncWebServerRequest* request) {
-  sprintln("!getCurrentUserBillCount");
+  dprintln("getCurrentUserBillCount");
   serveDynamicAuth(
     request, [&](const char* lCaseUsername, const char* cookie, char* newCookie, bool& setCookie) {
       AsyncWebServerResponse* response = request->beginResponse(
@@ -317,7 +314,7 @@ void Api::loadUsers(AsyncWebServerRequest* request) {
 }
 
 void Api::getIP(AsyncWebServerRequest* request) {
-  sprintln("!getIP");
+  dprintln("getIP");
   serveDynamicAuth(
     request, [&](const char* lCaseUsername, const char* cookie, char* newCookie, bool& setCookie) {
       AsyncWebServerResponse* response = request->beginResponse(
@@ -330,7 +327,7 @@ void Api::getIP(AsyncWebServerRequest* request) {
 }
 
 void Api::getGatewayIP(AsyncWebServerRequest* request) {
-  sprintln("!getGateway");
+  dprintln("getGatewayIP");
   serveDynamicAuth(
     request, [&](const char* lCaseUsername, const char* cookie, char* newCookie, bool& setCookie) {
       AsyncWebServerResponse* response = request->beginResponse(
@@ -343,7 +340,7 @@ void Api::getGatewayIP(AsyncWebServerRequest* request) {
 }
 
 bool Api::restart(AsyncWebServerRequest* request) {
-  sprintln("!restart");
+  dprintln("restart");
   bool res = false;
   serveDynamicAuth(
     request, [&](const char* lCaseUsername, const char* cookie, char* newCookie, bool& setCookie) {

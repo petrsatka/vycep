@@ -40,7 +40,7 @@ public:
   static constexpr int USERNAME_MIN_CHAR_COUNT = 5;
   static constexpr int PASSWORD_MIN_CHAR_COUNT = 6;
   static constexpr int PASSWORD_MAX_CHAR_COUNT = 30;
-  static constexpr double AUTH_TIMEOUT_SEC = 24 * 60 * 60 * 1;  //24h
+  static constexpr double AUTH_TIMEOUT_SEC = 1 * 60 * 60 * 1;  //1h
   static constexpr size_t INT32_CHAR_BUFFER_SIZE = 11;
   static constexpr size_t UTC_TIME_STRING_BUFFER_SIZE = 20;
   static constexpr size_t USERNAME_MAX_CHAR_COUNT = 15;
