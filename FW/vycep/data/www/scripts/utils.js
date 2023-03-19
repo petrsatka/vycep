@@ -450,15 +450,19 @@ api.restart = function(callback) {
 /*
   Připojí zařízení k AP. V případě úspěchu uloží ssid a securityKey a restartuje zařízení.
 */
-api.connect = function(ssid, securityKey, callback) {
-  console.log(`connect ${ssid} ${securityKey}`);
-  if (!ssid || !securityKey) {
-    setTimeout(() => callback(null,"unnable_to_connect", null), 1000);
-  } else {
-    setTimeout(() => callback('192.168.1.25',"OK", null), 1000);
-  }
+api.setWifiConnection = function(ssid, securityKey, callback) {
+  //console.log(`setWifiConnection ${ssid} ${securityKey}`);
+  //if (!ssid || !securityKey) {
+  //  setTimeout(() => callback(null,"unnable_to_connect", null), 1000);
+  //} else {
+  //  setTimeout(() => callback('192.168.1.25',"OK", null), 1000);
+  //}
   //setTimeout(() => callback(false, "unable_to_run_connect", null), 1000);
   //setTimeout(() => callback(null, null, "500 - bad request"), 1000);
+  api.post("/api/setWifiConnection", {ssid: ssid, securitykey: securityKey}, (resData, errorText) => {
+    var results = api.parseResponseData(resData, errorText);
+    callback(null, results[0], errorText);
+  }); 
 }
 
 
@@ -956,9 +960,9 @@ gui.callApiAction = function(apiMethod, callback) {
 /*
   Připojení k AP
 */
-gui.connect = function(ssid, securityKey, callback) {
+gui.setWifiConnection = function(ssid, securityKey, callback) {
   gui.setInProgress(true);
-  api.connect(ssid, securityKey, (result, resultCode, errorMessage) => {
+  api.setWifiConnection(ssid, securityKey, (result, resultCode, errorMessage) => {
     if (gui.handleError(resultCode, errorMessage, true)) {
       if (callback) {
         callback(result);
@@ -1314,14 +1318,15 @@ settings.restart = function() {
   });
 }
 
-settings.connect = function() {
-  gui.connect($("#ssid").val(), $("#skey"), (result) => {
+settings.setWifiConnection = function() {
+  gui.setWifiConnection($("#ssid").val(), $("#skey").val(), (result) => {
     gui.setInProgress(true);
-    notify.alert('Připojeno', `Přidělená IP adresa: ${result}`, () => {
+    notify.alert('Zařízení bude restartováno.', () => {
       setTimeout(() => {
         gui.setInProgress(false);
-        let target = `http://${result}`;
-        gui.navigate(target);
+        //Tady navigace na doménu. Pokud je nastavena!!!
+        //let target = `http://${result}`;
+        //gui.navigate(target);
       }, 4000);
     });
   });

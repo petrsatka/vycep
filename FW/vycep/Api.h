@@ -4,19 +4,23 @@
 #include <ESPAsyncWebSrv.h>
 #include "User.h"
 #include "Utils.h"
+#include "Settings.h"
 #include "Debug.h"
 
-typedef std::function<AsyncWebServerResponse*(const char* lCaseUsername, uint32_t &permissions, const char* cookie, char* newCookie, bool &setCookie)> ResponseGetterFunction;
+typedef std::function<AsyncWebServerResponse*(const char* lCaseUsername, uint32_t& permissions, const char* cookie, char* newCookie, bool& setCookie)> ResponseGetterFunction;
 typedef std::function<AsyncWebServerResponse*()> ErrorResponseGetterFunction;
 
 class Api {
 public:
-  Api(User& user);
+  Api(User &user, Settings &settings);
   ~Api();
   static constexpr const char* AHUTH_COOKIE_NAME = "ESPAUTH=";
   static constexpr const char* USERNAME_COOKIE_NAME = "ESPUNAME=";
   static constexpr const char* GENERAL_SUCCESS_RESULT_CODE = "OK";
+  static constexpr const char* GENERAL_ERROR_RESULT_CODE = "UNKNOWN_ERROR";
   static constexpr const char* INVALID_USERNAME_OR_PASSWORD_RESULT_CODE = "INVALID_USERNAME_OR_PASSWORD";
+  static constexpr const char* SSID_TOO_LONG_RESULT_CODE = "SSID_TOO_LONG";
+  static constexpr const char* SESURITY_KEY_TOO_LONG_RESULT_CODE = "SKEY_TOO_LONG";
 
   void serveStaticAuth(AsyncWebServerRequest* request, const char* path, uint32_t permissionMask);
   void serveDynamicAuth(AsyncWebServerRequest* request, ResponseGetterFunction responseGetter, uint32_t permissionMask);
@@ -36,11 +40,13 @@ public:
   void getIP(AsyncWebServerRequest* request);
   void getGatewayIP(AsyncWebServerRequest* request);
   bool restart(AsyncWebServerRequest* request);
+  bool setWifiConnection(AsyncWebServerRequest* request);
 
   static void onNotFound(AsyncWebServerRequest* request);
 
 private:
   User& user;
+  Settings& settings;
 
   static constexpr int CRED_VERIF_ERR_COUNT = 13;
   static constexpr int CRED_VERIF_ERR_BUFFER_SIZE = 32;

@@ -3,6 +3,6 @@
 #define sprintln(a) (Serial.println(a))
 //#define sprintln(a)
 
-//#define dprintln(a) (Serial.println(a))
-#define dprintln(a)
+#define dprintln(a) (Serial.println(a))
+//#define dprintln(a)
 #endif

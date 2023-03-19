@@ -1,7 +1,7 @@
 #include "Api.h"
 
-Api::Api(User& user)
-  : user(user) {
+Api::Api(User& user, Settings& settings)
+  : user(user), settings(settings) {
 }
 
 Api::~Api() {
@@ -350,6 +350,38 @@ bool Api::restart(AsyncWebServerRequest* request) {
         String(GENERAL_SUCCESS_RESULT_CODE));
       res = true;
       return response;
+    },
+    User::PERMISSIONS_ADMIN);
+
+  return res;
+}
+
+bool Api::setWifiConnection(AsyncWebServerRequest* request) {
+  bool res = false;
+  sprintln("!connect");
+  serveDynamicAuth(
+    request, [&](const char* lCaseUsername, uint32_t& permissions, const char* cookie, char* newCookie, bool& setCookie) {
+      if (request->hasParam("ssid", true) && request->hasParam("securitykey", true)) {
+        AsyncWebParameter* pSSID = request->getParam("ssid", true);
+        AsyncWebParameter* pSKey = request->getParam("securitykey", true);
+        const char* resultCode = GENERAL_ERROR_RESULT_CODE;
+        if (strlen(pSSID->value().c_str()) >= Utils::SSID_BUFFER_SIZE) {
+          resultCode = SSID_TOO_LONG_RESULT_CODE;
+        } else if (strlen(pSKey->value().c_str()) >= Utils::SECURITY_KEY_BUFFER_SIZE) {
+          resultCode = SESURITY_KEY_TOO_LONG_RESULT_CODE;
+        } else if (settings.setSSID(pSSID->value().c_str()) && settings.setSecurityKey(pSKey->value().c_str())) {
+          resultCode = GENERAL_SUCCESS_RESULT_CODE;
+          res = true;
+        }
+
+        AsyncWebServerResponse* response = request->beginResponse(
+          200,
+          "text/plain",
+          String(resultCode));
+        return response;
+      }
+
+      return request->beginResponse(400);
     },
     User::PERMISSIONS_ADMIN);
 

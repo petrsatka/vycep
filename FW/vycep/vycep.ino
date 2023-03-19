@@ -8,18 +8,20 @@
 #include "Utils.h"
 #include "Settings.h"
 
-static constexpr const char* NVS_PARTTION = "nvs_ext";
+static constexpr const char *NVS_PARTTION = "nvs_ext";
 
-unsigned long startMillis;
-unsigned long currentMillis;
+bool needReconnect = false;
+unsigned long lastHeapPrintMillis = 0;
+unsigned long lastTryReconnectMillis = 0;
 const unsigned long heapPrintPeriod = 20000;
 uint32_t heapAfterInit = 0;
 bool shouldReboot = false;
 AsyncWebServer server(80);
 //Mutex pro řízení přístupu k FLASH
 SemaphoreHandle_t xSemaphore = xSemaphoreCreateMutex();
+Settings settings(xSemaphore, NVS_PARTTION);
 User user(xSemaphore, NVS_PARTTION);
-Api api(user);
+Api api(user, settings);
 
 //Callback handler registrace prvního admina. Po vytvořaní admina bude odstraněn.
 AsyncCallbackWebHandler *firstRegistrationRedirectHandler = NULL;
@@ -29,6 +31,59 @@ void test() {
   user.test();
   Utils::test();
   user.clearAll();
+}
+
+void createAP() {
+  dprintln("Create soft AP");
+  IPAddress apIP = IPAddress(192, 168, 1, 1);
+  IPAddress apGatewayIP = IPAddress(192, 168, 1, 1);
+  IPAddress apSubnet = IPAddress(255, 255, 255, 0);
+
+  WiFi.disconnect();
+  dprintln("soft AP config");
+  dprintln(WiFi.softAPConfig(apIP, apGatewayIP, apSubnet) ? "Ready" : "Failed!");
+  String mac = WiFi.macAddress();
+  mac.replace(":", "");
+  String apName = "Vycep_" + mac;
+  dprintln(WiFi.softAP(apName) ? "Ready" : "Failed!");
+  dprintln(WiFi.softAPIP().toString());
+}
+
+bool connectWiFiClient() {
+  char ssid[Utils::SSID_BUFFER_SIZE] = { 0 };
+  char secKey[Utils::SECURITY_KEY_BUFFER_SIZE] = { 0 };
+  dprintln("connectWiFiClient");
+  WiFi.disconnect();
+  dprintln("GetSSID");
+  settings.getSSID(ssid);
+  if (ssid[0] == 0) {
+    dprintln("NoSSID");
+    return false;
+  }
+
+  dprintln(ssid);
+  dprintln("GetSecurityKey");
+  settings.getSecurityKey(secKey);
+  WiFi.begin(ssid, secKey);
+  if (WiFi.waitForConnectResult() != WL_CONNECTED) {
+    dprintln("ClientConnectionFailed");
+    return false;
+  }
+
+  WiFi.setAutoReconnect(true);
+  WiFi.persistent(true);
+  sprintln(WiFi.localIP().toString());
+  return true;
+}
+
+void wiFiInit() {
+  settings.clearAll();  //DEBUG odstranit!!!
+  WiFi.mode(WIFI_STA);
+  if (!connectWiFiClient()) {
+    WiFi.mode(WIFI_AP_STA);
+    createAP();
+    needReconnect = true;
+  }
 }
 
 //Inicalizace serveru
@@ -194,6 +249,10 @@ void serverInit() {
     shouldReboot = api.restart(request);
   });
 
+  server.on("/api/setWifiConnection", HTTP_POST, [](AsyncWebServerRequest *request) {
+    shouldReboot = api.setWifiConnection(request);
+  });
+
   server.on("/first-registration.html", HTTP_GET, [](AsyncWebServerRequest *request) {
     if (user.isAnyUserSet()) {
       request->redirect("/login.html");
@@ -222,12 +281,7 @@ void setup() {
     return;
   }
 
-  WiFi.mode(WIFI_STA);
-  WiFi.begin("PaPaJ 2.4", "petapajajola");
-  if (WiFi.waitForConnectResult() != WL_CONNECTED) {
-    sprintln("WiFi Failed!");
-    return;
-  }
+  wiFiInit();
 
   struct tm timeInfo;
   if (!getLocalTime(&timeInfo, 10000)) {
@@ -235,7 +289,6 @@ void setup() {
     sprintln("NTP Timeout");
   }
 
-  sprintln(WiFi.localIP().toString());
   //user.clearAll(); //Debug - odstranit !!!!
   serverInit();
   sprintln("Start");
@@ -250,9 +303,21 @@ void loop() {
     ESP.restart();
   }
 
-  currentMillis = millis();
-  if (currentMillis - startMillis >= heapPrintPeriod) {
+  unsigned currentMillis = millis();
+  if (currentMillis - lastHeapPrintMillis >= heapPrintPeriod) {
     sprintln((int64_t)ESP.getFreeHeap() - (int64_t)heapAfterInit);
-    startMillis = currentMillis;
+    lastHeapPrintMillis = currentMillis;
+  }
+
+  if (needReconnect && currentMillis - lastTryReconnectMillis >= heapPrintPeriod) {
+    dprintln("tryReconnect");
+    // if (connectWiFiClient()) {
+    //   ESP.restart();
+    // } else {
+    //    WiFi.disconnect(true);
+    // }
+
+
+    lastTryReconnectMillis = currentMillis;
   }
 }

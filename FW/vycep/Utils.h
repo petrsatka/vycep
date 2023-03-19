@@ -11,6 +11,8 @@ class Utils {
 public:
   static constexpr size_t HASH_BUFFER_SIZE = 32;
   static constexpr size_t HASH_HEXSTRING_BUFFER_SIZE = 2 * HASH_BUFFER_SIZE + 1;
+  static constexpr size_t SSID_BUFFER_SIZE = 33;          //32 Znaků
+  static constexpr size_t SECURITY_KEY_BUFFER_SIZE = 64;  //63 Znaků
 
   static void actTime(struct tm& timeInfo);
   static void hexStr(const unsigned char* data, int len, char* buffer);
