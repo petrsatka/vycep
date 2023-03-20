@@ -321,13 +321,17 @@ api.setSettingsValue = function(name, value, callback) {
   Získá hodnotu nastavení
 */
 api.getSettingsValue = function(name, callback) {
-  let val = api.settings[name];
-  if (val === undefined) {
-    setTimeout(() => callback(null, "unable_to_get_settings_value", null), 1000); 
-  } else {
-    setTimeout(() => callback(val,"OK", null), 1000);
-  }
+  //let val = api.settings[name];
+  //if (val === undefined) {
+  //  setTimeout(() => callback(null, "unable_to_get_settings_value", null), 1000); 
+  //} else {
+  //  setTimeout(() => callback(val,"OK", null), 1000);
+  //}
   //setTimeout(() => callback(null, null, "500 - bad request"), 1000);
+   api.post("/api/getSettingsValue", {key: name}, (resData, errorText) => {
+    var results = api.parseResponseData(resData, errorText);
+    callback(results[1], results[0], errorText);
+  });
 }
 
 /*
@@ -1205,7 +1209,7 @@ users.loadUsers = function() {
 }
 
 users.loadAllowPayment = function() {
-  gui.loadSettingsValue('newUsersPayment', '#allow-payment');
+  gui.loadSettingsValue('nuserpaymnt', '#allow-payment');
 }
 
 users.onAllowPaymentCheckboxChange = function(event) {
@@ -1272,10 +1276,10 @@ settings.registerChange = function() {
 settings.loadValues = function() {
   gui.loadSettingsValue('ssid', '#ssid');
   gui.loadSettingsValue('skey', '#skey');
-  gui.loadSettingsValue('pcount', '#pcount');
+  gui.loadSettingsValue('pulseplitter', '#pcount');
   gui.loadSettingsValue('mode', '[name="mode"]');
-  gui.loadSettingsValue('inactTimeout', '#inactivity-timeout');
-  gui.loadSettingsValue('underLimTimeout', '#nder-limit-timeout');
+  gui.loadSettingsValue('mastertimeout', '#inactivity-timeout');
+  gui.loadSettingsValue('ulimtimeout', '#nder-limit-timeout');
   settings.loadNetworkInfo();
 }
 

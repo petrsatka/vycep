@@ -19,6 +19,7 @@ public:
   static constexpr const char* GENERAL_SUCCESS_RESULT_CODE = "OK";
   static constexpr const char* GENERAL_ERROR_RESULT_CODE = "UNKNOWN_ERROR";
   static constexpr const char* INVALID_USERNAME_OR_PASSWORD_RESULT_CODE = "INVALID_USERNAME_OR_PASSWORD";
+  static constexpr const char* INVALID_KEY_RESULT_CODE = "INVALID_KEY";
   static constexpr const char* SSID_TOO_LONG_RESULT_CODE = "SSID_TOO_LONG";
   static constexpr const char* SESURITY_KEY_TOO_LONG_RESULT_CODE = "SKEY_TOO_LONG";
 
@@ -41,6 +42,7 @@ public:
   void getGatewayIP(AsyncWebServerRequest* request);
   bool restart(AsyncWebServerRequest* request);
   bool setWifiConnection(AsyncWebServerRequest* request);
+  void getSettingsValue(AsyncWebServerRequest* request);
 
   static void onNotFound(AsyncWebServerRequest* request);
 

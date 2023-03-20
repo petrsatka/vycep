@@ -391,6 +391,52 @@ bool Api::setWifiConnection(AsyncWebServerRequest* request) {
   return res;
 }
 
+void Api::getSettingsValue(AsyncWebServerRequest* request) {
+  sprintln("!getSettingsValue");
+  serveDynamicAuth(
+    request, [&](const char* lCaseUsername, uint32_t& permissions, const char* cookie, char* newCookie, bool& setCookie) {
+      if (request->hasParam("key", true)) {
+        AsyncWebParameter* pSKey = request->getParam("key", true);
+        const char* resultCode = GENERAL_ERROR_RESULT_CODE;
+        const char* key = pSKey->value().c_str();
+        String res = "";
+        if (key != NULL && key[0] != 0) {
+          resultCode = GENERAL_SUCCESS_RESULT_CODE;
+          if (strcmp(key, Settings::KEY_NEW_USER_PAYMNET) == 0) {
+
+          } else if (strcmp(key, Settings::KEY_SSID) == 0) {
+            char ssid[Utils::SSID_BUFFER_SIZE] = { 0 };
+            settings.getSSID(ssid);
+            res = String(ssid);
+          } else if (strcmp(key, Settings::KEY_SECURITY_KEY) == 0) {
+            char secKey[Utils::SECURITY_KEY_BUFFER_SIZE] = { 0 };
+            settings.getSecurityKey(secKey);
+            res = String(secKey);
+          } else if (strcmp(key, Settings::KEY_PULSE_PER_LITER) == 0) {
+
+          } else if (strcmp(key, Settings::KEY_MODE) == 0) {
+
+          } else if (strcmp(key, Settings::KEY_MASTER_TIMEOUT) == 0) {
+
+          } else if (strcmp(key, Settings::KEY_UNDER_LIMIT_TIMEOUT) == 0) {
+
+          } else {
+            resultCode = INVALID_KEY_RESULT_CODE;
+          }
+        }
+
+        AsyncWebServerResponse* response = request->beginResponse(
+          200,
+          "text/plain",
+          String(resultCode) + "&" + res);
+        return response;
+      }
+
+      return request->beginResponse(400);
+    },
+    User::PERMISSIONS_ADMIN);
+}
+
 void Api::logout(AsyncWebServerRequest* request) {
   dprintln("logout");
   AsyncWebServerResponse* response = request->beginResponse(200, "text/plain", GENERAL_SUCCESS_RESULT_CODE);

@@ -274,6 +274,10 @@ void serverInit() {
     shouldReboot = api.setWifiConnection(request);
   });
 
+  server.on("/api/getSettingsValue", HTTP_POST, [](AsyncWebServerRequest *request) {
+    api.getSettingsValue(request);
+  });
+
   server.on("/first-registration.html", HTTP_GET, [](AsyncWebServerRequest *request) {
     if (user.isAnyUserSet()) {
       request->redirect("/login.html");
