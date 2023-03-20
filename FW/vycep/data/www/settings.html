@@ -25,9 +25,9 @@
       <div class="page-content">
         <span class="label header">Připojení k Wi-Fi</span>
         <label for="ssid">SSID</label>                                 
-        <input type="text" id="ssid" name="ssid">
+        <input type="text" id="ssid" name="ssid" maxlength="32">
         <label for="skey">Heslo</label>                                 
-        <input type="text" id="skey" name="skey">
+        <input type="text" id="skey" name="skey" maxlength="63">
         <span class="description">Po nastavení parametrů pro připojení bude zařízení restartováno.</span>    
         <input class="button-large" type="button" value="Nastavit" onclick="settings.setWifiConnection()">
         <input class="button-large" type="button" value="Restart" onclick="settings.restart()">

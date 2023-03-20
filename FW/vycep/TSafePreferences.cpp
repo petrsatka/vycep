@@ -159,7 +159,7 @@ size_t TSafePreferences::putBool(const char* key, bool value) {
 }
 
 size_t TSafePreferences::putString(const char* key, const char* value) {
-  sprintln("!putString");
+  dprintln("putString");
   size_t res = 0;
   if (this->xMutex != NULL && xSemaphoreTake(this->xMutex, portMAX_DELAY)) {
     res = preferences.putString(key, value);
@@ -357,7 +357,7 @@ bool TSafePreferences::getBool(const char* key, bool defaultValue) {
 }
 
 size_t TSafePreferences::getString(const char* key, char* value, size_t maxLen) {
-  sprintln("!getString");
+  dprintln("getString");
   size_t res = 0;
   if (this->xMutex != NULL && xSemaphoreTake(this->xMutex, portMAX_DELAY)) {
     res = preferences.getString(key, value, maxLen);

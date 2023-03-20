@@ -10,9 +10,7 @@
 
 static constexpr const char *NVS_PARTTION = "nvs_ext";
 
-bool needReconnect = false;
 unsigned long lastHeapPrintMillis = 0;
-unsigned long lastTryReconnectMillis = 0;
 const unsigned long heapPrintPeriod = 20000;
 uint32_t heapAfterInit = 0;
 bool shouldReboot = false;
@@ -40,19 +38,30 @@ void createAP() {
   IPAddress apSubnet = IPAddress(255, 255, 255, 0);
 
   WiFi.disconnect();
+  WiFi.mode(WIFI_AP);
   dprintln("soft AP config");
-  dprintln(WiFi.softAPConfig(apIP, apGatewayIP, apSubnet) ? "Ready" : "Failed!");
+  if (WiFi.softAPConfig(apIP, apGatewayIP, apSubnet)) {
+    dprintln("Ready");
+  } else {
+    dprintln("Failed!");
+  }
+
   String mac = WiFi.macAddress();
   mac.replace(":", "");
   String apName = "Vycep_" + mac;
-  dprintln(WiFi.softAP(apName) ? "Ready" : "Failed!");
+  if (WiFi.softAP(apName)) {
+    dprintln("Ready");
+  } else {
+    dprintln("Failed!");
+  }
+
   dprintln(WiFi.softAPIP().toString());
 }
 
 bool connectWiFiClient() {
   char ssid[Utils::SSID_BUFFER_SIZE] = { 0 };
   char secKey[Utils::SECURITY_KEY_BUFFER_SIZE] = { 0 };
-  dprintln("connectWiFiClient");
+  dprintln("wiFiClientBegin");
   WiFi.disconnect();
   dprintln("GetSSID");
   settings.getSSID(ssid);
@@ -64,7 +73,10 @@ bool connectWiFiClient() {
   dprintln(ssid);
   dprintln("GetSecurityKey");
   settings.getSecurityKey(secKey);
+  dprintln(secKey);
+  WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, secKey);
+
   if (WiFi.waitForConnectResult() != WL_CONNECTED) {
     dprintln("ClientConnectionFailed");
     return false;
@@ -77,12 +89,21 @@ bool connectWiFiClient() {
 }
 
 void wiFiInit() {
-  settings.clearAll();  //DEBUG odstranit!!!
-  WiFi.mode(WIFI_STA);
-  if (!connectWiFiClient()) {
-    WiFi.mode(WIFI_AP_STA);
-    createAP();
-    needReconnect = true;
+  sprintln(!wiFiInit);
+  if (settings.getWiFiOK()) {
+    dprintln("wifiOK");
+    //WIFI byla již úspěšně připojena - budeme se zkoušet znovu připojit k nastavené wifi
+    //Pokud wifi již neexistuje. Je možný pouze HW reset wifi.
+    while (!connectWiFiClient()) {};
+  } else {
+    dprintln("wifiNotOK");
+    //Může se jednat o nenastavenou wifi, nebo pokus o první připojení
+    if (connectWiFiClient()) {
+      settings.setWiFiOK();
+    } else {
+      //Nezdařilo se přopojení. Vytvoříme AP
+      createAP();
+    }
   }
 }
 
@@ -307,17 +328,5 @@ void loop() {
   if (currentMillis - lastHeapPrintMillis >= heapPrintPeriod) {
     sprintln((int64_t)ESP.getFreeHeap() - (int64_t)heapAfterInit);
     lastHeapPrintMillis = currentMillis;
-  }
-
-  if (needReconnect && currentMillis - lastTryReconnectMillis >= heapPrintPeriod) {
-    dprintln("tryReconnect");
-    // if (connectWiFiClient()) {
-    //   ESP.restart();
-    // } else {
-    //    WiFi.disconnect(true);
-    // }
-
-
-    lastTryReconnectMillis = currentMillis;
   }
 }

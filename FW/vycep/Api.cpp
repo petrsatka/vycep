@@ -358,7 +358,7 @@ bool Api::restart(AsyncWebServerRequest* request) {
 
 bool Api::setWifiConnection(AsyncWebServerRequest* request) {
   bool res = false;
-  sprintln("!connect");
+  dprintln("setWifiConnection");
   serveDynamicAuth(
     request, [&](const char* lCaseUsername, uint32_t& permissions, const char* cookie, char* newCookie, bool& setCookie) {
       if (request->hasParam("ssid", true) && request->hasParam("securitykey", true)) {
@@ -369,9 +369,12 @@ bool Api::setWifiConnection(AsyncWebServerRequest* request) {
           resultCode = SSID_TOO_LONG_RESULT_CODE;
         } else if (strlen(pSKey->value().c_str()) >= Utils::SECURITY_KEY_BUFFER_SIZE) {
           resultCode = SESURITY_KEY_TOO_LONG_RESULT_CODE;
-        } else if (settings.setSSID(pSSID->value().c_str()) && settings.setSecurityKey(pSKey->value().c_str())) {
-          resultCode = GENERAL_SUCCESS_RESULT_CODE;
-          res = true;
+        } else {
+          settings.clearWiFiOK();
+          if (settings.setSSID(pSSID->value().c_str()) && settings.setSecurityKey(pSKey->value().c_str())) {
+            resultCode = GENERAL_SUCCESS_RESULT_CODE;
+            res = true;
+          }
         }
 
         AsyncWebServerResponse* response = request->beginResponse(

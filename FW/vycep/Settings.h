@@ -16,6 +16,8 @@ public:
   };
 
   void clearAll();
+  bool setWiFiOK();
+  bool clearWiFiOK();
   bool setSSID(const char* ssid);
   bool setSecurityKey(const char* securityKey);
   bool setPulsePerLiterCount(unsigned int pulseCount);
@@ -28,9 +30,11 @@ public:
   Settings::DeviceMode getMode();
   unsigned long getMasterTimeoutSeconds();
   unsigned long getUnderLimitTimeoutSeconds();
+   bool getWiFiOK();
 
 private:
   static constexpr const char* NAMESPACE_SYSTEM_SETTINGS = "setts-system";
+  static constexpr const char* KEY_WIFI_OK = "wifiok";
   static constexpr const char* KEY_SSID = "ssid";
   static constexpr const char* KEY_SECURITY_KEY = "skey";
   static constexpr const char* KEY_PULSE_PER_LITER = "pulseplitter";

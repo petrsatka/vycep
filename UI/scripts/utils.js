@@ -614,7 +614,13 @@ gui.handleError = function(resultCode, errorMessage, popupWindow = false) {
       break;   
     case 'INVALID_PASSWORD':
       message = 'Neplatné heslo';
-      break;  
+      break;
+    case 'SSID_TOO_LONG':
+      message = 'Maximální délka SSID je 32 bytů';
+      break;
+      case 'SKEY_TOO_LONG':
+      message = 'Maximální délka hesla je 63 bytů';
+      break 
       
     /*case 'bad_username_or_password':
       message = 'Neplatné jméno nebo heslo.';
