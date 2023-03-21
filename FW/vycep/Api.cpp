@@ -10,11 +10,23 @@ Api::~Api() {
 constexpr const char Api::credentialsVerificationResultNames[CRED_VERIF_ERR_COUNT][CRED_VERIF_ERR_BUFFER_SIZE];
 
 const char* Api::getCredentialsVerificationResultName(User::CredentialsVerificationResult res) {
+  sprintln("!getCredentialsVerificationResultName");
   if (static_cast<int>(res) < 0 || static_cast<int>(res) >= CRED_VERIF_ERR_COUNT) {
     return Api::credentialsVerificationResultNames[static_cast<int>(User::CredentialsVerificationResult::UNKNOWN_ERROR)];
   }
 
   return Api::credentialsVerificationResultNames[static_cast<int>(res)];
+}
+
+constexpr const char Api::deviceModeNames[DEV_MODE_COUNT][DEV_MODE_BUFFER_SIZE];
+
+const char* Api::getDeviceModeName(Settings::DeviceMode mode) {
+  sprintln("!getDeviceModeName");
+  if (static_cast<int>(mode) < 0 || static_cast<int>(mode) >= DEV_MODE_COUNT) {
+    return Api::deviceModeNames[static_cast<int>(Settings::DeviceMode::AUTO)];
+  }
+
+  return Api::deviceModeNames[static_cast<int>(mode)];
 }
 
 void Api::serveAuth(AsyncWebServerRequest* request, uint32_t permissionMask, ResponseGetterFunction responseGetter, ErrorResponseGetterFunction noPermissionsresponseGetter, ErrorResponseGetterFunction errorResponseGetter) {
@@ -326,6 +338,19 @@ void Api::getIP(AsyncWebServerRequest* request) {
     User::PERMISSIONS_ADMIN);
 }
 
+void Api::getMAC(AsyncWebServerRequest* request) {
+  sprintln("!getMAC");
+  serveDynamicAuth(
+    request, [&](const char* lCaseUsername, uint32_t& permissions, const char* cookie, char* newCookie, bool& setCookie) {
+      AsyncWebServerResponse* response = request->beginResponse(
+        200,
+        "text/plain",
+        String(GENERAL_SUCCESS_RESULT_CODE) + "&" + WiFi.macAddress());
+      return response;
+    },
+    User::PERMISSIONS_ADMIN);
+}
+
 void Api::getGatewayIP(AsyncWebServerRequest* request) {
   dprintln("getGatewayIP");
   serveDynamicAuth(
@@ -392,7 +417,7 @@ bool Api::setWifiConnection(AsyncWebServerRequest* request) {
 }
 
 void Api::getSettingsValue(AsyncWebServerRequest* request) {
-  sprintln("!getSettingsValue");
+  dprintln("getSettingsValue");
   serveDynamicAuth(
     request, [&](const char* lCaseUsername, uint32_t& permissions, const char* cookie, char* newCookie, bool& setCookie) {
       if (request->hasParam("key", true)) {
@@ -403,7 +428,7 @@ void Api::getSettingsValue(AsyncWebServerRequest* request) {
         if (key != NULL && key[0] != 0) {
           resultCode = GENERAL_SUCCESS_RESULT_CODE;
           if (strcmp(key, Settings::KEY_NEW_USER_PAYMNET) == 0) {
-
+            res = String(settings.getNewUserPaymentEnabled() ? "true" : "false");
           } else if (strcmp(key, Settings::KEY_SSID) == 0) {
             char ssid[Utils::SSID_BUFFER_SIZE] = { 0 };
             settings.getSSID(ssid);
@@ -413,13 +438,13 @@ void Api::getSettingsValue(AsyncWebServerRequest* request) {
             settings.getSecurityKey(secKey);
             res = String(secKey);
           } else if (strcmp(key, Settings::KEY_PULSE_PER_LITER) == 0) {
-
+            res = String(settings.getPulsePerLiterCount());              
           } else if (strcmp(key, Settings::KEY_MODE) == 0) {
-
+            res = String(getDeviceModeName(static_cast<Settings::DeviceMode>(settings.getMode())));
           } else if (strcmp(key, Settings::KEY_MASTER_TIMEOUT) == 0) {
-
+            res = String(settings.getMasterTimeoutSeconds() / 60);
           } else if (strcmp(key, Settings::KEY_UNDER_LIMIT_TIMEOUT) == 0) {
-
+            res = String(settings.getUnderLimitTimeoutSeconds() / 60);
           } else {
             resultCode = INVALID_KEY_RESULT_CODE;
           }

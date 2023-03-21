@@ -61,6 +61,11 @@ bool Settings::setUnderLimitTimeoutSeconds(unsigned long timeoutSeconds) {
   return systemSettingsStorage->putULong(Settings::KEY_UNDER_LIMIT_TIMEOUT, timeoutSeconds) > 0;
 }
 
+bool Settings::setNewUserPaymentEnabled(bool enabled) {
+  sprintln("!setNewUserPaymentEnabled");
+  return systemSettingsStorage->putBool(Settings::KEY_NEW_USER_PAYMNET, enabled) > 0;
+}
+
 void Settings::getSSID(char* ssid) {
   sprintln("getSSID");
   if (ssid != NULL) {
@@ -94,7 +99,12 @@ unsigned long Settings::getMasterTimeoutSeconds() {
 
 unsigned long Settings::getUnderLimitTimeoutSeconds() {
   sprintln("!getUnderLimitTimeoutSeconds");
-  return systemSettingsStorage->putULong(Settings::KEY_UNDER_LIMIT_TIMEOUT, Settings::DEFAULT_UNDER_LIMIT_TIMEOUT_SECONDS) > 0;
+  return systemSettingsStorage->getULong(Settings::KEY_UNDER_LIMIT_TIMEOUT, Settings::DEFAULT_UNDER_LIMIT_TIMEOUT_SECONDS);
+}
+
+bool Settings::getNewUserPaymentEnabled() {
+  sprintln("!getNewUserPaymentEnabled");
+  return systemSettingsStorage->getBool(Settings::KEY_NEW_USER_PAYMNET);
 }
 
 bool Settings::getWiFiOK() {

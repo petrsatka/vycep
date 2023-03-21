@@ -358,6 +358,16 @@ api.getIP = function(callback) {
 }
 
 /*
+  Získá MAC adresu zařízení
+*/
+api.getMAC = function(callback) {
+  api.post("/api/getMAC", null, (resData, errorText) => {
+    var results = api.parseResponseData(resData, errorText);
+    callback(results[1], results[0], errorText);
+  });  
+}
+
+/*
   Získá bránu zařízení
 */
 api.getGatewayIP = function(callback) {
@@ -742,7 +752,7 @@ gui.loadValue = function(apiMethod, targetElementSelector, callback) {
       isError = false;
       if ($(targetElementSelector).is(':input')) { 
         if ($(targetElementSelector).is(':checkbox')) {
-          $(targetElementSelector).prop("checked", !!result);
+          $(targetElementSelector).prop("checked", result == 'true');
         } else if ($(targetElementSelector).is(':radio')) {
           $(targetElementSelector).val([result]);
         } else {      
@@ -1264,6 +1274,7 @@ let settings = {};
 settings.loadNetworkInfo = function() {
   gui.loadValue(api.getGatewayIP, '#gateway');
   gui.loadValue(api.getIP, '#ip');
+  gui.loadValue(api.getMAC, '#mac');
 }
 
 settings.registerChange = function() {
@@ -1279,7 +1290,7 @@ settings.loadValues = function() {
   gui.loadSettingsValue('pulseplitter', '#pcount');
   gui.loadSettingsValue('mode', '[name="mode"]');
   gui.loadSettingsValue('mastertimeout', '#inactivity-timeout');
-  gui.loadSettingsValue('ulimtimeout', '#nder-limit-timeout');
+  gui.loadSettingsValue('ulimtimeout', '#under-limit-timeout');
   settings.loadNetworkInfo();
 }
 

@@ -262,6 +262,10 @@ void serverInit() {
     api.getIP(request);
   });
 
+  server.on("/api/getMAC", HTTP_POST, [](AsyncWebServerRequest *request) {
+    api.getMAC(request);
+  });
+
   server.on("/api/getGatewayIP", HTTP_POST, [](AsyncWebServerRequest *request) {
     api.getGatewayIP(request);
   });

@@ -6,14 +6,8 @@ Neaktivnímu uživateli zašedit objednávku
 Zohlednit nastavení povolení platby pro nové užovatele - až při aktivaci?
 
 Automatický refresh hodnoty na výčepu.
-V případě režimu AP pravidelně zkoušet reconnect k nastavenému AP. - Aby došlo k připojení po výpadku sítě i po restartu krabičky.
-Use case - vypadne elektřina a krabička naběhne dřív než router.
-V informacích o síti zobrazit MAC
 Po nastavení připojení navigace na no-ip doménu. Pokud je.
 Factory reset HW i SW
-Občas se nenačte navigace - asi vyřešeno
-Errory při dlouhém ssid a hesle
-Timery
 
 
 --Active user

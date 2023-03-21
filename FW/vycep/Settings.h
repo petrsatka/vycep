@@ -28,6 +28,7 @@ public:
   bool clearWiFiOK();
   bool setSSID(const char* ssid);
   bool setSecurityKey(const char* securityKey);
+  bool setNewUserPaymentEnabled(bool enabled);
   bool setPulsePerLiterCount(unsigned int pulseCount);
   bool setMode(Settings::DeviceMode mode);
   bool setMasterTimeoutSeconds(unsigned long timeoutSeconds);
@@ -38,6 +39,7 @@ public:
   Settings::DeviceMode getMode();
   unsigned long getMasterTimeoutSeconds();
   unsigned long getUnderLimitTimeoutSeconds();
+  bool getNewUserPaymentEnabled();
   bool getWiFiOK();
 
 private:

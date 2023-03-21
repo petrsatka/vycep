@@ -39,6 +39,7 @@ public:
   void loadUsers(AsyncWebServerRequest* request);
   void logout(AsyncWebServerRequest* request);
   void getIP(AsyncWebServerRequest* request);
+  void getMAC(AsyncWebServerRequest* request);
   void getGatewayIP(AsyncWebServerRequest* request);
   bool restart(AsyncWebServerRequest* request);
   bool setWifiConnection(AsyncWebServerRequest* request);
@@ -52,6 +53,8 @@ private:
 
   static constexpr int CRED_VERIF_ERR_COUNT = 13;
   static constexpr int CRED_VERIF_ERR_BUFFER_SIZE = 32;
+  static constexpr int DEV_MODE_COUNT = 3;
+  static constexpr int DEV_MODE_BUFFER_SIZE = 7;
   static constexpr const char* HTTPONLY_COOKIE_ATTRIBUTE = "; HttpOnly";
   static constexpr const char* COMMON_COOKIE_ATTRIBUTES = "; Max-Age=1707109200; Path=/";
   static constexpr const char* UNSET_COOKIE_ATTRIBUTES = "; Max-Age=-1; Path=/";
@@ -72,7 +75,14 @@ private:
     "INVALID_PASSWORD"
   };
 
+  static constexpr const char deviceModeNames[DEV_MODE_COUNT][DEV_MODE_BUFFER_SIZE] = {
+    "AUTO",
+    "OPEN",
+    "CLOSED",
+  };
+
   static const char* getCredentialsVerificationResultName(User::CredentialsVerificationResult res);
+  static const char* getDeviceModeName(Settings::DeviceMode mode);
   static bool extractCookie(AsyncWebServerRequest* request, const char* cookieName, char* cookie);
   static bool setCookies(AsyncWebServerResponse* response, const char* lCaseUsername, const char* authCookieContent);
   static bool unsetCookies(AsyncWebServerResponse* response);
