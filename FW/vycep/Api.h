@@ -44,6 +44,7 @@ public:
   bool restart(AsyncWebServerRequest* request);
   bool setWifiConnection(AsyncWebServerRequest* request);
   void getSettingsValue(AsyncWebServerRequest* request);
+  void setSettingsValue(AsyncWebServerRequest* request);
 
   static void onNotFound(AsyncWebServerRequest* request);
 
@@ -83,6 +84,7 @@ private:
 
   static const char* getCredentialsVerificationResultName(User::CredentialsVerificationResult res);
   static const char* getDeviceModeName(Settings::DeviceMode mode);
+  Settings::DeviceMode getDeviceModeByName(const char* modeName);
   static bool extractCookie(AsyncWebServerRequest* request, const char* cookieName, char* cookie);
   static bool setCookies(AsyncWebServerResponse* response, const char* lCaseUsername, const char* authCookieContent);
   static bool unsetCookies(AsyncWebServerResponse* response);

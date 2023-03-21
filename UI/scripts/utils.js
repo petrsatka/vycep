@@ -294,7 +294,7 @@ api.logout = function(callback) {
 }
 
 /*DEBUG*/
-api.settings = {
+/*api.settings = {
   'newUsersPayment' : true,
   'ssid': 'coolap',
   'skey': 'coolSecurityKey',
@@ -302,19 +302,23 @@ api.settings = {
   'inactTimeout': 10,
   'underLimTimeout': 5,
   'mode': 'auto'
-}
+}*/
 
 /*
   Uloží hodnotu nastavení
 */
 api.setSettingsValue = function(name, value, callback) {
-  let val = api.settings[name];
-  if (val === undefined) {
-    setTimeout(() => callback(null, "unable_to_set_settings_value", null), 1000); 
-  } else {
-    setTimeout(() => callback({name: name, value: value}, "OK", null), 1000);  
-  }
-  //setTimeout(() => callback(null, null, "500 - bad request"), 1000);  
+  //let val = api.settings[name];
+  //if (val === undefined) {
+  //  setTimeout(() => callback(null, "unable_to_set_settings_value", null), 1000); 
+  //} else {
+  //  setTimeout(() => callback({name: name, value: value}, "OK", null), 1000);  
+  //}
+  //setTimeout(() => callback(null, null, "500 - bad request"), 1000);
+   api.post("/api/setSettingsValue", {key: name, value: value}, (resData, errorText) => {
+    var results = api.parseResponseData(resData, errorText);
+    callback(null, results[0], errorText);
+  });  
 }
 
 /*
@@ -420,7 +424,7 @@ api.activateUser = function(username, callback) {
   Spustí kalibraci
 */
 api.startCalibration = function(callback) {
-  api.settings['pcount'] = 330;
+  //api.settings['pcount'] = 330;
   console.log("calibration start");
   setTimeout(() => callback(true,"OK", null), 1000);
   //setTimeout(() => callback(false, "unable_to_start_calibration", null), 1000);
@@ -1225,7 +1229,7 @@ users.loadAllowPayment = function() {
 users.onAllowPaymentCheckboxChange = function(event) {
   let checkbox = event.target;
   let status = checkbox.checked;
-  gui.setSettingsValue('newUsersPayment', status); 
+  gui.setSettingsValue('nuserpaymnt', status); 
 }
 
 users.resetPassword = function(username, callback) {
@@ -1278,10 +1282,10 @@ settings.loadNetworkInfo = function() {
 }
 
 settings.registerChange = function() {
-  gui.onInputChange('#pcount', function(element, val) {gui.setSettingsValue('pcount',val);});
+  gui.onInputChange('#pcount', function(element, val) {gui.setSettingsValue('pulseplitter',val);});
   gui.onInputChange('[name="mode"]', function(element, val) {gui.setSettingsValue('mode',val);});
-  gui.onInputChange('#inactivity-timeout', function(element, val) {gui.setSettingsValue('inactTimeout',val);});
-  gui.onInputChange('#under-limit-timeout', function(element, val) {gui.setSettingsValue('underLimTimeout',val);});
+  gui.onInputChange('#inactivity-timeout', function(element, val) {gui.setSettingsValue('mastertimeout',val);});
+  gui.onInputChange('#under-limit-timeout', function(element, val) {gui.setSettingsValue('ulimtimeout',val);});
 }
 
 settings.loadValues = function() {

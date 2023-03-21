@@ -29,6 +29,17 @@ const char* Api::getDeviceModeName(Settings::DeviceMode mode) {
   return Api::deviceModeNames[static_cast<int>(mode)];
 }
 
+Settings::DeviceMode Api::getDeviceModeByName(const char* modeName) {
+  sprintln("!getDeviceModeByName");
+  for (int i = 0; i < DEV_MODE_COUNT; i++) {
+    if (strcmp(Api::deviceModeNames[i], modeName) == 0) {
+      return static_cast<Settings::DeviceMode>(i);
+    }
+  }
+
+  return Settings::DeviceMode::AUTO;
+}
+
 void Api::serveAuth(AsyncWebServerRequest* request, uint32_t permissionMask, ResponseGetterFunction responseGetter, ErrorResponseGetterFunction noPermissionsresponseGetter, ErrorResponseGetterFunction errorResponseGetter) {
   dprintln("serveAuth");
   AsyncWebServerResponse* response = NULL;
@@ -438,7 +449,7 @@ void Api::getSettingsValue(AsyncWebServerRequest* request) {
             settings.getSecurityKey(secKey);
             res = String(secKey);
           } else if (strcmp(key, Settings::KEY_PULSE_PER_LITER) == 0) {
-            res = String(settings.getPulsePerLiterCount());              
+            res = String(settings.getPulsePerLiterCount());
           } else if (strcmp(key, Settings::KEY_MODE) == 0) {
             res = String(getDeviceModeName(static_cast<Settings::DeviceMode>(settings.getMode())));
           } else if (strcmp(key, Settings::KEY_MASTER_TIMEOUT) == 0) {
@@ -454,6 +465,46 @@ void Api::getSettingsValue(AsyncWebServerRequest* request) {
           200,
           "text/plain",
           String(resultCode) + "&" + res);
+        return response;
+      }
+
+      return request->beginResponse(400);
+    },
+    User::PERMISSIONS_ADMIN);
+}
+
+void Api::setSettingsValue(AsyncWebServerRequest* request) {
+  sprintln("setSettingsValue");
+  serveDynamicAuth(
+    request, [&](const char* lCaseUsername, uint32_t& permissions, const char* cookie, char* newCookie, bool& setCookie) {
+      if (request->hasParam("key", true) && request->hasParam("value", true)) {
+        AsyncWebParameter* pKey = request->getParam("key", true);
+        AsyncWebParameter* pValue = request->getParam("value", true);
+        const char* resultCode = GENERAL_ERROR_RESULT_CODE;
+        const char* key = pKey->value().c_str();
+        const char* value = pValue->value().c_str();
+        String res = "";
+        if (key != NULL && key[0] != 0 && value != NULL) {
+          resultCode = GENERAL_SUCCESS_RESULT_CODE;
+          if (strcmp(key, Settings::KEY_NEW_USER_PAYMNET) == 0) {
+            settings.setNewUserPaymentEnabled(strcmp("true", value) == 0);
+          } else if (strcmp(key, Settings::KEY_PULSE_PER_LITER) == 0) {
+            settings.setPulsePerLiterCount((unsigned int)strtoul(value, nullptr, 10));
+          } else if (strcmp(key, Settings::KEY_MODE) == 0) {
+            settings.setMode(getDeviceModeByName(value));
+          } else if (strcmp(key, Settings::KEY_MASTER_TIMEOUT) == 0) {
+            settings.setMasterTimeoutSeconds(strtoul(value, nullptr, 10) * 60);
+          } else if (strcmp(key, Settings::KEY_UNDER_LIMIT_TIMEOUT) == 0) {
+            settings.setUnderLimitTimeoutSeconds(strtoul(value, nullptr, 10) * 60);
+          } else {
+            resultCode = INVALID_KEY_RESULT_CODE;
+          }
+        }
+
+        AsyncWebServerResponse* response = request->beginResponse(
+          200,
+          "text/plain",
+          String(resultCode));
         return response;
       }
 

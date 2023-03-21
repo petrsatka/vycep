@@ -25,7 +25,6 @@ pokud platí za sebe, pak ověřit práva na platbu
 --Active Admin
 *loadUsers
 *setSettingsValue
-*getSettingsValue
 *setPermissionValue
 *resetPassword
 *deleteUser
@@ -33,7 +32,6 @@ pokud platí za sebe, pak ověřit práva na platbu
 startCalibration
 stopCalibration
 runTest
-*connect
 
 HW
 Průtokoměr - sklon max +-5 stupňů - Jak namontovat na Lindr?

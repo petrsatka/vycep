@@ -282,6 +282,10 @@ void serverInit() {
     api.getSettingsValue(request);
   });
 
+  server.on("/api/setSettingsValue", HTTP_POST, [](AsyncWebServerRequest *request) {
+    api.setSettingsValue(request);
+  });
+
   server.on("/first-registration.html", HTTP_GET, [](AsyncWebServerRequest *request) {
     if (user.isAnyUserSet()) {
       request->redirect("/login.html");
