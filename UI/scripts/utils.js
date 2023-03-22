@@ -97,16 +97,6 @@ api.post = function(url, reqData, callback) {
   Vytvoření administrátorského účtu.
 */
 api.createFirstAdmin = function(username, password, callback) {
-  //DEBUG
-  //Validace délek na serveru? - alespoň username
-  //Odladit speciállní znaky v hesle
-  //Omezit volání pouze při inicializaci
-  //Test existujícího jména
-  //Test chyby HTTP
-  //Test neplatné návratové hodnty
-  //setTimeout(() => callback(null, null, "500 - bad request"), 1000);
-  //setTimeout(() => callback(username,"user_exists", null), 1000);
-  //setTimeout(() => callback(username,"OK", null), 1000);
   api.post("/api/createFirstAdmin", {username: username, password: password}, (resData, errorText) => {
     var results = api.parseResponseData(resData, errorText);
     callback(null, results[0], errorText);
@@ -117,15 +107,6 @@ api.createFirstAdmin = function(username, password, callback) {
   Vytvoření běžného účtu.
 */
 api.createUser = function(username, password, callback) {
-  //DEBUG Omezit volání pouze adminovi
-  //setTimeout(() => callback(username,"user_exists", null), 1000);
-  //setTimeout(() => callback(null, null, "500 - bad request"), 1000);
-  //setTimeout(() => callback(username,"unknown_error", null), 1000);
-  //if (username.toLowerCase() == 'franta') {
-  //   setTimeout(() => callback(username,"user_exists", null), 1000);
-  //} else {
-  //  setTimeout(() => callback(username,"OK", null), 1000);
-  //}
   api.post("/api/createUser", {username: username, password: password}, (resData, errorText) => {
     var results = api.parseResponseData(resData, errorText);
     callback(null, results[0], errorText);
@@ -136,13 +117,6 @@ api.createUser = function(username, password, callback) {
   Změna hesla
 */
 api.changePassword = function(oldPassword, newPassword, callback) {
-  //if (oldPassword == '') {
-  //  setTimeout(() => callback(false,"invalid_password", null), 1000);
-  //} else {
-    //setTimeout(() => callback(null, null, "500 - bad request"), 1000);
-  //  setTimeout(() => callback(true,"OK", null), 1000); 
-    //setTimeout(() => callback(false,"OK", null), 1000);
-  //}
   api.post("/api/changePassword", {oldpassword: oldPassword, newpassword: newPassword}, (resData, errorText) => {
     var results = api.parseResponseData(resData, errorText);
     callback(null, results[0], errorText);
@@ -153,11 +127,6 @@ api.changePassword = function(oldPassword, newPassword, callback) {
   Přihlášení
 */
 api.login = function(username, password, callback) {
-  //if (!username || !password) {
-  //  setTimeout(() => callback(username,"bad_username_or_password", null), 1000);
-  //} else {
-  //  setTimeout(() => callback(username,"OK", null), 1000);
-  //}
    api.post("/api/login", {username: username, password: password}, (resData, errorText) => {
     var results = api.parseResponseData(resData, errorText);
     callback(null, results[0], errorText);
@@ -170,18 +139,13 @@ api.billCountDEBUG = 20;
   Získá aktuální počet nápojů ve frontě zařízení
 */
 api.getQueueCount = function(callback) {
-  setTimeout(() => callback(api.qCountDEBUG,"OK", null), 1000);
-  //setTimeout(() => callback(-1,"unable_to_get_qcount", null), 1000);
-  //setTimeout(() => callback(null, null, "500 - bad request"), 1000); 
+  setTimeout(() => callback(api.qCountDEBUG,"OK", null), 1000); 
 }
 
 /*
   Získá aktuální počet nápojů na účtě přihlášeného uživatele
 */
 api.getCurrentUserBillCount = function(callback) {
-  //setTimeout(() => callback(api.billCountDEBUG,"OK", null), 1000);
-  //setTimeout(() => callback(-1,"unable_to_get_bcount", null), 1000);
-  //setTimeout(() => callback(null, null, "500 - bad request"), 1000);
   api.post("/api/getCurrentUserBillCount", null, (resData, errorText) => {
     var results = api.parseResponseData(resData, errorText);
     callback(results[1], results[0], errorText);
@@ -192,9 +156,6 @@ api.getCurrentUserBillCount = function(callback) {
   Získá aktuální počet nápojů na účtě uživatele
 */
 api.getUserBillCount = function(username, callback) {
-  //setTimeout(() => callback(api.billCountDEBUG,"OK", null), 1000);
-  //setTimeout(() => callback(-1,"unable_to_get_bcount", null), 1000);
-  //setTimeout(() => callback(null, null, "500 - bad request"), 1000);
   api.post("/api/getUserBillCount", {username: username}, (resData, errorText) => {
     var results = api.parseResponseData(resData, errorText);
     callback(results[1], results[0], errorText);
@@ -209,12 +170,6 @@ api.makeOrder = function(callback) {
    queueCount: ++api.qCountDEBUG,
    billCount: ++api.billCountDEBUG, 
   },"OK", null), 1000);
-
-  /*setTimeout(() => callback({
-    queueCount: api.qCountDEBUG,
-    billCount: api.billCountDEBUG, 
-  },"unable_to_make_order", null), 1000); */
-  //setTimeout(() => callback(null, null, "500 - bad request"), 1000); 
 }
   
 /*
@@ -234,11 +189,6 @@ api.payForUser = function(username, count, callback) {
       billCount: api.billCountDEBUG
     },"OK", null), 1000);
   }   
-  /*setTimeout(() => callback({
-     paid: 0,
-     billCount: api.billCountDEBUG,
-  },"unable_to_make_payment", null), 1000);*/
-  //setTimeout(() => callback(null, null, "500 - bad request"), 1000); 
 }
 
 api.pay = function( count, callback) {
@@ -255,11 +205,6 @@ api.pay = function( count, callback) {
       billCount: api.billCountDEBUG
     },"OK", null), 1000);
   }   
-  /*setTimeout(() => callback({
-     paid: 0,
-     billCount: api.billCountDEBUG,
-  },"unable_to_make_payment", null), 1000);*/
-  //setTimeout(() => callback(null, null, "500 - bad request"), 1000); 
 }
 
 api.debugUsers = [
@@ -277,8 +222,6 @@ api.debugUsers = [
 */
 api.loadUsers = function(callback) {
   setTimeout(() => callback(api.debugUsers,"OK", null), 1000);
-  //setTimeout(() => callback(null, "unable_to_get_users", null), 1000);
-  //setTimeout(() => callback(null, null, "500 - bad request"), 1000);
 }
 
 
@@ -293,28 +236,10 @@ api.logout = function(callback) {
   });
 }
 
-/*DEBUG*/
-/*api.settings = {
-  'newUsersPayment' : true,
-  'ssid': 'coolap',
-  'skey': 'coolSecurityKey',
-  'pcount': 345,
-  'inactTimeout': 10,
-  'underLimTimeout': 5,
-  'mode': 'auto'
-}*/
-
 /*
   Uloží hodnotu nastavení
 */
 api.setSettingsValue = function(name, value, callback) {
-  //let val = api.settings[name];
-  //if (val === undefined) {
-  //  setTimeout(() => callback(null, "unable_to_set_settings_value", null), 1000); 
-  //} else {
-  //  setTimeout(() => callback({name: name, value: value}, "OK", null), 1000);  
-  //}
-  //setTimeout(() => callback(null, null, "500 - bad request"), 1000);
    api.post("/api/setSettingsValue", {key: name, value: value}, (resData, errorText) => {
     var results = api.parseResponseData(resData, errorText);
     callback(null, results[0], errorText);
@@ -325,13 +250,6 @@ api.setSettingsValue = function(name, value, callback) {
   Získá hodnotu nastavení
 */
 api.getSettingsValue = function(name, callback) {
-  //let val = api.settings[name];
-  //if (val === undefined) {
-  //  setTimeout(() => callback(null, "unable_to_get_settings_value", null), 1000); 
-  //} else {
-  //  setTimeout(() => callback(val,"OK", null), 1000);
-  //}
-  //setTimeout(() => callback(null, null, "500 - bad request"), 1000);
    api.post("/api/getSettingsValue", {key: name}, (resData, errorText) => {
     var results = api.parseResponseData(resData, errorText);
     callback(results[1], results[0], errorText);
@@ -347,7 +265,6 @@ api.setPermissionValue = function(username, permissionKey, value, callback) {
   } else {
     setTimeout(() => callback(null, "unable_to_set_permissions_value", null), 1000);
   }
-  //setTimeout(() => callback(null, null, "500 - bad request"), 1000); 
 }
 
 /*
@@ -455,10 +372,6 @@ api.runTest = function(callback) {
   Restartuje zařízení
 */
 api.restart = function(callback) {
-  //console.log("restart");
-  //setTimeout(() => callback(true,"OK", null), 1000);
-  //setTimeout(() => callback(false, "unable_to_run_test", null), 1000);
-  //setTimeout(() => callback(null, null, "500 - bad request"), 1000);
   api.post("/api/restart", null, (resData, errorText) => {
     var results = api.parseResponseData(resData, errorText);
     callback(null, results[0], errorText);
@@ -469,14 +382,6 @@ api.restart = function(callback) {
   Připojí zařízení k AP. V případě úspěchu uloží ssid a securityKey a restartuje zařízení.
 */
 api.setWifiConnection = function(ssid, securityKey, callback) {
-  //console.log(`setWifiConnection ${ssid} ${securityKey}`);
-  //if (!ssid || !securityKey) {
-  //  setTimeout(() => callback(null,"unnable_to_connect", null), 1000);
-  //} else {
-  //  setTimeout(() => callback('192.168.1.25',"OK", null), 1000);
-  //}
-  //setTimeout(() => callback(false, "unable_to_run_connect", null), 1000);
-  //setTimeout(() => callback(null, null, "500 - bad request"), 1000);
   api.post("/api/setWifiConnection", {ssid: ssid, securitykey: securityKey}, (resData, errorText) => {
     var results = api.parseResponseData(resData, errorText);
     callback(null, results[0], errorText);
