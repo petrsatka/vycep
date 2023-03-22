@@ -38,7 +38,7 @@ size_t TSafePreferences::putChar(const char* key, int8_t value) {
 }
 
 size_t TSafePreferences::putShort(const char* key, int16_t value) {
-  sprintln("!putShort");
+  dprintln("putShort");
   size_t res = 0;
   if (this->xMutex != NULL && xSemaphoreTake(this->xMutex, portMAX_DELAY)) {
     res = preferences.putShort(key, value);
@@ -93,7 +93,7 @@ size_t TSafePreferences::putLong(const char* key, int32_t value) {
 }
 
 size_t TSafePreferences::putULong(const char* key, uint32_t value) {
-  sprintln("!putULong");
+  dprintln("putULong");
   size_t res = 0;
   if (this->xMutex != NULL && xSemaphoreTake(this->xMutex, portMAX_DELAY)) {
     res = preferences.putULong(key, value);
@@ -236,7 +236,7 @@ uint8_t TSafePreferences::getUChar(const char* key, uint8_t defaultValue) {
 }
 
 int16_t TSafePreferences::getShort(const char* key, int16_t defaultValue) {
-  sprintln("!getShort");
+  dprintln("getShort");
   int16_t res = defaultValue;
   if (this->xMutex != NULL && xSemaphoreTake(this->xMutex, portMAX_DELAY)) {
     res = preferences.getShort(key, defaultValue);
@@ -291,7 +291,7 @@ int32_t TSafePreferences::getLong(const char* key, int32_t defaultValue) {
 }
 
 uint32_t TSafePreferences::getULong(const char* key, uint32_t defaultValue) {
-  sprintln("!getULong");
+  dprintln("getULong");
   uint32_t res = defaultValue;
   if (this->xMutex != NULL && xSemaphoreTake(this->xMutex, portMAX_DELAY)) {
     res = preferences.getULong(key, defaultValue);

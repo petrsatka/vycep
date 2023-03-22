@@ -24,7 +24,7 @@ bool Settings::clearWiFiOK() {
 }
 
 bool Settings::setSSID(const char* ssid) {
-  sprintln("!setSSID");
+  dprintln("setSSID");
   if (ssid != NULL && strlen(ssid) < Utils::SSID_BUFFER_SIZE) {
     return systemSettingsStorage->putString(Settings::KEY_SSID, ssid) == strlen(ssid);
   }
@@ -33,7 +33,7 @@ bool Settings::setSSID(const char* ssid) {
 }
 
 bool Settings::setSecurityKey(const char* securityKey) {
-  sprintln("!setSecurityKey");
+  dprintln("setSecurityKey");
   if (securityKey != NULL && strlen(securityKey) < Utils::SECURITY_KEY_BUFFER_SIZE) {
     return systemSettingsStorage->putString(Settings::KEY_SECURITY_KEY, securityKey) == strlen(securityKey);
   }
@@ -42,32 +42,32 @@ bool Settings::setSecurityKey(const char* securityKey) {
 }
 
 bool Settings::setPulsePerLiterCount(unsigned int pulseCount) {
-  sprintln("!setPulsePerLiterCount");
+  dprintln("setPulsePerLiterCount");
   return systemSettingsStorage->putUInt(Settings::KEY_PULSE_PER_LITER, pulseCount) > 0;
 }
 
 bool Settings::setMode(Settings::DeviceMode mode) {
-  sprintln("!setMode");
+  dprintln("setMode");
   return systemSettingsStorage->putShort(Settings::KEY_MODE, static_cast<short>(mode)) > 0;
 }
 
 bool Settings::setMasterTimeoutSeconds(unsigned long timeoutSeconds) {
-  sprintln("!setMasterTimeoutSeconds");
+  dprintln("setMasterTimeoutSeconds");
   return systemSettingsStorage->putULong(Settings::KEY_MASTER_TIMEOUT, timeoutSeconds) > 0;
 }
 
 bool Settings::setUnderLimitTimeoutSeconds(unsigned long timeoutSeconds) {
-  sprintln("!setUnderLimitTimeoutSeconds");
+  dprintln("setUnderLimitTimeoutSeconds");
   return systemSettingsStorage->putULong(Settings::KEY_UNDER_LIMIT_TIMEOUT, timeoutSeconds) > 0;
 }
 
 bool Settings::setNewUserPaymentEnabled(bool enabled) {
-  sprintln("!setNewUserPaymentEnabled");
+  dprintln("setNewUserPaymentEnabled");
   return systemSettingsStorage->putBool(Settings::KEY_NEW_USER_PAYMNET, enabled) > 0;
 }
 
 void Settings::getSSID(char* ssid) {
-  sprintln("getSSID");
+  dprintln("getSSID");
   if (ssid != NULL) {
     ssid[0] = 0;
     systemSettingsStorage->getString(Settings::KEY_SSID, ssid, Utils::SSID_BUFFER_SIZE);
@@ -75,7 +75,7 @@ void Settings::getSSID(char* ssid) {
 }
 
 void Settings::getSecurityKey(char* securityKey) {
-  sprintln("getSecurityKey");
+  dprintln("getSecurityKey");
   if (securityKey != NULL) {
     securityKey[0] = 0;
     systemSettingsStorage->getString(Settings::KEY_SECURITY_KEY, securityKey, Utils::SECURITY_KEY_BUFFER_SIZE);
@@ -83,27 +83,27 @@ void Settings::getSecurityKey(char* securityKey) {
 }
 
 unsigned int Settings::getPulsePerLiterCount() {
-  sprintln("!getPulsePerLiterCount");
+  dprintln("getPulsePerLiterCount");
   return systemSettingsStorage->getUInt(Settings::KEY_PULSE_PER_LITER, Settings::DEFAULT_PULSE_PER_LITER);
 }
 
 Settings::DeviceMode Settings::getMode() {
-  sprintln("!getMode");
+  dprintln("getMode");
   return static_cast<Settings::DeviceMode>(systemSettingsStorage->getShort(Settings::KEY_MODE, static_cast<short>(Settings::DeviceMode::AUTO)));
 }
 
 unsigned long Settings::getMasterTimeoutSeconds() {
-  sprintln("!getMasterTimeoutSeconds");
+  dprintln("getMasterTimeoutSeconds");
   return systemSettingsStorage->getULong(Settings::KEY_MASTER_TIMEOUT, Settings::DEFAULT_MASTER_TIMEOUT_SECONDS);
 }
 
 unsigned long Settings::getUnderLimitTimeoutSeconds() {
-  sprintln("!getUnderLimitTimeoutSeconds");
+  dprintln("getUnderLimitTimeoutSeconds");
   return systemSettingsStorage->getULong(Settings::KEY_UNDER_LIMIT_TIMEOUT, Settings::DEFAULT_UNDER_LIMIT_TIMEOUT_SECONDS);
 }
 
 bool Settings::getNewUserPaymentEnabled() {
-  sprintln("!getNewUserPaymentEnabled");
+  dprintln("getNewUserPaymentEnabled");
   return systemSettingsStorage->getBool(Settings::KEY_NEW_USER_PAYMNET);
 }
 

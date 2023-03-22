@@ -21,7 +21,7 @@ const char* Api::getCredentialsVerificationResultName(User::CredentialsVerificat
 constexpr const char Api::deviceModeNames[DEV_MODE_COUNT][DEV_MODE_BUFFER_SIZE];
 
 const char* Api::getDeviceModeName(Settings::DeviceMode mode) {
-  sprintln("!getDeviceModeName");
+  dprintln("getDeviceModeName");
   if (static_cast<int>(mode) < 0 || static_cast<int>(mode) >= DEV_MODE_COUNT) {
     return Api::deviceModeNames[static_cast<int>(Settings::DeviceMode::AUTO)];
   }
@@ -30,7 +30,7 @@ const char* Api::getDeviceModeName(Settings::DeviceMode mode) {
 }
 
 Settings::DeviceMode Api::getDeviceModeByName(const char* modeName) {
-  sprintln("!getDeviceModeByName");
+  dprintln("getDeviceModeByName");
   for (int i = 0; i < DEV_MODE_COUNT; i++) {
     if (strcmp(Api::deviceModeNames[i], modeName) == 0) {
       return static_cast<Settings::DeviceMode>(i);
@@ -350,7 +350,7 @@ void Api::getIP(AsyncWebServerRequest* request) {
 }
 
 void Api::getMAC(AsyncWebServerRequest* request) {
-  sprintln("!getMAC");
+  dprintln("getMAC");
   serveDynamicAuth(
     request, [&](const char* lCaseUsername, uint32_t& permissions, const char* cookie, char* newCookie, bool& setCookie) {
       AsyncWebServerResponse* response = request->beginResponse(
@@ -474,7 +474,7 @@ void Api::getSettingsValue(AsyncWebServerRequest* request) {
 }
 
 void Api::setSettingsValue(AsyncWebServerRequest* request) {
-  sprintln("setSettingsValue");
+  dprintln("setSettingsValue");
   serveDynamicAuth(
     request, [&](const char* lCaseUsername, uint32_t& permissions, const char* cookie, char* newCookie, bool& setCookie) {
       if (request->hasParam("key", true) && request->hasParam("value", true)) {
