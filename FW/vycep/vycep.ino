@@ -130,7 +130,7 @@ void serverInit() {
   //Pokud jde dotaz na login a uživatel je přilášen, pak přesměrovat na objednávky
   server.on("/login.html", HTTP_GET, [](AsyncWebServerRequest *request) {
     api.serveAuth(
-      request, User::PERMISSIONS_ANY_PERMISSIONS, [request](const char *lCaseUsername, uint32_t &permissions, const char *cookie, char *newCookie, bool &setCookie) {
+      request, User::PERMISSIONS_ANY_PERMISSIONS, false, [request](const char *lCaseUsername, uint32_t &permissions, const char *cookie, char *newCookie, bool &setCookie) {
         AsyncWebServerResponse *response = request->beginResponse(302);
         response->addHeader("Location", "/orders.html");
         return response;
@@ -143,7 +143,7 @@ void serverInit() {
   //Pokud jde dotaz na registraci a uživatel je přilášen, pak přesměrovat na objednávky
   server.on("/registration.html", HTTP_GET, [](AsyncWebServerRequest *request) {
     api.serveAuth(
-      request, User::PERMISSIONS_ANY_PERMISSIONS, [request](const char *lCaseUsername, uint32_t &permissions, const char *cookie, char *newCookie, bool &setCookie) {
+      request, User::PERMISSIONS_ANY_PERMISSIONS, false, [request](const char *lCaseUsername, uint32_t &permissions, const char *cookie, char *newCookie, bool &setCookie) {
         AsyncWebServerResponse *response = request->beginResponse(302);
         response->addHeader("Location", "/orders.html");
         return response;
@@ -157,7 +157,7 @@ void serverInit() {
   server.on("/rolespecific/menu-content.js", HTTP_GET, [](AsyncWebServerRequest *request) {
     sprintln("!menu-content");
     api.serveAuth(
-      request, User::PERMISSIONS_ANY_PERMISSIONS, [request](const char *lCaseUsername, uint32_t &permissions, const char *cookie, char *newCookie, bool &setCookie) {
+      request, User::PERMISSIONS_ANY_PERMISSIONS, false, [request](const char *lCaseUsername, uint32_t &permissions, const char *cookie, char *newCookie, bool &setCookie) {
         if (User::checkPermissions(permissions, User::PERMISSIONS_ACTIVE | User::PERMISSIONS_ADMIN | User::PERMISSIONS_PAYMENT)) {
           return request->beginResponse(LittleFS, "/www/rolespecific/menu-content-admin-payment.js");
         } else if (User::checkPermissions(permissions, User::PERMISSIONS_ACTIVE | User::PERMISSIONS_ADMIN)) {
@@ -189,11 +189,11 @@ void serverInit() {
 
   //Admin
   server.on("/users.html", HTTP_GET, [](AsyncWebServerRequest *request) {
-    api.serveStaticAuth(request, "/www/users.html", User::PERMISSIONS_ADMIN);
+    api.serveStaticAuth(request, "/www/users.html", User::PERMISSIONS_ACTIVE | User::PERMISSIONS_ADMIN);
   });
 
   server.on("/settings.html", HTTP_GET, [](AsyncWebServerRequest *request) {
-    api.serveStaticAuth(request, "/www/settings.html", User::PERMISSIONS_ADMIN);
+    api.serveStaticAuth(request, "/www/settings.html", User::PERMISSIONS_ACTIVE | User::PERMISSIONS_ADMIN);
   });
 
   //API - práva se kontroují až uvnitř

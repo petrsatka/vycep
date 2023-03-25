@@ -7,7 +7,10 @@ Zohlednit nastavení povolení platby pro nové užovatele - až při aktivaci?
 
 Automatický refresh hodnoty na výčepu.
 Po nastavení připojení navigace na no-ip doménu. Pokud je.
-Factory reset HW i SW
+Factory reset HW
+Identifikace v síti - broadcast jeména
+Dořešit proces aktvace - aby na straně aktivovaného proběhal rychle a intuitivně
+Otestovat smazání uživatele a set operace.
 
 
 --Active user
@@ -24,7 +27,6 @@ pokud platí za sebe, pak ověřit práva na platbu
 
 --Active Admin
 *loadUsers
-*setSettingsValue
 *setPermissionValue
 *resetPassword
 *deleteUser

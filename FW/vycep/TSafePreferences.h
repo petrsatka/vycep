@@ -4,11 +4,15 @@
 #define TSafePreferences_h
 #include <Arduino.h>
 #include <Preferences.h>
+#include <nvs.h>
 #include "Debug.h"
+
+typedef std::function<void(const char* key)> KeyIterationCallback;
 
 class TSafePreferences {
 public:
-  TSafePreferences(SemaphoreHandle_t xMutex, const char* nmspce, const char* partitionName);
+  TSafePreferences(SemaphoreHandle_t xMutex, const char* namespce, const char* partitionName);
+  void iterateKeys(KeyIterationCallback iterationCallback);
   bool clear(); //Vymaže celý namespace
   bool remove(const char* key); //Odstraní klíč
   size_t putChar(const char* key, int8_t value);
@@ -67,5 +71,7 @@ public:
 private:
   SemaphoreHandle_t xMutex = NULL;
   Preferences preferences;
+  const char* namespce = NULL;
+  const char* partitionName = NULL;
 };
 #endif

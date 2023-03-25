@@ -367,7 +367,7 @@ User::CredentialsVerificationResult User::createUser(const char* username, const
     return verificationResult;
   }
 
-  if (hashesStorage->isKey(lCaseUsername)) {
+  if (isUserSet(lCaseUsername)) {
     return User::CredentialsVerificationResult::USERNAME_EXISTS;
   }
 

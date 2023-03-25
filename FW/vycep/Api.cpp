@@ -40,8 +40,8 @@ Settings::DeviceMode Api::getDeviceModeByName(const char* modeName) {
   return Settings::DeviceMode::AUTO;
 }
 
-void Api::serveAuth(AsyncWebServerRequest* request, uint32_t permissionMask, ResponseGetterFunction responseGetter, ErrorResponseGetterFunction noPermissionsresponseGetter, ErrorResponseGetterFunction errorResponseGetter) {
-  dprintln("serveAuth");
+void Api::serveAuth(AsyncWebServerRequest* request, uint32_t permissionMask, bool verifyUserExistence, ResponseGetterFunction responseGetter, ErrorResponseGetterFunction noPermissionsresponseGetter, ErrorResponseGetterFunction errorResponseGetter) {
+  sprintln("!serveAuth");
   AsyncWebServerResponse* response = NULL;
   char cookie[User::COOKIE_BUFFER_SIZE] = { 0 };
   if (extractCookie(request, AHUTH_COOKIE_NAME, cookie)) {
@@ -53,7 +53,7 @@ void Api::serveAuth(AsyncWebServerRequest* request, uint32_t permissionMask, Res
     if (res == User::CookieVerificationResult::OK || res == User::CookieVerificationResult::OUT_OF_DATE_REVALIDATED) {
       bool forceSetCookie = false;
       //Cookie prošlo, nebo bylo obnoveno
-      if (User::checkPermissions(permissions, permissionMask)) {
+      if (User::checkPermissions(permissions, permissionMask) && (!verifyUserExistence || user.isUserSet(username))) {
         //Má oprávnění
         if (responseGetter != NULL) {
           response = responseGetter(username, permissions, cookie, newCookie, forceSetCookie);
@@ -87,10 +87,10 @@ void Api::serveAuth(AsyncWebServerRequest* request, uint32_t permissionMask, Res
   }
 }
 
-void Api::serveStaticAuth(AsyncWebServerRequest* request, const char* path, uint32_t permissionMask) {
+void Api::serveStaticAuth(AsyncWebServerRequest* request, const char* path, uint32_t permissionMask, bool verifyUserExistence) {
   dprintln("serveStaticAuth");
   serveAuth(
-    request, permissionMask, [request, path](const char* lCaseUsername, uint32_t& permissions, const char* cookie, char* newCookie, bool& setCookie) {
+    request, permissionMask, verifyUserExistence, [request, path](const char* lCaseUsername, uint32_t& permissions, const char* cookie, char* newCookie, bool& setCookie) {
       return request->beginResponse(LittleFS, path);
     },
     NULL, [request]() {
@@ -100,10 +100,10 @@ void Api::serveStaticAuth(AsyncWebServerRequest* request, const char* path, uint
     });
 }
 
-void Api::serveDynamicAuth(AsyncWebServerRequest* request, ResponseGetterFunction responseGetter, uint32_t permissionMask) {
+void Api::serveDynamicAuth(AsyncWebServerRequest* request, ResponseGetterFunction responseGetter, uint32_t permissionMask, bool verifyUserExistence) {
   dprintln("serveDynamicAuth");
   serveAuth(
-    request, permissionMask, responseGetter, [request]() {
+    request, permissionMask, verifyUserExistence, responseGetter, [request]() {
       //Forbidden
       return request->beginResponse(403);
     },
@@ -248,7 +248,7 @@ void Api::changePassword(AsyncWebServerRequest* request) {
 
       return request->beginResponse(400);
     },
-    User::PERMISSIONS_ACTIVE);
+    User::PERMISSIONS_ACTIVE, false);
 }
 
 bool Api::login(AsyncWebServerRequest* request) {
@@ -297,7 +297,7 @@ void Api::getUserBillCount(AsyncWebServerRequest* request) {
 
       return request->beginResponse(400);
     },
-    User::PERMISSIONS_ADMIN);
+    User::PERMISSIONS_ACTIVE | User::PERMISSIONS_ADMIN, false);
 }
 
 void Api::getCurrentUserBillCount(AsyncWebServerRequest* request) {
@@ -310,7 +310,7 @@ void Api::getCurrentUserBillCount(AsyncWebServerRequest* request) {
         String(GENERAL_SUCCESS_RESULT_CODE) + "&" + String(user.getUserBill(lCaseUsername)));
       return response;
     },
-    User::PERMISSIONS_ANY_PERMISSIONS);
+    User::PERMISSIONS_ANY_PERMISSIONS, false);
 }
 
 void Api::makeOrder(AsyncWebServerRequest* request) {
@@ -346,7 +346,7 @@ void Api::getIP(AsyncWebServerRequest* request) {
         String(GENERAL_SUCCESS_RESULT_CODE) + "&" + WiFi.localIP().toString());
       return response;
     },
-    User::PERMISSIONS_ADMIN);
+    User::PERMISSIONS_ACTIVE | User::PERMISSIONS_ADMIN, false);
 }
 
 void Api::getMAC(AsyncWebServerRequest* request) {
@@ -359,7 +359,7 @@ void Api::getMAC(AsyncWebServerRequest* request) {
         String(GENERAL_SUCCESS_RESULT_CODE) + "&" + WiFi.macAddress());
       return response;
     },
-    User::PERMISSIONS_ADMIN);
+    User::PERMISSIONS_ACTIVE | User::PERMISSIONS_ADMIN, false);
 }
 
 void Api::getGatewayIP(AsyncWebServerRequest* request) {
@@ -372,7 +372,7 @@ void Api::getGatewayIP(AsyncWebServerRequest* request) {
         String(GENERAL_SUCCESS_RESULT_CODE) + "&" + WiFi.gatewayIP().toString());
       return response;
     },
-    User::PERMISSIONS_ADMIN);
+    User::PERMISSIONS_ACTIVE | User::PERMISSIONS_ADMIN, false);
 }
 
 bool Api::restart(AsyncWebServerRequest* request) {
@@ -387,7 +387,7 @@ bool Api::restart(AsyncWebServerRequest* request) {
       res = true;
       return response;
     },
-    User::PERMISSIONS_ADMIN);
+    User::PERMISSIONS_ACTIVE | User::PERMISSIONS_ADMIN, true);
 
   return res;
 }
@@ -422,7 +422,7 @@ bool Api::setWifiConnection(AsyncWebServerRequest* request) {
 
       return request->beginResponse(400);
     },
-    User::PERMISSIONS_ADMIN);
+    User::PERMISSIONS_ACTIVE | User::PERMISSIONS_ADMIN, true);
 
   return res;
 }
@@ -470,7 +470,7 @@ void Api::getSettingsValue(AsyncWebServerRequest* request) {
 
       return request->beginResponse(400);
     },
-    User::PERMISSIONS_ADMIN);
+    User::PERMISSIONS_ACTIVE | User::PERMISSIONS_ADMIN, false);
 }
 
 void Api::setSettingsValue(AsyncWebServerRequest* request) {
@@ -510,7 +510,7 @@ void Api::setSettingsValue(AsyncWebServerRequest* request) {
 
       return request->beginResponse(400);
     },
-    User::PERMISSIONS_ADMIN);
+    User::PERMISSIONS_ACTIVE | User::PERMISSIONS_ADMIN, true);
 }
 
 void Api::logout(AsyncWebServerRequest* request) {

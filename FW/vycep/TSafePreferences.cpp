@@ -1,7 +1,27 @@
 #include "TSafePreferences.h"
-TSafePreferences::TSafePreferences(SemaphoreHandle_t xMutex, const char* nmspce, const char* partitionName) {
+TSafePreferences::TSafePreferences(SemaphoreHandle_t xMutex, const char* namespce, const char* partitionName) {
   this->xMutex = xMutex;
-  preferences.begin(nmspce, false, partitionName);
+  this->namespce = namespce;
+  this->partitionName = partitionName;
+  preferences.begin(namespce, false, partitionName);
+}
+
+void TSafePreferences::iterateKeys(KeyIterationCallback iterationCallback) {
+  sprintln("!iterateKeys");
+  if (iterationCallback) {
+    if (this->xMutex != NULL && xSemaphoreTake(this->xMutex, portMAX_DELAY)) {
+      nvs_iterator_t it = nvs_entry_find(partitionName, namespce, NVS_TYPE_ANY);
+      while (it) {
+        nvs_entry_info_t info;
+        nvs_entry_info(it, &info);
+        iterationCallback(info.key);
+        it = nvs_entry_next(it);
+      }
+
+      nvs_release_iterator(it);
+      xSemaphoreGive(this->xMutex);
+    }
+  }
 }
 
 bool TSafePreferences::clear() {
