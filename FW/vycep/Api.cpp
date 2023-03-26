@@ -477,7 +477,8 @@ void Api::getUsers(AsyncWebServerRequest* request) {
       unsigned short userCount = user.getUserCount();
       char** usernames = new char*[userCount]();
       response->printf("%s&", resultCode);
-      response->print("[");
+      response->printf("{\"paymentEnabled\": %s,", Utils::bToStr(User::checkPermissions(permissions, User::PERMISSIONS_PAYMENT)));
+      response->print("\"users\":[");
       user.iterateUsers([usernames, userCount](const char* key, unsigned short index) {
         if (index < userCount) {
           char* unameBuffer = new char[User::USERNAME_BUFFER_SIZE]();
@@ -488,6 +489,10 @@ void Api::getUsers(AsyncWebServerRequest* request) {
 
       for (int i = 0; i < userCount; i++) {
         uint32_t permissions = user.getPermissions(usernames[i]);
+        if (i) {
+          response->print(",");
+        }
+
         response->printf("{ \"username\": \"%s\", \"payment\": %s, \"admin\": %s, \"active\": %s }",
                          usernames[i],
                          Utils::bToStr(User::checkPermissions(permissions, User::PERMISSIONS_PAYMENT)),
@@ -497,8 +502,7 @@ void Api::getUsers(AsyncWebServerRequest* request) {
         usernames[i] = NULL;
       }
 
-      response->print("]");
-
+      response->print("]}");
       delete (usernames);
       usernames = NULL;
       return response;

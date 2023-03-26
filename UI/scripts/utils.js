@@ -217,11 +217,30 @@ api.debugUsers = [
 { "username": "VLS", "payment": true, "admin": true, "active": true, "paymentCheckboxEnabled":true, "adminCheckboxEnabled":true, "passwordResetButtonEnabled":true, "payButtonEnabled":true, "deleteButtonEnabled":true, "activateButtonEnabled":false }
 ]
 
+api.parseGetUsersJSONData = function(jsonData) {
+  var resp = JSON.parse(jsonData);
+  return resp.users.map(usr => {
+    return {
+      ...usr,
+      paymentCheckboxEnabled: cookies.getUsername() !== usr.username && usr.active,
+      adminCheckboxEnabled: cookies.getUsername() !== usr.username && usr.active,
+      passwordResetButtonEnabled: cookies.getUsername() !== usr.username,
+      payButtonEnabled: resp.paymentEnabled && usr.active,
+      deleteButtonEnabled: cookies.getUsername() !== usr.username,
+      activateButtonEnabled:cookies.getUsername() !== usr.username && !usr.active,
+    }
+  });
+}
+
 /*
   Načte uživatele
 */
-api.loadUsers = function(callback) {
-  setTimeout(() => callback(api.debugUsers,"OK", null), 1000);
+api.getUsers = function(callback) {
+  //setTimeout(() => callback(api.debugUsers,"OK", null), 1000);
+  api.post("/api/getUsers", null, (resData, errorText) => {
+    var results = api.parseResponseData(resData, errorText);
+    callback(api.parseGetUsersJSONData(results[1]), results[0], errorText);
+  });
 }
 
 
@@ -765,8 +784,8 @@ gui.pay = function(username, count, callback) {
 /*
   Načtení uživatelů
 */
-gui.loadUsers = function(callback) {
-  api.loadUsers((result, resultCode, errorMessage) => {
+gui.getUsers = function(callback) {
+  api.getUsers((result, resultCode, errorMessage) => {
     if (gui.handleError(resultCode, errorMessage, true)) {
       if (callback) {
         callback(result);
@@ -1121,8 +1140,8 @@ users.pay = function(username) {
   gui.navigate('payment.html#'+ username)
 }
 
-users.loadUsers = function() {
-  gui.loadUsers((tableRowsData) => {
+users.getUsers = function() {
+  gui.getUsers((tableRowsData) => {
    $('#users-table-holder').html(users.createTable(tableRowsData));
   });  
 }
@@ -1164,7 +1183,7 @@ users.deleteUser = function(username, callback) {
 users.activateUser = function(username, callback) {
   gui.activateUser(username, (result, isError) => {
     if(!isError) {
-      users.loadUsers();
+      users.getUsers();
     }
     
     if (callback) {
@@ -1174,7 +1193,7 @@ users.activateUser = function(username, callback) {
 }
 
 users.onPageShow = function() {
-  users.loadUsers();
+  users.getUsers();
   users.loadAllowPayment();
 }
 
