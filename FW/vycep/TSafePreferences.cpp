@@ -1,3 +1,4 @@
+#include "nvs.h"
 #include "TSafePreferences.h"
 TSafePreferences::TSafePreferences(SemaphoreHandle_t xMutex, const char* namespce, const char* partitionName) {
   this->xMutex = xMutex;
@@ -11,10 +12,11 @@ void TSafePreferences::iterateKeys(KeyIterationCallback iterationCallback) {
   if (iterationCallback) {
     if (this->xMutex != NULL && xSemaphoreTake(this->xMutex, portMAX_DELAY)) {
       nvs_iterator_t it = nvs_entry_find(partitionName, namespce, NVS_TYPE_ANY);
+      int i = 0;
       while (it) {
         nvs_entry_info_t info;
         nvs_entry_info(it, &info);
-        iterationCallback(info.key);
+        iterationCallback(info.key, i++);
         it = nvs_entry_next(it);
       }
 

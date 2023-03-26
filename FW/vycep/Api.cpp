@@ -331,11 +331,6 @@ void Api::payForUser(AsyncWebServerRequest* request) {
   //Ověřit, zda má práva admina
 }
 
-void Api::loadUsers(AsyncWebServerRequest* request) {
-  sprintln("!loadUsers");
-  //Ověřit práva admina
-}
-
 void Api::getIP(AsyncWebServerRequest* request) {
   dprintln("getIP");
   serveDynamicAuth(
@@ -469,6 +464,44 @@ void Api::getSettingsValue(AsyncWebServerRequest* request) {
       }
 
       return request->beginResponse(400);
+    },
+    User::PERMISSIONS_ACTIVE | User::PERMISSIONS_ADMIN, false);
+}
+
+void Api::getUsers(AsyncWebServerRequest* request) {
+  sprintln("!getUsers");
+  serveDynamicAuth(
+    request, [&](const char* lCaseUsername, uint32_t& permissions, const char* cookie, char* newCookie, bool& setCookie) {
+      const char* resultCode = GENERAL_SUCCESS_RESULT_CODE;
+      AsyncResponseStream* response = request->beginResponseStream("text/plain");
+      unsigned short userCount = user.getUserCount();
+      char** usernames = new char*[userCount]();
+      response->printf("%s&", resultCode);
+      response->print("[");
+      user.iterateUsers([usernames, userCount](const char* key, unsigned short index) {
+        if (index < userCount) {
+          char* unameBuffer = new char[User::USERNAME_BUFFER_SIZE]();
+          strcpy(unameBuffer, key);
+          usernames[index] = unameBuffer;
+        }
+      });
+
+      for (int i = 0; i < userCount; i++) {
+        uint32_t permissions = user.getPermissions(usernames[i]);
+        response->printf("{ \"username\": \"%s\", \"payment\": %s, \"admin\": %s, \"active\": %s }",
+                         usernames[i],
+                         Utils::bToStr(User::checkPermissions(permissions, User::PERMISSIONS_PAYMENT)),
+                         Utils::bToStr(User::checkPermissions(permissions, User::PERMISSIONS_ADMIN)),
+                         Utils::bToStr(User::checkPermissions(permissions, User::PERMISSIONS_ACTIVE)));
+        delete (usernames[i]);
+        usernames[i] = NULL;
+      }
+
+      response->print("]");
+
+      delete (usernames);
+      usernames = NULL;
+      return response;
     },
     User::PERMISSIONS_ACTIVE | User::PERMISSIONS_ADMIN, false);
 }

@@ -7,7 +7,7 @@
 #include <nvs.h>
 #include "Debug.h"
 
-typedef std::function<void(const char* key)> KeyIterationCallback;
+typedef std::function<void(const char* key, unsigned short index)> KeyIterationCallback;
 
 class TSafePreferences {
 public:

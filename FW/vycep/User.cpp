@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include "User.h"
 
 User::User(SemaphoreHandle_t xSemaphore, const char* nvsParttionName) {
@@ -185,6 +186,21 @@ bool User::clearAll() {
   res = billsStorage->clear() && res;
   res = settings->clear() && res;
   return res;
+}
+
+void User::iterateUsers(KeyIterationCallback iterationCallback) {
+  sprintln("!iterateUsers");
+  hashesStorage->iterateKeys(iterationCallback);
+}
+
+unsigned short User::getUserCount() {
+  sprintln("!getUserCount");
+  unsigned short count = 0;
+   hashesStorage->iterateKeys([&count](const char* key, unsigned short index){
+     count++;
+   });
+
+   return count;  
 }
 
 void User::getPermissionsValidityHexHash(const char* lCaseUsername, uint32_t permissions, const unsigned char* passwordHash, char* hexHash) {
@@ -557,6 +573,12 @@ bool User::setUserBill(const char* lCaseUsername, uint16_t bill) {
 bool User::addUserBill(const char* lCaseUsername, uint16_t add, uint16_t& res) {
   sprintln("!addUserBill");
   return billsStorage->addUShort(lCaseUsername, add, 0, res);
+}
+
+
+uint32_t User::getPermissions(const char* lCaseUsername) {
+  sprintln("!getPermissions");
+  return permissionsStorage->getUInt(lCaseUsername, 0);
 }
 
 bool User::checkPermissions(uint32_t permissions, uint32_t permissionMask) {

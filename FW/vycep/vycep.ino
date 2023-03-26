@@ -232,8 +232,8 @@ void serverInit() {
     api.getUserBillCount(request);
   });
 
-  server.on("/api/loadUsers", HTTP_POST, [](AsyncWebServerRequest *request) {
-    api.loadUsers(request);
+  server.on("/api/getUsers", HTTP_POST, [](AsyncWebServerRequest *request) {
+    api.getUsers(request);
   });
 
   server.on("/api/login", HTTP_POST, [](AsyncWebServerRequest *request) {
@@ -331,7 +331,7 @@ void setup() {
 
 void loop() {
   if (shouldReboot) {
-    Serial.println("Rebooting...");
+    dprintln("Rebooting...");
     delay(200);
     ESP.restart();
   }

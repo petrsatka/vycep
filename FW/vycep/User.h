@@ -54,8 +54,11 @@ public:
 
   static bool checkPermissions(uint32_t permissions, uint32_t permissionMask);
 
+  uint32_t getPermissions(const char* lCaseUsername);
   bool isAnyUserSet();
   bool isUserSet(const char* lCaseUsername);
+  void iterateUsers(KeyIterationCallback iterationCallback);
+  unsigned short getUserCount();
   bool delteUser(const char* lCaseUsername);
   User::CredentialsVerificationResult verifyPassword(const char* username, const char* password, char* lCaseUsername);
   User::CredentialsVerificationResult setPassword(const char* lCaseUsername, const char* password);

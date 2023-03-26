@@ -36,7 +36,7 @@ public:
   void makeOrder(AsyncWebServerRequest* request);
   void pay(AsyncWebServerRequest* request);
   void payForUser(AsyncWebServerRequest* request);
-  void loadUsers(AsyncWebServerRequest* request);
+  void getUsers(AsyncWebServerRequest* request);
   void logout(AsyncWebServerRequest* request);
   void getIP(AsyncWebServerRequest* request);
   void getMAC(AsyncWebServerRequest* request);

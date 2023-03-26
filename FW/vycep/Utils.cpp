@@ -153,6 +153,11 @@ int Utils::strLenUTF8(const char* str) {
   return len;
 }
 
+const char* Utils::bToStr(bool val) {
+  sprintln("!bToStr");
+  return val ? TRUE_STR : FALSE_STR;
+}
+
 short Utils::getCookiePropsPosition(const char* cookie) {
   dprintln("getCookiePropsPosition");
   short pos = 2 * Utils::HASH_HEXSTRING_BUFFER_SIZE;
