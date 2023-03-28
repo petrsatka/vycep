@@ -154,7 +154,7 @@ int Utils::strLenUTF8(const char* str) {
 }
 
 const char* Utils::bToStr(bool val) {
-  sprintln("!bToStr");
+  dprintln("bToStr");
   return val ? TRUE_STR : FALSE_STR;
 }
 

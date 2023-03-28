@@ -130,6 +130,15 @@ void User::test() {
     sprintln("createUser test FAILED");
   }
 
+  if (getPermissions("") == 0 
+    && getPermissions(NULL) == 0 
+    && getPermissions("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa") == 4294967295
+    && getPermissions("aaaaaaaaaaaaaaa") == 4294967295) {
+      //sprintln("getPermissions test OK");
+  } else {
+    sprintln("getPermissions test FAILED");
+  }
+
   char username[USERNAME_BUFFER_SIZE];
   uint32_t permissions = 0;
   struct tm timeInfo;
@@ -305,6 +314,7 @@ bool User::isAnyUserSet() {
   return settings->getBool(KEY_USER_IS_SET);
 }
 bool User::isUserSet(const char* lCaseUsername) {
+  sprintln("!isUserSet");
   return hashesStorage->isKey(lCaseUsername);
 }
 
@@ -577,7 +587,7 @@ bool User::addUserBill(const char* lCaseUsername, uint16_t add, uint16_t& res) {
 
 
 uint32_t User::getPermissions(const char* lCaseUsername) {
-  sprintln("!getPermissions");
+  dprintln("getPermissions");
   return permissionsStorage->getUInt(lCaseUsername, 0);
 }
 

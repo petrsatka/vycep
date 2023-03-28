@@ -52,16 +52,18 @@ void Api::serveAuth(AsyncWebServerRequest* request, uint32_t permissionMask, boo
     User::CookieVerificationResult res = this->user.getCookieInfo(cookie, username, &permissions, newCookie);
     if (res == User::CookieVerificationResult::OK || res == User::CookieVerificationResult::OUT_OF_DATE_REVALIDATED) {
       bool forceSetCookie = false;
-      //Cookie prošlo, nebo bylo obnoveno
-      if (User::checkPermissions(permissions, permissionMask) && (!verifyUserExistence || user.isUserSet(username))) {
-        //Má oprávnění
-        if (responseGetter != NULL) {
-          response = responseGetter(username, permissions, cookie, newCookie, forceSetCookie);
-        }
-      } else {
-        if (noPermissionsresponseGetter != NULL) {
-          //Nemá oprávnění, ale je pro tento případ nastaven fallback
-          response = noPermissionsresponseGetter();
+      if (!verifyUserExistence || user.isUserSet(username)) {
+        //Cookie prošlo, nebo bylo obnoveno
+        if (User::checkPermissions(permissions, permissionMask)) {
+          //Má oprávnění
+          if (responseGetter != NULL) {
+            response = responseGetter(username, permissions, cookie, newCookie, forceSetCookie);
+          }
+        } else {
+          if (noPermissionsresponseGetter != NULL) {
+            //Nemá oprávnění, ale je pro tento případ nastaven fallback
+            response = noPermissionsresponseGetter();
+          }
         }
       }
 
