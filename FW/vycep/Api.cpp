@@ -41,7 +41,7 @@ Settings::DeviceMode Api::getDeviceModeByName(const char* modeName) {
 }
 
 void Api::serveAuth(AsyncWebServerRequest* request, uint32_t permissionMask, bool verifyUserExistence, ResponseGetterFunction responseGetter, ErrorResponseGetterFunction noPermissionsresponseGetter, ErrorResponseGetterFunction errorResponseGetter) {
-  sprintln("!serveAuth");
+  dprintln("serveAuth");
   AsyncWebServerResponse* response = NULL;
   char cookie[User::COOKIE_BUFFER_SIZE] = { 0 };
   if (extractCookie(request, AHUTH_COOKIE_NAME, cookie)) {
@@ -151,7 +151,7 @@ bool Api::setCookie(AsyncWebServerResponse* response, const char* name, const ch
 }
 
 bool Api::unsetCookies(AsyncWebServerResponse* response) {
-  sprintln("!unsetCookies");
+  dprintln("unsetCookies");
   bool res = unsetCookie(response, AHUTH_COOKIE_NAME);
   return unsetCookie(response, USERNAME_COOKIE_NAME) && res;
 }

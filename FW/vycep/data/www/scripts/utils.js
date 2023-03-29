@@ -86,8 +86,9 @@ api.post = function(url, reqData, callback) {
     }, 
     statusCode: {
       401: function() {
-      //Otestovat
-        gui.navigate("login.html");
+        api.logout(() => {
+          gui.navigate("login.html");
+        });
       }
     }
   });

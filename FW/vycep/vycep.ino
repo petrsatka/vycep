@@ -325,7 +325,7 @@ void setup() {
   //user.clearAll(); //Debug - odstranit !!!!
   serverInit();
   sprintln("Start");
-  test();  //Debug - odstranit !!!!!
+  //test();  //Debug - odstranit !!!!!
   heapAfterInit = ESP.getFreeHeap();
 }
 

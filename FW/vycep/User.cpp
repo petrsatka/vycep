@@ -130,13 +130,25 @@ void User::test() {
     sprintln("createUser test FAILED");
   }
 
-  if (getPermissions("") == 0 
-    && getPermissions(NULL) == 0 
-    && getPermissions("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa") == 4294967295
-    && getPermissions("aaaaaaaaaaaaaaa") == 4294967295) {
-      //sprintln("getPermissions test OK");
+  if (getPermissions("") == 0
+      && getPermissions(NULL) == 0
+      && getPermissions("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa") == 4294967295
+      && getPermissions("aaaaaaaaaaaaaaa") == 4294967295) {
+    //sprintln("getPermissions test OK");
   } else {
     sprintln("getPermissions test FAILED");
+  }
+
+  if (!isUserSet(NULL) && !isUserSet("") && !isUserSet("aaaaaaaaaaaaaax") && !isUserSet("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx") && isUserSet("aaaaaaaaaaaaaaa")) {
+    //sprintln("isUserSet test OK");
+  } else {
+    sprintln("isUserSet test FAILED");
+  }
+
+  if (getUserCount() == 2) {
+    //sprintln("getUserCount test OK");
+  } else {
+    sprintln("getUserCount test FAILED");
   }
 
   char username[USERNAME_BUFFER_SIZE];
@@ -203,13 +215,13 @@ void User::iterateUsers(KeyIterationCallback iterationCallback) {
 }
 
 unsigned short User::getUserCount() {
-  sprintln("!getUserCount");
+  dprintln("getUserCount");
   unsigned short count = 0;
-   hashesStorage->iterateKeys([&count](const char* key, unsigned short index){
-     count++;
-   });
+  hashesStorage->iterateKeys([&count](const char* key, unsigned short index) {
+    count++;
+  });
 
-   return count;  
+  return count;
 }
 
 void User::getPermissionsValidityHexHash(const char* lCaseUsername, uint32_t permissions, const unsigned char* passwordHash, char* hexHash) {
@@ -310,11 +322,12 @@ bool User::parseCookie(const char* cookie, char* username, uint32_t* permissions
 }
 
 bool User::isAnyUserSet() {
+  //Rzchlejší, než volat getUserCount
   dprintln("isAnyUserSet");
   return settings->getBool(KEY_USER_IS_SET);
 }
 bool User::isUserSet(const char* lCaseUsername) {
-  sprintln("!isUserSet");
+  dprintln("isUserSet");
   return hashesStorage->isKey(lCaseUsername);
 }
 
@@ -460,7 +473,7 @@ User::CredentialsVerificationResult User::setPassword(const char* lCaseUsername,
   return res;
 }
 
-User::CredentialsVerificationResult User::changePassword(const char* username, const char*oldPassword, const char*newPassword) {
+User::CredentialsVerificationResult User::changePassword(const char* username, const char* oldPassword, const char* newPassword) {
   sprintln("!changePassword");
   char lCaseUsername[User::USERNAME_BUFFER_SIZE] = { 0 };
   User::CredentialsVerificationResult res = verifyPassword(username, oldPassword, lCaseUsername);
@@ -571,7 +584,7 @@ User::CookieVerificationResult User::getCookieInfo(const char* cookie, char* use
 }
 
 int16_t User::getUserBill(const char* lCaseUsername) {
-  sprintln("!getUserBill");
+  dprintln("getUserBill");
   return billsStorage->getUShort(lCaseUsername);
 }
 
