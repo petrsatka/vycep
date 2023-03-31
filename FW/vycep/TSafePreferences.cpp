@@ -8,7 +8,7 @@ TSafePreferences::TSafePreferences(SemaphoreHandle_t xMutex, const char* namespc
 }
 
 void TSafePreferences::iterateKeys(KeyIterationCallback iterationCallback) {
-  sprintln("!iterateKeys");
+  dprintln("iterateKeys");
   if (iterationCallback) {
     if (this->xMutex != NULL && xSemaphoreTake(this->xMutex, portMAX_DELAY)) {
       nvs_iterator_t it = nvs_entry_find(partitionName, namespce, NVS_TYPE_ANY);

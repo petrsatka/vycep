@@ -280,11 +280,16 @@ api.getSettingsValue = function(name, callback) {
   Uloží hodnotu oprávnění
 */
 api.setPermissionValue = function(username, permissionKey, value, callback) {
-  if (permissionKey == 'admin' || permissionKey == 'payment') {
-    setTimeout(() => callback({username : username, permissionKey: permissionKey, value: value}, "OK", null), 1000); 
-  } else {
-    setTimeout(() => callback(null, "unable_to_set_permissions_value", null), 1000);
-  }
+  api.post("/api/setPermissionsValue", {key: permissionKey, value:value}, (resData, errorText) => {
+    var results = api.parseResponseData(resData, errorText);
+    callback(null, results[0], errorText);
+  });
+  
+  //if (permissionKey == 'admin' || permissionKey == 'payment') {
+  //  setTimeout(() => callback({username : username, permissionKey: permissionKey, value: value}, "OK", null), 1000); 
+  //} else {
+  //  setTimeout(() => callback(null, "unable_to_set_permissions_value", null), 1000);
+  //}
 }
 
 /*

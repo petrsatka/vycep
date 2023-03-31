@@ -64,7 +64,7 @@ public:
   User::CredentialsVerificationResult setPassword(const char* lCaseUsername, const char* password);
   User::CredentialsVerificationResult changePassword(const char* username, const char* oldPassword, const char* newPassword);
   bool getNewCookie(const char* lCaseUsername, char* cookie);
-  CookieVerificationResult getCookieInfo(const char* cookie, char* username, uint32_t* permissions, char* newCookie);  //Získá infromace o cookie. Případně vypršeného ccokie, revaliduje a v případě úspěchu vytvoří nové cookie.
+  CookieVerificationResult getCookieInfo(const char* cookie, bool revalidateCookie, char* username, uint32_t* permissions, char* newCookie);  //Získá infromace o cookie. Případně vypršeného ccokie, revaliduje a v případě úspěchu vytvoří nové cookie.
   int16_t getUserBill(const char* lCaseUsername);
   bool setUserBill(const char* lCaseUsername, uint16_t bill);
   bool addUserBill(const char* lCaseUsername, uint16_t add, uint16_t& res);

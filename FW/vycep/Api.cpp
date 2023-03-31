@@ -40,7 +40,7 @@ Settings::DeviceMode Api::getDeviceModeByName(const char* modeName) {
   return Settings::DeviceMode::AUTO;
 }
 
-void Api::serveAuth(AsyncWebServerRequest* request, uint32_t permissionMask, bool verifyUserExistence, ResponseGetterFunction responseGetter, ErrorResponseGetterFunction noPermissionsresponseGetter, ErrorResponseGetterFunction errorResponseGetter) {
+void Api::serveAuth(AsyncWebServerRequest* request, uint32_t permissionMask, bool revalidateCookie, ResponseGetterFunction responseGetter, ErrorResponseGetterFunction noPermissionsresponseGetter, ErrorResponseGetterFunction errorResponseGetter) {
   dprintln("serveAuth");
   AsyncWebServerResponse* response = NULL;
   char cookie[User::COOKIE_BUFFER_SIZE] = { 0 };
@@ -49,21 +49,19 @@ void Api::serveAuth(AsyncWebServerRequest* request, uint32_t permissionMask, boo
     uint32_t permissions = 0;
     char newCookie[User::COOKIE_BUFFER_SIZE] = { 0 };
 
-    User::CookieVerificationResult res = this->user.getCookieInfo(cookie, username, &permissions, newCookie);
+    User::CookieVerificationResult res = this->user.getCookieInfo(cookie, revalidateCookie, username, &permissions, newCookie);
     if (res == User::CookieVerificationResult::OK || res == User::CookieVerificationResult::OUT_OF_DATE_REVALIDATED) {
       bool forceSetCookie = false;
-      if (!verifyUserExistence || user.isUserSet(username)) {
-        //Cookie prošlo, nebo bylo obnoveno
-        if (User::checkPermissions(permissions, permissionMask)) {
-          //Má oprávnění
-          if (responseGetter != NULL) {
-            response = responseGetter(username, permissions, cookie, newCookie, forceSetCookie);
-          }
-        } else {
-          if (noPermissionsresponseGetter != NULL) {
-            //Nemá oprávnění, ale je pro tento případ nastaven fallback
-            response = noPermissionsresponseGetter();
-          }
+      //Cookie prošlo, nebo bylo obnoveno
+      if (User::checkPermissions(permissions, permissionMask)) {
+        //Má oprávnění
+        if (responseGetter != NULL) {
+          response = responseGetter(username, permissions, cookie, newCookie, forceSetCookie);
+        }
+      } else {
+        if (noPermissionsresponseGetter != NULL) {
+          //Nemá oprávnění, ale je pro tento případ nastaven fallback
+          response = noPermissionsresponseGetter();
         }
       }
 
@@ -89,10 +87,10 @@ void Api::serveAuth(AsyncWebServerRequest* request, uint32_t permissionMask, boo
   }
 }
 
-void Api::serveStaticAuth(AsyncWebServerRequest* request, const char* path, uint32_t permissionMask, bool verifyUserExistence) {
+void Api::serveStaticAuth(AsyncWebServerRequest* request, const char* path, uint32_t permissionMask, bool revalidateCookie) {
   dprintln("serveStaticAuth");
   serveAuth(
-    request, permissionMask, verifyUserExistence, [request, path](const char* lCaseUsername, uint32_t& permissions, const char* cookie, char* newCookie, bool& setCookie) {
+    request, permissionMask, revalidateCookie, [request, path](const char* lCaseUsername, uint32_t& permissions, const char* cookie, char* newCookie, bool& setCookie) {
       return request->beginResponse(LittleFS, path);
     },
     NULL, [request]() {
@@ -102,10 +100,10 @@ void Api::serveStaticAuth(AsyncWebServerRequest* request, const char* path, uint
     });
 }
 
-void Api::serveDynamicAuth(AsyncWebServerRequest* request, ResponseGetterFunction responseGetter, uint32_t permissionMask, bool verifyUserExistence) {
+void Api::serveDynamicAuth(AsyncWebServerRequest* request, ResponseGetterFunction responseGetter, uint32_t permissionMask, bool revalidateCookie) {
   dprintln("serveDynamicAuth");
   serveAuth(
-    request, permissionMask, verifyUserExistence, responseGetter, [request]() {
+    request, permissionMask, revalidateCookie, responseGetter, [request]() {
       //Forbidden
       return request->beginResponse(403);
     },
@@ -551,6 +549,46 @@ void Api::setSettingsValue(AsyncWebServerRequest* request) {
     },
     User::PERMISSIONS_ACTIVE | User::PERMISSIONS_ADMIN, true);
 }
+
+// void Api::setPermissionsValue(AsyncWebServerRequest* request) {
+//   sprintln("setPermissionsValue");
+//   serveDynamicAuth(
+//     request, [&](const char* lCaseUsername, uint32_t& permissions, const char* cookie, char* newCookie, bool& setCookie) {
+//       if (request->hasParam("key", true) && request->hasParam("value", true)) {
+//         AsyncWebParameter* pKey = request->getParam("key", true);
+//         AsyncWebParameter* pValue = request->getParam("value", true);
+//         const char* resultCode = GENERAL_ERROR_RESULT_CODE;
+//         const char* key = pKey->value().c_str();
+//         const char* value = pValue->value().c_str();
+//         String res = "";
+//         if (key != NULL && key[0] != 0 && value != NULL) {
+//           resultCode = GENERAL_SUCCESS_RESULT_CODE;
+//           if (strcmp(key, Settings::KEY_NEW_USER_PAYMNET) == 0) {
+//             settings.setNewUserPaymentEnabled(strcmp("true", value) == 0);
+//           } else if (strcmp(key, Settings::KEY_PULSE_PER_LITER) == 0) {
+//             settings.setPulsePerLiterCount((unsigned int)strtoul(value, nullptr, 10));
+//           } else if (strcmp(key, Settings::KEY_MODE) == 0) {
+//             settings.setMode(getDeviceModeByName(value));
+//           } else if (strcmp(key, Settings::KEY_MASTER_TIMEOUT) == 0) {
+//             settings.setMasterTimeoutSeconds(strtoul(value, nullptr, 10) * 60);
+//           } else if (strcmp(key, Settings::KEY_UNDER_LIMIT_TIMEOUT) == 0) {
+//             settings.setUnderLimitTimeoutSeconds(strtoul(value, nullptr, 10) * 60);
+//           } else {
+//             resultCode = INVALID_KEY_RESULT_CODE;
+//           }
+//         }
+
+//         AsyncWebServerResponse* response = request->beginResponse(
+//           200,
+//           "text/plain",
+//           String(resultCode));
+//         return response;
+//       }
+
+//       return request->beginResponse(400);
+//     },
+//     User::PERMISSIONS_ACTIVE | User::PERMISSIONS_ADMIN, true);
+// }
 
 void Api::logout(AsyncWebServerRequest* request) {
   dprintln("logout");

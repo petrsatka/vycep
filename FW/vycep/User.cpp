@@ -210,7 +210,7 @@ bool User::clearAll() {
 }
 
 void User::iterateUsers(KeyIterationCallback iterationCallback) {
-  sprintln("!iterateUsers");
+  dprintln("iterateUsers");
   hashesStorage->iterateKeys(iterationCallback);
 }
 
@@ -551,7 +551,7 @@ bool User::verifyCookieHash(const char* cookie) {
   return memcmp(cookie, hexHash, 2 * Utils::HASH_BUFFER_SIZE) == 0;
 }
 
-User::CookieVerificationResult User::getCookieInfo(const char* cookie, char* username, uint32_t* permissions, char* newCookie) {
+User::CookieVerificationResult User::getCookieInfo(const char* cookie, bool revalidateCookie, char* username, uint32_t* permissions, char* newCookie) {
   dprintln("getCookieInfo");
   if (!verifyCookieHash(cookie)) {
     return CookieVerificationResult::INVALID_HASH;
@@ -565,7 +565,7 @@ User::CookieVerificationResult User::getCookieInfo(const char* cookie, char* use
   time_t now;
   time(&now);
   double cookieLifeSeconds = difftime(now, mktime(&timeInfo));
-  if (cookieLifeSeconds > AUTH_TIMEOUT_SEC) {
+  if (revalidateCookie || cookieLifeSeconds > AUTH_TIMEOUT_SEC) {
     if (!verifyPermissionsHash(cookie)) {
       return CookieVerificationResult::INVALID_PERMISSIONS;
     }

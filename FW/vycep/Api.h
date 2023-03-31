@@ -23,9 +23,9 @@ public:
   static constexpr const char* SSID_TOO_LONG_RESULT_CODE = "SSID_TOO_LONG";
   static constexpr const char* SESURITY_KEY_TOO_LONG_RESULT_CODE = "SKEY_TOO_LONG";
 
-  void serveStaticAuth(AsyncWebServerRequest* request, const char* path, uint32_t permissionMask, bool verifyUserExistence = false);
-  void serveDynamicAuth(AsyncWebServerRequest* request, ResponseGetterFunction responseGetter, uint32_t permissionMask, bool verifyUserExistence);
-  void serveAuth(AsyncWebServerRequest* request, uint32_t permissionMask, bool verifyUserExistence, ResponseGetterFunction responseGetter, ErrorResponseGetterFunction noPermissionsresponseGetter, ErrorResponseGetterFunction errorResponseGetter);
+  void serveStaticAuth(AsyncWebServerRequest* request, const char* path, uint32_t permissionMask, bool revalidateCookie = false);
+  void serveDynamicAuth(AsyncWebServerRequest* request, ResponseGetterFunction responseGetter, uint32_t permissionMask, bool revalidateCookie);
+  void serveAuth(AsyncWebServerRequest* request, uint32_t permissionMask, bool revalidateCookie, ResponseGetterFunction responseGetter, ErrorResponseGetterFunction noPermissionsresponseGetter, ErrorResponseGetterFunction errorResponseGetter);
   bool createFirstAdmin(AsyncWebServerRequest* request);
   bool createUser(AsyncWebServerRequest* request);
   void changePassword(AsyncWebServerRequest* request);
