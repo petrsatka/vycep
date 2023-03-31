@@ -45,6 +45,9 @@ public:
   bool setWifiConnection(AsyncWebServerRequest* request);
   void getSettingsValue(AsyncWebServerRequest* request);
   void setSettingsValue(AsyncWebServerRequest* request);
+  void setPermissionsValue(AsyncWebServerRequest* request);
+  void activateUser(AsyncWebServerRequest* request);
+  void deleteUser(AsyncWebServerRequest* request);
 
   static void onNotFound(AsyncWebServerRequest* request);
 

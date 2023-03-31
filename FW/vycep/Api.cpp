@@ -550,45 +550,91 @@ void Api::setSettingsValue(AsyncWebServerRequest* request) {
     User::PERMISSIONS_ACTIVE | User::PERMISSIONS_ADMIN, true);
 }
 
-// void Api::setPermissionsValue(AsyncWebServerRequest* request) {
-//   sprintln("setPermissionsValue");
-//   serveDynamicAuth(
-//     request, [&](const char* lCaseUsername, uint32_t& permissions, const char* cookie, char* newCookie, bool& setCookie) {
-//       if (request->hasParam("key", true) && request->hasParam("value", true)) {
-//         AsyncWebParameter* pKey = request->getParam("key", true);
-//         AsyncWebParameter* pValue = request->getParam("value", true);
-//         const char* resultCode = GENERAL_ERROR_RESULT_CODE;
-//         const char* key = pKey->value().c_str();
-//         const char* value = pValue->value().c_str();
-//         String res = "";
-//         if (key != NULL && key[0] != 0 && value != NULL) {
-//           resultCode = GENERAL_SUCCESS_RESULT_CODE;
-//           if (strcmp(key, Settings::KEY_NEW_USER_PAYMNET) == 0) {
-//             settings.setNewUserPaymentEnabled(strcmp("true", value) == 0);
-//           } else if (strcmp(key, Settings::KEY_PULSE_PER_LITER) == 0) {
-//             settings.setPulsePerLiterCount((unsigned int)strtoul(value, nullptr, 10));
-//           } else if (strcmp(key, Settings::KEY_MODE) == 0) {
-//             settings.setMode(getDeviceModeByName(value));
-//           } else if (strcmp(key, Settings::KEY_MASTER_TIMEOUT) == 0) {
-//             settings.setMasterTimeoutSeconds(strtoul(value, nullptr, 10) * 60);
-//           } else if (strcmp(key, Settings::KEY_UNDER_LIMIT_TIMEOUT) == 0) {
-//             settings.setUnderLimitTimeoutSeconds(strtoul(value, nullptr, 10) * 60);
-//           } else {
-//             resultCode = INVALID_KEY_RESULT_CODE;
-//           }
-//         }
+void Api::setPermissionsValue(AsyncWebServerRequest* request) {
+  sprintln("!setPermissionsValue");
+  serveDynamicAuth(
+    request, [&](const char* lCaseUsername, uint32_t& permissions, const char* cookie, char* newCookie, bool& setCookie) {
+      if (request->hasParam("key", true) && request->hasParam("value", true)) {
+        AsyncWebParameter* pKey = request->getParam("key", true);
+        AsyncWebParameter* pValue = request->getParam("value", true);
+        const char* resultCode = GENERAL_ERROR_RESULT_CODE;
+        const char* key = pKey->value().c_str();
+        const char* value = pValue->value().c_str();
+        String res = "";
+        if (key != NULL && key[0] != 0 && value != NULL) {
+          resultCode = GENERAL_SUCCESS_RESULT_CODE;
+          if (strcmp(key, Settings::KEY_ADMIN_PERMISSIONS) == 0) {
+            sprintln("adminset");
+          } else if (strcmp(key, Settings::KEY_PAYMENT_PERMISSIONS) == 0) {
+            sprintln("permset");
+          } else {
+            resultCode = INVALID_KEY_RESULT_CODE;
+          }
+        }
 
-//         AsyncWebServerResponse* response = request->beginResponse(
-//           200,
-//           "text/plain",
-//           String(resultCode));
-//         return response;
-//       }
+        AsyncWebServerResponse* response = request->beginResponse(
+          200,
+          "text/plain",
+          String(resultCode));
+        return response;
+      }
 
-//       return request->beginResponse(400);
-//     },
-//     User::PERMISSIONS_ACTIVE | User::PERMISSIONS_ADMIN, true);
-// }
+      return request->beginResponse(400);
+    },
+    User::PERMISSIONS_ACTIVE | User::PERMISSIONS_ADMIN, true);
+}
+
+void Api::activateUser(AsyncWebServerRequest* request) {
+  sprintln("!setPermissionsValue");
+  serveDynamicAuth(
+    request, [&](const char* lCaseUsername, uint32_t& permissions, const char* cookie, char* newCookie, bool& setCookie) {
+      if (request->hasParam("username", true)) {
+        AsyncWebParameter* pUsername = request->getParam("username", true);
+        const char* resultCode = GENERAL_ERROR_RESULT_CODE;
+        const char* username = pUsername->value().c_str();
+        String res = "";
+        if (username != NULL && username[0] != 0) {
+          resultCode = GENERAL_SUCCESS_RESULT_CODE;
+          sprintln("activate");
+        }
+
+        AsyncWebServerResponse* response = request->beginResponse(
+          200,
+          "text/plain",
+          String(resultCode));
+        return response;
+      }
+
+      return request->beginResponse(400);
+    },
+    User::PERMISSIONS_ACTIVE | User::PERMISSIONS_ADMIN, true);
+}
+
+void Api::deleteUser(AsyncWebServerRequest* request) {
+  sprintln("!deleteUser");
+  serveDynamicAuth(
+    request, [&](const char* lCaseUsername, uint32_t& permissions, const char* cookie, char* newCookie, bool& setCookie) {
+      if (request->hasParam("username", true)) {
+        AsyncWebParameter* pUsername = request->getParam("username", true);
+        const char* resultCode = GENERAL_ERROR_RESULT_CODE;
+        const char* username = pUsername->value().c_str();
+        String res = "";
+        if (username != NULL && username[0] != 0) {
+          resultCode = GENERAL_SUCCESS_RESULT_CODE;
+          sprintln("deleteuser");
+        }
+
+        AsyncWebServerResponse* response = request->beginResponse(
+          200,
+          "text/plain",
+          String(resultCode));
+        return response;
+      }
+
+      return request->beginResponse(400);
+    },
+    User::PERMISSIONS_ACTIVE | User::PERMISSIONS_ADMIN, true);
+}
 
 void Api::logout(AsyncWebServerRequest* request) {
   dprintln("logout");

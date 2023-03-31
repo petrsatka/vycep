@@ -216,6 +216,14 @@ void serverInit() {
     }
   });
 
+  server.on("/api/activateUser", HTTP_POST, [](AsyncWebServerRequest *request) {
+    api.activateUser(request);
+  });
+
+  server.on("/api/deleteUser", HTTP_POST, [](AsyncWebServerRequest *request) {
+    api.deleteUser(request);
+  });
+
   server.on("/api/changePassword", HTTP_POST, [](AsyncWebServerRequest *request) {
     api.changePassword(request);
   });
@@ -284,6 +292,10 @@ void serverInit() {
 
   server.on("/api/setSettingsValue", HTTP_POST, [](AsyncWebServerRequest *request) {
     api.setSettingsValue(request);
+  });
+
+  server.on("/api/setPermissionsValue", HTTP_POST, [](AsyncWebServerRequest *request) {
+    api.setPermissionsValue(request);
   });
 
   server.on("/first-registration.html", HTTP_GET, [](AsyncWebServerRequest *request) {

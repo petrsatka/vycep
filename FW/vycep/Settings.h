@@ -22,6 +22,8 @@ public:
   static constexpr const char* KEY_MASTER_TIMEOUT = "mastertimeout";
   static constexpr const char* KEY_UNDER_LIMIT_TIMEOUT = "ulimtimeout";
   static constexpr const char* KEY_NEW_USER_PAYMNET = "nuserpaymnt";
+  static constexpr const char* KEY_ADMIN_PERMISSIONS = "admin";
+  static constexpr const char* KEY_PAYMENT_PERMISSIONS = "payment";
 
   void clearAll();
   bool setWiFiOK();

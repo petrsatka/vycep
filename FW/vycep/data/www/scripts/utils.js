@@ -208,16 +208,6 @@ api.pay = function( count, callback) {
   }   
 }
 
-api.debugUsers = [
-{ "username": "Franta", "payment": true, "admin": true, "active": true, "paymentCheckboxEnabled":false, "adminCheckboxEnabled":false, "passwordResetButtonEnabled":true, "payButtonEnabled":true, "deleteButtonEnabled":false, "activateButtonEnabled":false },
-{ "username": "Honza", "payment": true, "admin": false, "active": true, "paymentCheckboxEnabled":true, "adminCheckboxEnabled":true, "passwordResetButtonEnabled":true, "payButtonEnabled":true, "deleteButtonEnabled":true, "activateButtonEnabled":false },
-{ "username": "Pavel", "payment": false, "admin": false, "active": true, "paymentCheckboxEnabled":true, "adminCheckboxEnabled":true, "passwordResetButtonEnabled":true, "payButtonEnabled":true, "deleteButtonEnabled":true, "activateButtonEnabled":false },
-{ "username": "Pepa", "payment": false, "admin": false, "active": true, "paymentCheckboxEnabled":true, "adminCheckboxEnabled":true, "passwordResetButtonEnabled":true, "payButtonEnabled":true, "deleteButtonEnabled":true, "activateButtonEnabled":false },
-{ "username": "Petr", "payment": false, "admin": false, "active": true, "paymentCheckboxEnabled":true, "adminCheckboxEnabled":true, "passwordResetButtonEnabled":true, "payButtonEnabled":true, "deleteButtonEnabled":true, "activateButtonEnabled":false },
-{ "username": "Tonda", "payment": true, "admin": false, "active": false, "paymentCheckboxEnabled":false, "adminCheckboxEnabled":false, "passwordResetButtonEnabled":false, "payButtonEnabled":false, "deleteButtonEnabled":true, "activateButtonEnabled":true },
-{ "username": "VLS", "payment": true, "admin": true, "active": true, "paymentCheckboxEnabled":true, "adminCheckboxEnabled":true, "passwordResetButtonEnabled":true, "payButtonEnabled":true, "deleteButtonEnabled":true, "activateButtonEnabled":false }
-]
-
 api.parseGetUsersJSONData = function(jsonData) {
   var resp = JSON.parse(jsonData);
   return resp.users.map(usr => {
@@ -337,29 +327,20 @@ api.resetPassword = function(username, callback) {
   Vymaže uživatele
 */
 api.deleteUser = function(username, callback) {
-  setTimeout(() => callback(username,"OK", null), 1000);
-  //setTimeout(() => callback(null, "unable_to_delete_user", null), 1000);
-  //setTimeout(() => callback(null, null, "500 - bad request"), 1000);
+  api.post("/api/deleteUser", {username: username}, (resData, errorText) => {
+    var results = api.parseResponseData(resData, errorText);
+    callback(null, results[0], errorText);
+  });
 }
 
 /*
   Aktivuje nového uživatele
 */
 api.activateUser = function(username, callback) {
-  let user = api.debugUsers.find(element => element['username'] == 'Tonda');
-  if (user) {
-    user["active"] = true;
-    user["paymentCheckboxEnabled"] = true;
-    user["adminCheckboxEnabled"] = true;
-    user["passwordResetButtonEnabled"] = true;
-    user["payButtonEnabled"] = true;
-    user["deleteButtonEnabled"] = true;
-    user["activateButtonEnabled"] =true
-  }
-  
-  setTimeout(() => callback(username,"OK", null), 1000);
-  //setTimeout(() => callback(null, "unable_to_activate_user", null), 1000);
-  //setTimeout(() => callback(null, null, "500 - bad request"), 1000);
+  api.post("/api/activateUser", {username: username}, (resData, errorText) => {
+    var results = api.parseResponseData(resData, errorText);
+    callback(null, results[0], errorText);
+  });
 }
 
 /*
