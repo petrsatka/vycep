@@ -2,6 +2,8 @@
 #include <ESPAsyncWebSrv.h>
 #include <LittleFS.h>
 #include <time.h>
+//#include <NetBIOS.h>
+#include <ESPmDNS.h>
 #include "User.h"
 #include "Api.h"
 #include "Debug.h"
@@ -9,6 +11,7 @@
 #include "Settings.h"
 
 static constexpr const char *NVS_PARTTION = "nvs_ext";
+static constexpr const char *HOST_NAME = "vycep";
 
 unsigned long lastHeapPrintMillis = 0;
 const unsigned long heapPrintPeriod = 20000;
@@ -31,6 +34,11 @@ void test() {
   user.clearAll();
 }
 
+void configureMDNS() {
+  MDNS.begin(HOST_NAME);
+  MDNS.addService("http", "tcp", 80);
+}
+
 void createAP() {
   dprintln("Create soft AP");
   IPAddress apIP = IPAddress(192, 168, 1, 1);
@@ -48,7 +56,7 @@ void createAP() {
 
   String mac = WiFi.macAddress();
   mac.replace(":", "");
-  String apName = "Vycep_" + mac;
+  String apName = String(HOST_NAME) + mac;
   if (WiFi.softAP(apName)) {
     dprintln("Ready");
   } else {
@@ -75,6 +83,7 @@ bool connectWiFiClient() {
   settings.getSecurityKey(secKey);
   dprintln(secKey);
   WiFi.mode(WIFI_STA);
+  WiFi.setHostname(HOST_NAME);
   WiFi.begin(ssid, secKey);
 
   if (WiFi.waitForConnectResult() != WL_CONNECTED) {
@@ -84,7 +93,10 @@ bool connectWiFiClient() {
 
   WiFi.setAutoReconnect(true);
   WiFi.persistent(true);
+  //NBNS.begin(HOST_NAME);
+  configureMDNS();
   sprintln(WiFi.localIP().toString());
+  sprintln(WiFi.getHostname());
   return true;
 }
 

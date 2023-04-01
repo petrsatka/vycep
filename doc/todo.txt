@@ -1,19 +1,23 @@
 Nějak rozumě nastavit cache pro js a css
-Tlačítko pro opuštění registrace
-Neaktivnímu uživateli zašedit objednávku
-Zohlednit nastavení povolení platby pro nové užovatele - až při aktivaci?
+
+*Neaktivnímu uživateli zašedit objednávku
+*Zohlednit nastavení povolení platby pro nové užovatele - až při aktivaci?
+*V příadě, že není žádný uživatel - nedovolit běžnou registraci
+*Dořešit proces aktivace - aby na straně aktivovaného proběhal rychle a intuitivně
+*Nezobrazovat tlačítko přejít k platbě, pokud nemá práva.
 
 Automatický refresh hodnoty na výčepu.
 Po nastavení připojení navigace na no-ip doménu. Pokud je.
 Factory reset HW
-Identifikace v síti - broadcast jeména
-Dořešit proces aktivace - aby na straně aktivovaného proběhal rychle a intuitivně
-Nezobrazovat tlačítko přejít k platbě, pokud nemá práva.
 Nějaká počitadla - kolik bylo natočeno od posledního resetu. Dlužníci.
 Aktualizace frimware z internetu
 při kalibarci přepnout do trvale otevřeno
 V trvale otevřeno a trvale uzavřeno nedovolit nové objednávky
-V příadě, že není žádný uživatel - nedovolit běžnou registraci
+
+Otestovat zámky.
+Při přístupu k NVS hlídat délku klíče? NVS klíč ořezává, což může vést k tomu, že admin s 15ti znakovým jménem si bude moci sám sobě něco nastavit, pokud použej 15tznakové jméno + jeden libovolný znak.
+Pohlídat watchdog - po přidání mdns došlo k resetu.
+
 
 
 --Active user
@@ -28,7 +32,6 @@ payForUser
 
 
 --Active Admin
-*resetPassword
 startCalibration
 stopCalibration
 runTest
