@@ -270,7 +270,7 @@ api.getSettingsValue = function(name, callback) {
   Uloží hodnotu oprávnění
 */
 api.setPermissionValue = function(username, permissionKey, value, callback) {
-  api.post("/api/setPermissionsValue", {key: permissionKey, value:value}, (resData, errorText) => {
+  api.post("/api/setPermissionsValue", {username: username, key: permissionKey, value:value}, (resData, errorText) => {
     var results = api.parseResponseData(resData, errorText);
     callback(null, results[0], errorText);
   });

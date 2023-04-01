@@ -17,14 +17,14 @@ User::~User() {
 }
 
 void User::test() {
-  if (checkPermissions(PERMISSIONS_ANY_PERMISSIONS, PERMISSIONS_ANY_PERMISSIONS)
+  if (checkPermissions(PERMISSIONS_NO_PERMISSIONS, PERMISSIONS_NO_PERMISSIONS)
       && checkPermissions(PERMISSIONS_ACTIVE, PERMISSIONS_ACTIVE)
       && checkPermissions(PERMISSIONS_ACTIVE | PERMISSIONS_PAYMENT, PERMISSIONS_ACTIVE | PERMISSIONS_PAYMENT)
-      && checkPermissions(PERMISSIONS_ACTIVE, PERMISSIONS_ANY_PERMISSIONS)
-      && checkPermissions(PERMISSIONS_INACTIVE, PERMISSIONS_ANY_PERMISSIONS)
+      && checkPermissions(PERMISSIONS_ACTIVE, PERMISSIONS_NO_PERMISSIONS)
+      && checkPermissions(PERMISSIONS_NO_PERMISSIONS, PERMISSIONS_NO_PERMISSIONS)
       && checkPermissions(PERMISSIONS_ACTIVE | PERMISSIONS_ADMIN, PERMISSIONS_ADMIN)
-      && !checkPermissions(PERMISSIONS_INACTIVE, PERMISSIONS_ADMIN)
-      && !checkPermissions(PERMISSIONS_INACTIVE, PERMISSIONS_ACTIVE | PERMISSIONS_PAYMENT)
+      && !checkPermissions(PERMISSIONS_NO_PERMISSIONS, PERMISSIONS_ADMIN)
+      && !checkPermissions(PERMISSIONS_NO_PERMISSIONS, PERMISSIONS_ACTIVE | PERMISSIONS_PAYMENT)
       && !checkPermissions(PERMISSIONS_ACTIVE, PERMISSIONS_ADMIN)) {
     //sprintln("Permissions test OK");
   } else {
@@ -373,7 +373,7 @@ User::CredentialsVerificationResult User::validatePassword(const char* password)
 
 User::CredentialsVerificationResult User::registerUser(const char* username, const char* password, char* lCaseUsername) {
   sprintln("!registerUser");
-  return createUser(username, password, User::PERMISSIONS_INACTIVE, lCaseUsername);
+  return createUser(username, password, User::PERMISSIONS_NO_PERMISSIONS, lCaseUsername);
 }
 
 User::CredentialsVerificationResult User::registerFirstAdmin(const char* username, const char* password, char* lCaseUsername) {
@@ -413,7 +413,7 @@ User::CredentialsVerificationResult User::createUser(const char* username, const
   unsigned char hash[Utils::HASH_BUFFER_SIZE];
   Utils::computeHmacHash(password, hash);
   int res = hashesStorage->putBytes(lCaseUsername, hash, Utils::HASH_BUFFER_SIZE) > 0
-            && permissionsStorage->putUInt(lCaseUsername, permissions) > 0
+            && setPermissions(lCaseUsername, permissions)
             && billsStorage->putUShort(lCaseUsername, 0) > 0
             && settings->putBool(KEY_USER_IS_SET, true);
 
@@ -604,7 +604,22 @@ uint32_t User::getPermissions(const char* lCaseUsername) {
   return permissionsStorage->getUInt(lCaseUsername, 0);
 }
 
+bool User::setPermissions(const char* lCaseUsername, uint32_t permissions) {
+  sprintln("!setPermissions");
+  return permissionsStorage->putUInt(lCaseUsername, permissions) > 0;
+}
+
+bool User::addPermissions(const char* lCaseUsername, uint32_t permissions) {
+  sprintln("!setPermissions");
+  return setPermissions(lCaseUsername, (getPermissions(lCaseUsername) | permissions));
+}
+
+bool User::removePermissions(const char* lCaseUsername, uint32_t permissions) {
+  sprintln("!setPermissions");
+  return setPermissions(lCaseUsername, (getPermissions(lCaseUsername) & ~permissions));
+}
+
 bool User::checkPermissions(uint32_t permissions, uint32_t permissionMask) {
   dprintln("checkPermissions");
-  return permissions & permissionMask;
+  return (permissions & permissionMask) == permissionMask;
 }

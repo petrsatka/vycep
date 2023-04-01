@@ -11,6 +11,7 @@ Factory reset HW
 Identifikace v síti - broadcast jeména
 Dořešit proces aktvace - aby na straně aktivovaného proběhal rychle a intuitivně
 Otestovat smazání uživatele a set operace.
+Nezobrazovat tlačítko přejít k platbě, pokud nemá práva.
 
 
 --Active user

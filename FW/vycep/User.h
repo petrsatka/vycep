@@ -46,15 +46,17 @@ public:
   static constexpr size_t USERNAME_MAX_CHAR_COUNT = 15;
   static constexpr size_t USERNAME_BUFFER_SIZE = USERNAME_MAX_CHAR_COUNT + 1;
   static constexpr size_t COOKIE_BUFFER_SIZE = USERNAME_BUFFER_SIZE + INT32_CHAR_BUFFER_SIZE + UTC_TIME_STRING_BUFFER_SIZE + 2 * Utils::HASH_HEXSTRING_BUFFER_SIZE;
-  static constexpr uint32_t PERMISSIONS_ANY_PERMISSIONS = -1;
-  static constexpr uint32_t PERMISSIONS_INACTIVE = 0b1;
-  static constexpr uint32_t PERMISSIONS_ACTIVE = 0b10;
-  static constexpr uint32_t PERMISSIONS_ADMIN = 0b100;
-  static constexpr uint32_t PERMISSIONS_PAYMENT = 0b1000;
+  static constexpr uint32_t PERMISSIONS_NO_PERMISSIONS = 0;
+  static constexpr uint32_t PERMISSIONS_ACTIVE = 0b1;
+  static constexpr uint32_t PERMISSIONS_ADMIN = 0b10;
+  static constexpr uint32_t PERMISSIONS_PAYMENT = 0b100;
 
   static bool checkPermissions(uint32_t permissions, uint32_t permissionMask);
 
   uint32_t getPermissions(const char* lCaseUsername);
+  bool setPermissions(const char* lCaseUsername, uint32_t permissions);
+  bool addPermissions(const char* lCaseUsername, uint32_t permissions);
+  bool removePermissions(const char* lCaseUsername, uint32_t permissions);
   bool isAnyUserSet();
   bool isUserSet(const char* lCaseUsername);
   void iterateUsers(KeyIterationCallback iterationCallback);

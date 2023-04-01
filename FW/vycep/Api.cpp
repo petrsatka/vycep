@@ -310,7 +310,7 @@ void Api::getCurrentUserBillCount(AsyncWebServerRequest* request) {
         String(GENERAL_SUCCESS_RESULT_CODE) + "&" + String(user.getUserBill(lCaseUsername)));
       return response;
     },
-    User::PERMISSIONS_ANY_PERMISSIONS, false);
+    User::PERMISSIONS_NO_PERMISSIONS, false);
 }
 
 void Api::makeOrder(AsyncWebServerRequest* request) {
@@ -554,21 +554,40 @@ void Api::setPermissionsValue(AsyncWebServerRequest* request) {
   sprintln("!setPermissionsValue");
   serveDynamicAuth(
     request, [&](const char* lCaseUsername, uint32_t& permissions, const char* cookie, char* newCookie, bool& setCookie) {
-      if (request->hasParam("key", true) && request->hasParam("value", true)) {
+      if (request->hasParam("username", true) && request->hasParam("key", true) && request->hasParam("value", true)) {
+        AsyncWebParameter* pUsername = request->getParam("username", true);
         AsyncWebParameter* pKey = request->getParam("key", true);
         AsyncWebParameter* pValue = request->getParam("value", true);
         const char* resultCode = GENERAL_ERROR_RESULT_CODE;
+        const char* username = pUsername->value().c_str();
         const char* key = pKey->value().c_str();
         const char* value = pValue->value().c_str();
         String res = "";
-        if (key != NULL && key[0] != 0 && value != NULL) {
-          resultCode = GENERAL_SUCCESS_RESULT_CODE;
-          if (strcmp(key, Settings::KEY_ADMIN_PERMISSIONS) == 0) {
-            sprintln("adminset");
-          } else if (strcmp(key, Settings::KEY_PAYMENT_PERMISSIONS) == 0) {
-            sprintln("permset");
-          } else {
-            resultCode = INVALID_KEY_RESULT_CODE;
+        if (key != NULL && key[0] != 0 && username != NULL && username[0] != 0 && value != NULL) {
+          if (strcmp(username, lCaseUsername) != 0) {
+            if (strcmp(key, Settings::KEY_ADMIN_PERMISSIONS) == 0) {
+              if (Utils::StrTob(value)) {
+                if (user.addPermissions(username, User::PERMISSIONS_ADMIN)) {
+                  resultCode = GENERAL_SUCCESS_RESULT_CODE;
+                }
+              } else {
+                if (user.removePermissions(username, User::PERMISSIONS_ADMIN)) {
+                  resultCode = GENERAL_SUCCESS_RESULT_CODE;
+                }
+              }
+            } else if (strcmp(key, Settings::KEY_PAYMENT_PERMISSIONS) == 0) {
+              if (Utils::StrTob(value)) {
+                if (user.addPermissions(username, User::PERMISSIONS_PAYMENT)) {
+                  resultCode = GENERAL_SUCCESS_RESULT_CODE;
+                }
+              } else {
+                if (user.removePermissions(username, User::PERMISSIONS_PAYMENT)) {
+                  resultCode = GENERAL_SUCCESS_RESULT_CODE;
+                }
+              }
+            } else {
+              resultCode = INVALID_KEY_RESULT_CODE;
+            }
           }
         }
 
@@ -594,8 +613,11 @@ void Api::activateUser(AsyncWebServerRequest* request) {
         const char* username = pUsername->value().c_str();
         String res = "";
         if (username != NULL && username[0] != 0) {
-          resultCode = GENERAL_SUCCESS_RESULT_CODE;
-          sprintln("activate");
+          if (strcmp(username, lCaseUsername) != 0) {
+            if (user.setPermissions(username, user.getPermissions(username) | User::PERMISSIONS_ACTIVE)) {
+              resultCode = GENERAL_SUCCESS_RESULT_CODE;
+            }
+          }
         }
 
         AsyncWebServerResponse* response = request->beginResponse(
@@ -620,8 +642,10 @@ void Api::deleteUser(AsyncWebServerRequest* request) {
         const char* username = pUsername->value().c_str();
         String res = "";
         if (username != NULL && username[0] != 0) {
-          if (user.deleteUser(username)) {
-            resultCode = GENERAL_SUCCESS_RESULT_CODE;
+          if (strcmp(username, lCaseUsername) != 0) {
+            if (user.deleteUser(username)) {
+              resultCode = GENERAL_SUCCESS_RESULT_CODE;
+            }
           }
         }
 

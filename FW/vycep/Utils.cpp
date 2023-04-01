@@ -158,6 +158,11 @@ const char* Utils::bToStr(bool val) {
   return val ? TRUE_STR : FALSE_STR;
 }
 
+bool Utils::StrTob(const char* val) {
+  sprintln("!StrTob");
+  return strcmp(val, Utils::TRUE_STR) == 0;
+}
+
 short Utils::getCookiePropsPosition(const char* cookie) {
   dprintln("getCookiePropsPosition");
   short pos = 2 * Utils::HASH_HEXSTRING_BUFFER_SIZE;

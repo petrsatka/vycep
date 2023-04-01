@@ -23,13 +23,14 @@ public:
   static int strLenUTF8(const char* str);
   static short getCookiePropsPosition(const char* cookie);
   static const char* bToStr(bool val);
+  static bool StrTob(const char* val);
 
   static void test();
+  static constexpr const char* TRUE_STR = "true";
+  static constexpr const char* FALSE_STR = "false";
 
 private:
   static constexpr const char* HMAC_KEY = "iR8sPr11YLDR1Ij7bw2ec70YvpJrt3gK";
   static constexpr const char* HEXMAP = "0123456789abcdef";
-  static constexpr const char* TRUE_STR = "true";
-  static constexpr const char* FALSE_STR = "false";
 };
 #endif
