@@ -5,6 +5,8 @@ Nějak rozumě nastavit cache pro js a css
 *V příadě, že není žádný uživatel - nedovolit běžnou registraci
 *Dořešit proces aktivace - aby na straně aktivovaného proběhal rychle a intuitivně
 *Nezobrazovat tlačítko přejít k platbě, pokud nemá práva.
+*registrace a přihlášení - trimovat jméno
+*ssid trimovat
 
 Automatický refresh hodnoty na výčepu.
 Po nastavení připojení navigace na no-ip doménu. Pokud je.

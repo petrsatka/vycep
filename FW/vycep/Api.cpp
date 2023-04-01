@@ -184,7 +184,9 @@ bool Api::createFirstAdmin(AsyncWebServerRequest* request) {
     if (request->hasParam("password", true)) {
       AsyncWebParameter* pPassword = request->getParam("password", true);
       char lCaseUsername[User::USERNAME_BUFFER_SIZE] = { 0 };
-      User::CredentialsVerificationResult res = user.registerFirstAdmin(pUname->value().c_str(), pPassword->value().c_str(), lCaseUsername);
+      String username = String(pUname->value().c_str());
+      username.trim();
+      User::CredentialsVerificationResult res = user.registerFirstAdmin(username.c_str(), pPassword->value().c_str(), lCaseUsername);
       if (res == User::CredentialsVerificationResult::OK) {
         AsyncWebServerResponse* response = request->beginResponse(200, "text/plain", Api::getCredentialsVerificationResultName(res));
         char authCookieContent[User::COOKIE_BUFFER_SIZE] = { 0 };
@@ -210,7 +212,9 @@ bool Api::createUser(AsyncWebServerRequest* request) {
     if (request->hasParam("password", true)) {
       AsyncWebParameter* pPassword = request->getParam("password", true);
       char lCaseUsername[User::USERNAME_BUFFER_SIZE] = { 0 };
-      User::CredentialsVerificationResult res = user.registerUser(pUname->value().c_str(), pPassword->value().c_str(), lCaseUsername);
+      String username = String(pUname->value().c_str());
+      username.trim();
+      User::CredentialsVerificationResult res = user.registerUser(username.c_str(), pPassword->value().c_str(), lCaseUsername);
       if (res == User::CredentialsVerificationResult::OK) {
         AsyncWebServerResponse* response = request->beginResponse(200, "text/plain", Api::getCredentialsVerificationResultName(res));
         char authCookieContent[User::COOKIE_BUFFER_SIZE] = { 0 };
@@ -258,7 +262,9 @@ bool Api::login(AsyncWebServerRequest* request) {
     if (request->hasParam("password", true)) {
       AsyncWebParameter* pPassword = request->getParam("password", true);
       char lCaseUsername[User::USERNAME_BUFFER_SIZE] = { 0 };
-      if (user.verifyPassword(pUname->value().c_str(), pPassword->value().c_str(), lCaseUsername) == User::CredentialsVerificationResult::OK) {
+      String username = String(pUname->value().c_str());
+      username.trim();
+      if (user.verifyPassword(username.c_str(), pPassword->value().c_str(), lCaseUsername) == User::CredentialsVerificationResult::OK) {
         AsyncWebServerResponse* response = request->beginResponse(200, "text/plain", GENERAL_SUCCESS_RESULT_CODE);
         char authCookieContent[User::COOKIE_BUFFER_SIZE] = { 0 };
         user.getNewCookie(lCaseUsername, authCookieContent);

@@ -185,3 +185,11 @@ void Utils::getRandomString(char *str, unsigned int bufferSize)
     }
     str[i] = '\0';
 }
+
+// void Utils::trimRight(char* str) {
+//     int len = strlen(str);
+//     int i = len - 1;
+//     while (i >= 0 && isspace(str[i])) {
+//         str[i--] = '\0';
+//     }
+// }
