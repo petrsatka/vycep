@@ -424,7 +424,7 @@ User::CredentialsVerificationResult User::createUser(const char* username, const
   return User::CredentialsVerificationResult::OK;
 }
 
-bool User::delteUser(const char* lCaseUsername) {
+bool User::deleteUser(const char* lCaseUsername) {
   sprintln("!delteUser");
   bool res = hashesStorage->remove(lCaseUsername) && res;
   res = permissionsStorage->remove(lCaseUsername) && res;

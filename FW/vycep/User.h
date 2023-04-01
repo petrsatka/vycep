@@ -59,7 +59,7 @@ public:
   bool isUserSet(const char* lCaseUsername);
   void iterateUsers(KeyIterationCallback iterationCallback);
   unsigned short getUserCount();
-  bool delteUser(const char* lCaseUsername);
+  bool deleteUser(const char* lCaseUsername);
   User::CredentialsVerificationResult verifyPassword(const char* username, const char* password, char* lCaseUsername);
   User::CredentialsVerificationResult setPassword(const char* lCaseUsername, const char* password);
   User::CredentialsVerificationResult changePassword(const char* username, const char* oldPassword, const char* newPassword);

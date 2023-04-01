@@ -620,8 +620,9 @@ void Api::deleteUser(AsyncWebServerRequest* request) {
         const char* username = pUsername->value().c_str();
         String res = "";
         if (username != NULL && username[0] != 0) {
-          resultCode = GENERAL_SUCCESS_RESULT_CODE;
-          sprintln("deleteuser");
+          if (user.deleteUser(username)) {
+            resultCode = GENERAL_SUCCESS_RESULT_CODE;
+          }
         }
 
         AsyncWebServerResponse* response = request->beginResponse(
