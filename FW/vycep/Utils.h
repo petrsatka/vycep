@@ -24,6 +24,7 @@ public:
   static short getCookiePropsPosition(const char* cookie);
   static const char* bToStr(bool val);
   static bool StrTob(const char* val);
+  static void getRandomString(char *str, unsigned int bufferSize);
 
   static void test();
   static constexpr const char* TRUE_STR = "true";

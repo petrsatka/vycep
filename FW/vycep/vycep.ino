@@ -224,6 +224,10 @@ void serverInit() {
     api.deleteUser(request);
   });
 
+  server.on("/api/resetPassword", HTTP_POST, [](AsyncWebServerRequest *request) {
+    api.resetPassword(request);
+  });
+
   server.on("/api/changePassword", HTTP_POST, [](AsyncWebServerRequest *request) {
     api.changePassword(request);
   });

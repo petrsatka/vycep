@@ -661,6 +661,34 @@ void Api::deleteUser(AsyncWebServerRequest* request) {
     User::PERMISSIONS_ACTIVE | User::PERMISSIONS_ADMIN, true);
 }
 
+void Api::resetPassword(AsyncWebServerRequest* request) {
+  sprintln("!resetPassword");
+  serveDynamicAuth(
+    request, [&](const char* lCaseUsername, uint32_t& permissions, const char* cookie, char* newCookie, bool& setCookie) {
+      if (request->hasParam("username", true)) {
+        char newPassword[User::PASSWORD_MIN_CHAR_COUNT + 1] = { 0 };
+        AsyncWebParameter* pUsername = request->getParam("username", true);
+        const char* resultCode = GENERAL_ERROR_RESULT_CODE;
+        const char* username = pUsername->value().c_str();
+        String res = "";
+        if (username != NULL && username[0] != 0) {
+          if (user.resetPassword(username, newPassword, User::PASSWORD_MIN_CHAR_COUNT + 1)) {
+            resultCode = GENERAL_SUCCESS_RESULT_CODE;
+          }
+        }
+
+        AsyncWebServerResponse* response = request->beginResponse(
+          200,
+          "text/plain",
+          String(resultCode) + "&" + String(newPassword));
+        return response;
+      }
+
+      return request->beginResponse(400);
+    },
+    User::PERMISSIONS_ACTIVE | User::PERMISSIONS_ADMIN, true);
+}
+
 void Api::logout(AsyncWebServerRequest* request) {
   dprintln("logout");
   AsyncWebServerResponse* response = request->beginResponse(200, "text/plain", GENERAL_SUCCESS_RESULT_CODE);

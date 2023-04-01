@@ -172,3 +172,16 @@ short Utils::getCookiePropsPosition(const char* cookie) {
 
   return pos;
 }
+
+void Utils::getRandomString(char *str, unsigned int bufferSize)
+{
+    unsigned int i;
+    srand(time(NULL));
+
+    for (i = 0; i < bufferSize -1; i++)
+    {
+        // Add random printable ASCII char
+        str[i] = (rand() % 26) + 'a';
+    }
+    str[i] = '\0';
+}

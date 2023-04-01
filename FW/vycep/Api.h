@@ -48,6 +48,7 @@ public:
   void setPermissionsValue(AsyncWebServerRequest* request);
   void activateUser(AsyncWebServerRequest* request);
   void deleteUser(AsyncWebServerRequest* request);
+  void resetPassword(AsyncWebServerRequest* request);
 
   static void onNotFound(AsyncWebServerRequest* request);
 

@@ -62,6 +62,7 @@ public:
   void iterateUsers(KeyIterationCallback iterationCallback);
   unsigned short getUserCount();
   bool deleteUser(const char* lCaseUsername);
+  bool resetPassword(const char* lCaseUsername, char* newGenertedPassword, unsigned int bufferSize);
   User::CredentialsVerificationResult verifyPassword(const char* username, const char* password, char* lCaseUsername);
   User::CredentialsVerificationResult setPassword(const char* lCaseUsername, const char* password);
   User::CredentialsVerificationResult changePassword(const char* username, const char* oldPassword, const char* newPassword);

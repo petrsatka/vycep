@@ -425,11 +425,16 @@ User::CredentialsVerificationResult User::createUser(const char* username, const
 }
 
 bool User::deleteUser(const char* lCaseUsername) {
-  sprintln("!delteUser");
+  sprintln("!deleteUser");
   bool res = hashesStorage->remove(lCaseUsername) && res;
   res = permissionsStorage->remove(lCaseUsername) && res;
   res = billsStorage->remove(lCaseUsername);
   return res;
+}
+
+bool User::resetPassword(const char* lCaseUsername, char* newGenertedPassword, unsigned int bufferSize) {
+  Utils::getRandomString(newGenertedPassword, bufferSize);
+  return setPassword(lCaseUsername, newGenertedPassword) == User::CredentialsVerificationResult::OK;
 }
 
 User::CredentialsVerificationResult User::verifyPassword(const char* username, const char* password, char* lCaseUsername) {

@@ -1,6 +1,4 @@
 Nějak rozumě nastavit cache pro js a css
-
-nedovolit smazat všechny uživatele
 Tlačítko pro opuštění registrace
 Neaktivnímu uživateli zašedit objednávku
 Zohlednit nastavení povolení platby pro nové užovatele - až při aktivaci?
@@ -9,9 +7,13 @@ Automatický refresh hodnoty na výčepu.
 Po nastavení připojení navigace na no-ip doménu. Pokud je.
 Factory reset HW
 Identifikace v síti - broadcast jeména
-Dořešit proces aktvace - aby na straně aktivovaného proběhal rychle a intuitivně
-Otestovat smazání uživatele a set operace.
+Dořešit proces aktivace - aby na straně aktivovaného proběhal rychle a intuitivně
 Nezobrazovat tlačítko přejít k platbě, pokud nemá práva.
+Nějaká počitadla - kolik bylo natočeno od posledního resetu. Dlužníci.
+Aktualizace frimware z internetu
+při kalibarci přepnout do trvale otevřeno
+V trvale otevřeno a trvale uzavřeno nedovolit nové objednávky
+V příadě, že není žádný uživatel - nedovolit běžnou registraci
 
 
 --Active user
@@ -23,15 +25,10 @@ pay
 
 -- admin
 payForUser
-pokud platí za sebe, pak ověřit práva na platbu
 
 
 --Active Admin
-*loadUsers
-*setPermissionValue
 *resetPassword
-*deleteUser
-*activateUser
 startCalibration
 stopCalibration
 runTest

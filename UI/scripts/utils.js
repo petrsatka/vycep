@@ -99,7 +99,7 @@ api.post = function(url, reqData, callback) {
 */
 api.createFirstAdmin = function(username, password, callback) {
   api.post("/api/createFirstAdmin", {username: username, password: password}, (resData, errorText) => {
-    var results = api.parseResponseData(resData, errorText);
+    let results = api.parseResponseData(resData, errorText);
     callback(null, results[0], errorText);
   });
 }
@@ -109,7 +109,7 @@ api.createFirstAdmin = function(username, password, callback) {
 */
 api.createUser = function(username, password, callback) {
   api.post("/api/createUser", {username: username, password: password}, (resData, errorText) => {
-    var results = api.parseResponseData(resData, errorText);
+    let results = api.parseResponseData(resData, errorText);
     callback(null, results[0], errorText);
   });
 }
@@ -119,7 +119,7 @@ api.createUser = function(username, password, callback) {
 */
 api.changePassword = function(oldPassword, newPassword, callback) {
   api.post("/api/changePassword", {oldpassword: oldPassword, newpassword: newPassword}, (resData, errorText) => {
-    var results = api.parseResponseData(resData, errorText);
+    let results = api.parseResponseData(resData, errorText);
     callback(null, results[0], errorText);
   });  
 }
@@ -129,7 +129,7 @@ api.changePassword = function(oldPassword, newPassword, callback) {
 */
 api.login = function(username, password, callback) {
    api.post("/api/login", {username: username, password: password}, (resData, errorText) => {
-    var results = api.parseResponseData(resData, errorText);
+    let results = api.parseResponseData(resData, errorText);
     callback(null, results[0], errorText);
   });
 }
@@ -148,7 +148,7 @@ api.getQueueCount = function(callback) {
 */
 api.getCurrentUserBillCount = function(callback) {
   api.post("/api/getCurrentUserBillCount", null, (resData, errorText) => {
-    var results = api.parseResponseData(resData, errorText);
+    let results = api.parseResponseData(resData, errorText);
     callback(results[1], results[0], errorText);
   });
 }
@@ -158,7 +158,7 @@ api.getCurrentUserBillCount = function(callback) {
 */
 api.getUserBillCount = function(username, callback) {
   api.post("/api/getUserBillCount", {username: username}, (resData, errorText) => {
-    var results = api.parseResponseData(resData, errorText);
+    let results = api.parseResponseData(resData, errorText);
     callback(results[1], results[0], errorText);
   });
 }
@@ -209,7 +209,7 @@ api.pay = function( count, callback) {
 }
 
 api.parseGetUsersJSONData = function(jsonData) {
-  var resp = JSON.parse(jsonData);
+  let resp = JSON.parse(jsonData);
   return resp.users.map(usr => {
     return {
       ...usr,
@@ -229,7 +229,7 @@ api.parseGetUsersJSONData = function(jsonData) {
 api.getUsers = function(callback) {
   //setTimeout(() => callback(api.debugUsers,"OK", null), 1000);
   api.post("/api/getUsers", null, (resData, errorText) => {
-    var results = api.parseResponseData(resData, errorText);
+    let results = api.parseResponseData(resData, errorText);
     callback(api.parseGetUsersJSONData(results[1]), results[0], errorText);
   });
 }
@@ -241,7 +241,7 @@ api.getUsers = function(callback) {
 api.logout = function(callback) {
   //setTimeout(() => callback(true,"OK", null), 1000);
   api.post("/api/logout", null, (resData, errorText) => {
-    var results = api.parseResponseData(resData, errorText);
+    let results = api.parseResponseData(resData, errorText);
     callback(null, results[0], errorText);
   });
 }
@@ -251,7 +251,7 @@ api.logout = function(callback) {
 */
 api.setSettingsValue = function(name, value, callback) {
    api.post("/api/setSettingsValue", {key: name, value: value}, (resData, errorText) => {
-    var results = api.parseResponseData(resData, errorText);
+    let results = api.parseResponseData(resData, errorText);
     callback(null, results[0], errorText);
   });  
 }
@@ -261,7 +261,7 @@ api.setSettingsValue = function(name, value, callback) {
 */
 api.getSettingsValue = function(name, callback) {
    api.post("/api/getSettingsValue", {key: name}, (resData, errorText) => {
-    var results = api.parseResponseData(resData, errorText);
+    let results = api.parseResponseData(resData, errorText);
     callback(results[1], results[0], errorText);
   });
 }
@@ -271,7 +271,7 @@ api.getSettingsValue = function(name, callback) {
 */
 api.setPermissionValue = function(username, permissionKey, value, callback) {
   api.post("/api/setPermissionsValue", {username: username, key: permissionKey, value:value}, (resData, errorText) => {
-    var results = api.parseResponseData(resData, errorText);
+    let results = api.parseResponseData(resData, errorText);
     callback(null, results[0], errorText);
   });
   
@@ -288,7 +288,7 @@ api.setPermissionValue = function(username, permissionKey, value, callback) {
 api.getIP = function(callback) {
   //setTimeout(() => callback('192.168.1.45',"OK", null), 1000);
   api.post("/api/getIP", null, (resData, errorText) => {
-    var results = api.parseResponseData(resData, errorText);
+    let results = api.parseResponseData(resData, errorText);
     callback(results[1], results[0], errorText);
   });  
 }
@@ -298,7 +298,7 @@ api.getIP = function(callback) {
 */
 api.getMAC = function(callback) {
   api.post("/api/getMAC", null, (resData, errorText) => {
-    var results = api.parseResponseData(resData, errorText);
+    let results = api.parseResponseData(resData, errorText);
     callback(results[1], results[0], errorText);
   });  
 }
@@ -309,7 +309,7 @@ api.getMAC = function(callback) {
 api.getGatewayIP = function(callback) {
   //setTimeout(() => callback('192.168.1.1',"OK", null), 1000);
   api.post("/api/getGatewayIP", null, (resData, errorText) => {
-    var results = api.parseResponseData(resData, errorText);
+    let results = api.parseResponseData(resData, errorText);
     callback(results[1], results[0], errorText);
   }); 
 }
@@ -318,9 +318,10 @@ api.getGatewayIP = function(callback) {
   Resetuje heslo
 */
 api.resetPassword = function(username, callback) {
-  setTimeout(() => callback('xyz7abc',"OK", null), 1000);
-  //setTimeout(() => callback(null, "unable_to_reset_password", null), 1000);
-  //setTimeout(() => callback(null, null, "500 - bad request"), 1000);
+  api.post("/api/resetPassword", {username: username}, (resData, errorText) => {
+    let results = api.parseResponseData(resData, errorText);
+    callback(results[1], results[0], errorText);
+  });
 }
 
 /*
@@ -328,7 +329,7 @@ api.resetPassword = function(username, callback) {
 */
 api.deleteUser = function(username, callback) {
   api.post("/api/deleteUser", {username: username}, (resData, errorText) => {
-    var results = api.parseResponseData(resData, errorText);
+    let results = api.parseResponseData(resData, errorText);
     callback(null, results[0], errorText);
   });
 }
@@ -338,7 +339,7 @@ api.deleteUser = function(username, callback) {
 */
 api.activateUser = function(username, callback) {
   api.post("/api/activateUser", {username: username}, (resData, errorText) => {
-    var results = api.parseResponseData(resData, errorText);
+    let results = api.parseResponseData(resData, errorText);
     callback(null, results[0], errorText);
   });
 }
@@ -379,7 +380,7 @@ api.runTest = function(callback) {
 */
 api.restart = function(callback) {
   api.post("/api/restart", null, (resData, errorText) => {
-    var results = api.parseResponseData(resData, errorText);
+    let results = api.parseResponseData(resData, errorText);
     callback(null, results[0], errorText);
   }); 
 }
@@ -389,7 +390,7 @@ api.restart = function(callback) {
 */
 api.setWifiConnection = function(ssid, securityKey, callback) {
   api.post("/api/setWifiConnection", {ssid: ssid, securitykey: securityKey}, (resData, errorText) => {
-    var results = api.parseResponseData(resData, errorText);
+    let results = api.parseResponseData(resData, errorText);
     callback(null, results[0], errorText);
   }); 
 }
