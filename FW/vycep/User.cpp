@@ -567,6 +567,9 @@ User::CookieVerificationResult User::getCookieInfo(const char* cookie, bool reva
     return CookieVerificationResult::INVALID_FORMAT;
   }
 
+  //neaktivnním uživatelům revalidujeme cookie vždy - urychlí to přehlášení při aktivaci uživatele
+  revalidateCookie = revalidateCookie || !checkPermissions(*permissions, PERMISSIONS_ACTIVE);
+
   time_t now;
   time(&now);
   double cookieLifeSeconds = difftime(now, mktime(&timeInfo));

@@ -1,8 +1,5 @@
 Nějak rozumě nastavit cache pro js a css
 
-*Zohlednit nastavení povolení platby pro nové uživatele - až při aktivaci?
-*Dořešit proces aktivace - aby na straně aktivovaného proběhal rychle a intuitivní
-
 Automatický refresh hodnoty na výčepu.
 Po nastavení připojení navigace na no-ip doménu. Pokud je.
 Factory reset HW
