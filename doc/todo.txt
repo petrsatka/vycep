@@ -1,12 +1,7 @@
 Nějak rozumě nastavit cache pro js a css
 
-*Neaktivnímu uživateli zašedit objednávku
-*Zohlednit nastavení povolení platby pro nové užovatele - až při aktivaci?
-*V příadě, že není žádný uživatel - nedovolit běžnou registraci
-*Dořešit proces aktivace - aby na straně aktivovaného proběhal rychle a intuitivně
-*Nezobrazovat tlačítko přejít k platbě, pokud nemá práva.
-*registrace a přihlášení - trimovat jméno
-*ssid trimovat
+*Zohlednit nastavení povolení platby pro nové uživatele - až při aktivaci?
+*Dořešit proces aktivace - aby na straně aktivovaného proběhal rychle a intuitivní
 
 Automatický refresh hodnoty na výčepu.
 Po nastavení připojení navigace na no-ip doménu. Pokud je.

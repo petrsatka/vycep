@@ -161,7 +161,15 @@ void serverInit() {
         return response;
       },
       NULL, [request]() {
-        return request->beginResponse(LittleFS, "/www/registration.html");
+        AsyncWebServerResponse *response = NULL;
+        if (user.isAnyUserSet()) {
+          response = request->beginResponse(LittleFS, "/www/registration.html");
+        } else {
+          response = request->beginResponse(302);
+          response->addHeader("Location", "/first-registration.html");
+        }
+
+        return response;
       });
   });
 
@@ -350,7 +358,7 @@ void setup() {
     sprintln("NTP Timeout");
   }
 
-  //user.clearAll(); //Debug - odstranit !!!!
+  //user.clearAll();  //Debug - odstranit !!!!
   serverInit();
   sprintln("Start");
   //test();  //Debug - odstranit !!!!!

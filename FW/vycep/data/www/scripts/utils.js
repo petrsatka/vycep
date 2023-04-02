@@ -274,12 +274,6 @@ api.setPermissionValue = function(username, permissionKey, value, callback) {
     let results = api.parseResponseData(resData, errorText);
     callback(null, results[0], errorText);
   });
-  
-  //if (permissionKey == 'admin' || permissionKey == 'payment') {
-  //  setTimeout(() => callback({username : username, permissionKey: permissionKey, value: value}, "OK", null), 1000); 
-  //} else {
-  //  setTimeout(() => callback(null, "unable_to_set_permissions_value", null), 1000);
-  //}
 }
 
 /*
@@ -460,30 +454,6 @@ gui.validate = function(isOK, errorMessage, okMessage = "", timeout = 0){
 }
 
 /*
-  Validace uživatelského jména
-*/
-gui.validateUsername = function(username) {
-  let regEx = /^[0-9a-zA-Z]+$/;
-  let minLen = 5;
-  let maxLen = 15;
-  return gui.validate(username, "Není vyplněno jméno.") && 
-  gui.validate(username.length >= minLen, `Minimální délka jména je ${minLen} znaků.`) &&
-  gui.validate(username.length <= maxLen, `Maximální délka jména je ${maxLen} znaků.`) && 
-  gui.validate(username.match(regEx), "Jméno smí obsahovat pouze písmena a číslice.");
-}
-
-/*
-  Validace hesla
-*/
-gui.validatePassword = function(password) {
-  let minLen = 6;
-  let maxLen = 30;
-  return gui.validate(password, "Není vyplněno heslo.") && 
-  gui.validate(password.length >= minLen, `Minimální délka hesla je ${minLen} znaků.`) &&
-  gui.validate(password.length <= maxLen, `Maximální délka hesla je ${maxLen} znaků.`);
-}
-
-/*
   Verifikace hesla
 */
 gui.verifyPassword = function(password, passwordVerification) {
@@ -587,8 +557,6 @@ gui.setInProgress = function(inProgress) {
   Vytvoření administrátorského účtu
 */
 gui.createFirstAdmin = function(username, password, passwordVerification, navigationTarget) {
-  //gui.validateUsername(username) &&
-  //gui.validatePassword(password) &&
   gui.verifyPassword(password, passwordVerification) &&
   gui.setInProgress(true) &&
   api.createFirstAdmin(username, password, (result, resultCode, errorMessage) => {
@@ -603,8 +571,6 @@ gui.createFirstAdmin = function(username, password, passwordVerification, naviga
   Vytvoření běžného účtu
 */
 gui.createUser = function(username, password, passwordVerification, navigationTarget) {
-  //gui.validateUsername(username) &&
-  //gui.validatePassword(password) &&
   gui.verifyPassword(password, passwordVerification) &&
   gui.setInProgress(true) &&
   api.createUser(username, password, (result, resultCode, errorMessage) => {
@@ -650,10 +616,11 @@ gui.login = function(username, password, navigationTarget) {
 gui.logout = function(navigationTarget) {
   gui.setInProgress(true);
   api.logout((result, resultCode, errorMessage) => {
-    gui.setInProgress(false);
     if (gui.handleError(resultCode, errorMessage, true)) {
       gui.navigate(navigationTarget);
-    }  
+    } else {
+      gui.setInProgress(false);
+    } 
   });
 }
 
@@ -1016,7 +983,7 @@ payment.setPaidMessage = function(paid) {
 
 payment.pay = function() {
   $("#count").prop('disabled', true);
-  gui.pay(payment.getUsername(), $("#count").val(), (result, isError) => {
+  gui.pay(payment.getParamUsername(), $("#count").val(), (result, isError) => {
     if (!isError) {
       payment.setCountValue(result.billCount);
       payment.setPaidMessage(result.paid);
@@ -1033,7 +1000,7 @@ payment.goBack = function() {
 
 payment.loadBCount = function() {
   gui.setInProgress(true);
-  let username = payment.getUsername();
+  let username = payment.getParamUsername();
   let apiMethod = username ? (callback) => {api.getUserBillCount(username, callback)} : (callback) => {api.getCurrentUserBillCount(callback)};
   gui.loadValue(apiMethod, "#count", (count, isError) => {
     if (!isError) {
@@ -1042,12 +1009,12 @@ payment.loadBCount = function() {
   });
 }
 
-payment.getUsername = function() {
+payment.getParamUsername = function() {
   return $(location).attr('hash').replace("#", '') || '';
 }                                          
 
 payment.loadValues = function() {
-  $("#username").text(payment.getUsername());
+  $("#username").text(payment.getParamUsername() || cookies.getUsername());
   payment.loadBCount();
 }
 

@@ -620,7 +620,12 @@ void Api::activateUser(AsyncWebServerRequest* request) {
         String res = "";
         if (username != NULL && username[0] != 0) {
           if (strcmp(username, lCaseUsername) != 0) {
-            if (user.setPermissions(username, user.getPermissions(username) | User::PERMISSIONS_ACTIVE)) {
+            uint32_t perms = User::PERMISSIONS_ACTIVE;
+            if (settings.getNewUserPaymentEnabled()) {
+              perms = perms | User::PERMISSIONS_PAYMENT;
+            }
+
+            if (user.setPermissions(username, user.getPermissions(username) | perms)) {
               resultCode = GENERAL_SUCCESS_RESULT_CODE;
             }
           }
