@@ -30,16 +30,23 @@
         <input type="text" id="skey" name="skey" maxlength="63">
         <span class="description">Po nastavení parametrů pro připojení bude zařízení restartováno.</span>    
         <input class="button-large" type="button" value="Nastavit" onclick="settings.setWifiConnection()">
-        <input class="button-large" type="button" value="Restart" onclick="settings.restart()">
         <span class="label header">TCP/IP info</span>
         <span class="label">Výchozí brána</span>
         <span class="value small" id="gateway">-</span>
         <span class="label">Adresa IP</span>
         <span class="value small" id="ip">-</span>
-         <span class="label">Adresa MAC</span>
+        <span class="label">Adresa MAC</span>
         <span class="value small" id="mac">-</span>
         <span class="label header">No-IP</span>
-        <span class="description">???</span>
+        <label for="ddns-domain">Doména</label>                                 
+        <input type="text" id="ddns-domain" name="ddns-domain" maxlength="253">
+        <label for="ddns-uname">Uživatelské jméno</label>
+        <span class="description">Nejedná se o e-mail. Je nutné nastavit v administraci účtu no-ipo.org.</span>                                   
+        <input type="text" id="ddns-uname" name="ddns-uname" maxlength="63">
+        <label for="ddns-password">Heslo</label>                                 
+        <input type="password" id="ddns-password" name="ddns-password" maxlength="63">
+        <span class="description">Aby se nastavení No-IP projevilo, je nutné zařízení restartovat.</span>
+        <input class="button-large" type="button" value="Restart" onclick="settings.restart()">      
         <span class="label header">Kalibrace</span>
         <label for="pcount">Počet pulsů na litr</label>
         <input type="text" id="pcount" name="pcount">

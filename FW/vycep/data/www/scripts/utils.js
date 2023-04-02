@@ -1165,6 +1165,9 @@ settings.registerChange = function() {
   gui.onInputChange('[name="mode"]', function(element, val) {gui.setSettingsValue('mode',val);});
   gui.onInputChange('#inactivity-timeout', function(element, val) {gui.setSettingsValue('mastertimeout',val);});
   gui.onInputChange('#under-limit-timeout', function(element, val) {gui.setSettingsValue('ulimtimeout',val);});
+  gui.onInputChange('#ddns-domain', function(element, val) {gui.setSettingsValue('ddnsdomain',val);});
+  gui.onInputChange('#ddns-uname', function(element, val) {gui.setSettingsValue('ddnsuname',val);});
+  gui.onInputChange('#ddns-password', function(element, val) {gui.setSettingsValue('ddnspassword',val);});
 }
 
 settings.loadValues = function() {
@@ -1174,6 +1177,8 @@ settings.loadValues = function() {
   gui.loadSettingsValue('mode', '[name="mode"]');
   gui.loadSettingsValue('mastertimeout', '#inactivity-timeout');
   gui.loadSettingsValue('ulimtimeout', '#under-limit-timeout');
+  gui.loadSettingsValue('ddnsdomain', '#ddns-domain');
+  gui.loadSettingsValue('ddnsuname', '#ddns-uname');
   settings.loadNetworkInfo();
 }
 
