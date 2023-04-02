@@ -520,7 +520,11 @@ gui.handleError = function(resultCode, errorMessage, popupWindow = false) {
       break;
       case 'SKEY_TOO_LONG':
       message = 'Maximální délka hesla je 63 bytů';
-      break 
+      break
+    case 'VALUE_OUT_OF_RANGE':
+      message = 'Hodnota mimo rozsah';
+      break
+       
       
     /*case 'bad_username_or_password':
       message = 'Neplatné jméno nebo heslo.';

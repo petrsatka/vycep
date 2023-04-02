@@ -440,7 +440,7 @@ void Api::getSettingsValue(AsyncWebServerRequest* request) {
         if (key != NULL && key[0] != 0) {
           resultCode = GENERAL_SUCCESS_RESULT_CODE;
           if (strcmp(key, Settings::KEY_NEW_USER_PAYMNET) == 0) {
-            res = String(settings.getNewUserPaymentEnabled() ? "true" : "false");
+            res = String(Utils::bToStr(settings.getNewUserPaymentEnabled()));
           } else if (strcmp(key, Settings::KEY_SSID) == 0) {
             char ssid[Utils::SSID_BUFFER_SIZE] = { 0 };
             settings.getSSID(ssid);
@@ -457,6 +457,12 @@ void Api::getSettingsValue(AsyncWebServerRequest* request) {
             res = String(settings.getMasterTimeoutSeconds() / 60);
           } else if (strcmp(key, Settings::KEY_UNDER_LIMIT_TIMEOUT) == 0) {
             res = String(settings.getUnderLimitTimeoutSeconds() / 60);
+          } else if (strcmp(key, Settings::KEY_DDNS_DOMAIN) == 0) {
+            char ddnsDomain[Settings::DDNSS_DOAMIN_BUFFER_SIZE] = { 0 };
+            settings.getDdnsDomain(ddnsDomain);
+          } else if (strcmp(key, Settings::KEY_DDNS_USERNAME) == 0) {
+            char ddnsUsername[Settings::DDNSS_USERNAME_BUFFER_SIZE] = { 0 };
+            settings.getDdnsUsername(ddnsUsername);
           } else {
             resultCode = INVALID_KEY_RESULT_CODE;
           }
@@ -530,7 +536,7 @@ void Api::setSettingsValue(AsyncWebServerRequest* request) {
         if (key != NULL && key[0] != 0 && value != NULL) {
           resultCode = GENERAL_SUCCESS_RESULT_CODE;
           if (strcmp(key, Settings::KEY_NEW_USER_PAYMNET) == 0) {
-            settings.setNewUserPaymentEnabled(strcmp("true", value) == 0);
+            settings.setNewUserPaymentEnabled(Utils::StrTob(value));
           } else if (strcmp(key, Settings::KEY_PULSE_PER_LITER) == 0) {
             settings.setPulsePerLiterCount((unsigned int)strtoul(value, nullptr, 10));
           } else if (strcmp(key, Settings::KEY_MODE) == 0) {
@@ -539,6 +545,18 @@ void Api::setSettingsValue(AsyncWebServerRequest* request) {
             settings.setMasterTimeoutSeconds(strtoul(value, nullptr, 10) * 60);
           } else if (strcmp(key, Settings::KEY_UNDER_LIMIT_TIMEOUT) == 0) {
             settings.setUnderLimitTimeoutSeconds(strtoul(value, nullptr, 10) * 60);
+          } else if (strcmp(key, Settings::KEY_DDNS_DOMAIN) == 0) {
+            if (!settings.setDdnsDomain(value)) {
+              resultCode = GENERAL_ERROR_RESULT_CODE;
+            }
+          } else if (strcmp(key, Settings::KEY_DDNS_USERNAME) == 0) {
+            if (!settings.setDdnsUsername(value)) {
+              resultCode = GENERAL_ERROR_RESULT_CODE;
+            }
+          } else if (strcmp(key, Settings::KEY_DDNS_PASSWORD) == 0) {
+            if (!settings.setDdnsPassword(value)) {
+              resultCode = GENERAL_ERROR_RESULT_CODE;
+            }
           } else {
             resultCode = INVALID_KEY_RESULT_CODE;
           }

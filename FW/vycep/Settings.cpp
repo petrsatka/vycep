@@ -41,6 +41,33 @@ bool Settings::setSecurityKey(const char* securityKey) {
   return false;
 }
 
+bool Settings::setDdnsDomain(const char* ddnsDomain) {
+  sprintln("!setDdnsDomain");
+  if (ddnsDomain != NULL && strlen(ddnsDomain) < DDNSS_DOAMIN_BUFFER_SIZE) {
+    return systemSettingsStorage->putString(Settings::KEY_DDNS_DOMAIN, ddnsDomain) == strlen(ddnsDomain);
+  }
+
+  return false;
+}
+
+bool Settings::setDdnsUsername(const char* ddnsUsername) {
+  sprintln("!setDdnsUsername");
+  if (ddnsUsername != NULL && strlen(ddnsUsername) < DDNSS_USERNAME_BUFFER_SIZE) {
+    return systemSettingsStorage->putString(Settings::KEY_DDNS_USERNAME, ddnsUsername) == strlen(ddnsUsername);
+  }
+
+  return false;
+}
+
+bool Settings::setDdnsPassword(const char* ddnsPassword) {
+  sprintln("!setDdnsPassword");
+  if (ddnsPassword != NULL && strlen(ddnsPassword) < DDNSS_PASSWORD_BUFFER_SIZE) {
+    return systemSettingsStorage->putString(Settings::KEY_DDNS_PASSWORD, ddnsPassword) == strlen(ddnsPassword);
+  }
+
+  return false;
+}
+
 bool Settings::setPulsePerLiterCount(unsigned int pulseCount) {
   dprintln("setPulsePerLiterCount");
   return systemSettingsStorage->putUInt(Settings::KEY_PULSE_PER_LITER, pulseCount) > 0;
@@ -71,6 +98,22 @@ void Settings::getSSID(char* ssid) {
   if (ssid != NULL) {
     ssid[0] = 0;
     systemSettingsStorage->getString(Settings::KEY_SSID, ssid, Utils::SSID_BUFFER_SIZE);
+  }
+}
+
+void Settings::getDdnsDomain(char* ddnsDomain) {
+  sprintln("!getDdnsDomain");
+  if (ddnsDomain != NULL) {
+    ddnsDomain[0] = 0;
+    systemSettingsStorage->getString(Settings::KEY_DDNS_DOMAIN, ddnsDomain, DDNSS_DOAMIN_BUFFER_SIZE);
+  }
+}
+
+void Settings::getDdnsUsername(char* ddnsUsername) {
+  sprintln("!getDdnsUsername");
+  if (ddnsUsername != NULL) {
+    ddnsUsername[0] = 0;
+    systemSettingsStorage->getString(Settings::KEY_DDNS_USERNAME, ddnsUsername, DDNSS_USERNAME_BUFFER_SIZE);
   }
 }
 

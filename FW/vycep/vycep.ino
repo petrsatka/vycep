@@ -4,6 +4,7 @@
 #include <time.h>
 //#include <NetBIOS.h>
 #include <ESPmDNS.h>
+#include <EasyDDNS.h>
 #include "User.h"
 #include "Api.h"
 #include "Debug.h"
@@ -32,6 +33,11 @@ void test() {
   user.test();
   Utils::test();
   user.clearAll();
+}
+
+void updateDDNS() {
+  EasyDDNS.service("noip");
+  EasyDDNS.client("vycep.hopto.org", "petrsatka", "3trpaslici");
 }
 
 void configureMDNS() {
@@ -95,6 +101,7 @@ bool connectWiFiClient() {
   WiFi.persistent(true);
   //NBNS.begin(HOST_NAME);
   configureMDNS();
+  updateDDNS();
   sprintln(WiFi.localIP().toString());
   sprintln(WiFi.getHostname());
   return true;
@@ -366,6 +373,7 @@ void setup() {
 }
 
 void loop() {
+  EasyDDNS.update(/*1 * 60 **/ 60 * 1000, true); //jedna hodina
   if (shouldReboot) {
     dprintln("Rebooting...");
     delay(200);
