@@ -41,6 +41,15 @@ bool Settings::setSecurityKey(const char* securityKey) {
   return false;
 }
 
+bool Settings::setMdnsHostname(const char* mdnsHostname) {
+  sprintln("!setMdnsHostname");
+  if (mdnsHostname != NULL && strlen(mdnsHostname) < Settings::MDNS_HOSTNAME_BUFFER_SIZE) {
+    return systemSettingsStorage->putString(Settings::KEY_MDNS_HOSTNAME, mdnsHostname) == strlen(mdnsHostname);
+  }
+
+  return false;
+}
+
 bool Settings::setDdnsDomain(const char* ddnsDomain) {
   sprintln("!setDdnsDomain");
   if (ddnsDomain != NULL && strlen(ddnsDomain) < DDNSS_DOAMIN_BUFFER_SIZE) {
@@ -101,11 +110,22 @@ void Settings::getSSID(char* ssid) {
   }
 }
 
+void Settings::getMdnsHostname(char* mdnsHostname) {
+  sprintln("!getMdnsHostname");
+  if (mdnsHostname != NULL) {
+    mdnsHostname[0] = 0;
+    systemSettingsStorage->getString(Settings::KEY_MDNS_HOSTNAME, mdnsHostname, Settings::MDNS_HOSTNAME_BUFFER_SIZE);
+    if (mdnsHostname[0] == 0) {
+      strcpy(mdnsHostname, Utils::DEFAULT_HOST_NAME);
+    }
+  }
+}
+
 void Settings::getDdnsDomain(char* ddnsDomain) {
   sprintln("!getDdnsDomain");
   if (ddnsDomain != NULL) {
     ddnsDomain[0] = 0;
-    systemSettingsStorage->getString(Settings::KEY_DDNS_DOMAIN, ddnsDomain, DDNSS_DOAMIN_BUFFER_SIZE);
+    systemSettingsStorage->getString(Settings::KEY_DDNS_DOMAIN, ddnsDomain, Settings::DDNSS_DOAMIN_BUFFER_SIZE);
   }
 }
 
@@ -113,7 +133,15 @@ void Settings::getDdnsUsername(char* ddnsUsername) {
   sprintln("!getDdnsUsername");
   if (ddnsUsername != NULL) {
     ddnsUsername[0] = 0;
-    systemSettingsStorage->getString(Settings::KEY_DDNS_USERNAME, ddnsUsername, DDNSS_USERNAME_BUFFER_SIZE);
+    systemSettingsStorage->getString(Settings::KEY_DDNS_USERNAME, ddnsUsername, Settings::DDNSS_USERNAME_BUFFER_SIZE);
+  }
+}
+
+void Settings::getDdnsPassword(char* ddnsPassword) {
+  sprintln("!getDdnsPassword");
+  if (ddnsPassword != NULL) {
+    ddnsPassword[0] = 0;
+    systemSettingsStorage->getString(Settings::KEY_DDNS_PASSWORD, ddnsPassword, Settings::DDNSS_PASSWORD_BUFFER_SIZE);
   }
 }
 

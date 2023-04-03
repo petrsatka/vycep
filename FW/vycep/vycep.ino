@@ -12,12 +12,12 @@
 #include "Settings.h"
 
 static constexpr const char *NVS_PARTTION = "nvs_ext";
-static constexpr const char *HOST_NAME = "vycep";
 
 unsigned long lastHeapPrintMillis = 0;
 const unsigned long heapPrintPeriod = 20000;
 uint32_t heapAfterInit = 0;
 bool shouldReboot = false;
+bool ddnsEnabled = false;
 AsyncWebServer server(80);
 //Mutex pro řízení přístupu k FLASH
 SemaphoreHandle_t xSemaphore = xSemaphoreCreateMutex();
@@ -36,12 +36,26 @@ void test() {
 }
 
 void updateDDNS() {
-  EasyDDNS.service("noip");
-  EasyDDNS.client("vycep.hopto.org", "petrsatka", "3trpaslici");
+  char ddnsDomain[Settings::DDNSS_DOAMIN_BUFFER_SIZE] = { 0 };
+  settings.getDdnsDomain(ddnsDomain);
+
+  char ddnsUsername[Settings::DDNSS_USERNAME_BUFFER_SIZE] = { 0 };
+  settings.getDdnsUsername(ddnsUsername);
+
+  char ddnsPassword[Settings::DDNSS_PASSWORD_BUFFER_SIZE] = { 0 };
+  settings.getDdnsPassword(ddnsPassword);
+
+  if (ddnsDomain[0] != 0 && ddnsUsername[0] != 0 && ddnsPassword[0] != 0) {
+    EasyDDNS.service("noip");
+    EasyDDNS.client(ddnsDomain, ddnsUsername, ddnsPassword);
+    ddnsEnabled = true;
+  }
 }
 
 void configureMDNS() {
-  MDNS.begin(HOST_NAME);
+  char mdnsHostname[Settings::MDNS_HOSTNAME_BUFFER_SIZE] = { 0 };
+  settings.getMdnsHostname(mdnsHostname);
+  MDNS.begin(mdnsHostname);
   MDNS.addService("http", "tcp", 80);
 }
 
@@ -62,7 +76,7 @@ void createAP() {
 
   String mac = WiFi.macAddress();
   mac.replace(":", "");
-  String apName = String(HOST_NAME) + mac;
+  String apName = String(Utils::DEFAULT_HOST_NAME) + mac;
   if (WiFi.softAP(apName)) {
     dprintln("Ready");
   } else {
@@ -89,7 +103,9 @@ bool connectWiFiClient() {
   settings.getSecurityKey(secKey);
   dprintln(secKey);
   WiFi.mode(WIFI_STA);
-  WiFi.setHostname(HOST_NAME);
+  char mdnsHostname[Settings::MDNS_HOSTNAME_BUFFER_SIZE] = { 0 };
+  settings.getMdnsHostname(mdnsHostname);
+  WiFi.setHostname(mdnsHostname);
   WiFi.begin(ssid, secKey);
 
   if (WiFi.waitForConnectResult() != WL_CONNECTED) {
@@ -373,7 +389,10 @@ void setup() {
 }
 
 void loop() {
-  EasyDDNS.update(/*1 * 60 **/ 60 * 1000, true); //jedna hodina
+  if (ddnsEnabled) {
+    EasyDDNS.update(/*1 * 60 **/ 60 * 1000, true);
+  }
+
   if (shouldReboot) {
     dprintln("Rebooting...");
     delay(200);

@@ -520,7 +520,11 @@ gui.handleError = function(resultCode, errorMessage, popupWindow = false) {
       break;
       case 'SKEY_TOO_LONG':
       message = 'Maximální délka hesla je 63 bytů';
-      break 
+      break
+    case 'VALUE_OUT_OF_RANGE':
+      message = 'Hodnota mimo rozsah';
+      break
+       
       
     /*case 'bad_username_or_password':
       message = 'Neplatné jméno nebo heslo.';
@@ -1168,6 +1172,7 @@ settings.registerChange = function() {
   gui.onInputChange('#ddns-domain', function(element, val) {gui.setSettingsValue('ddnsdomain',val);});
   gui.onInputChange('#ddns-uname', function(element, val) {gui.setSettingsValue('ddnsuname',val);});
   gui.onInputChange('#ddns-password', function(element, val) {gui.setSettingsValue('ddnspassword',val);});
+  gui.onInputChange('#mdns-name', function(element, val) {gui.setSettingsValue('mdnsname',val);});
 }
 
 settings.loadValues = function() {
@@ -1179,6 +1184,7 @@ settings.loadValues = function() {
   gui.loadSettingsValue('ulimtimeout', '#under-limit-timeout');
   gui.loadSettingsValue('ddnsdomain', '#ddns-domain');
   gui.loadSettingsValue('ddnsuname', '#ddns-uname');
+  gui.loadSettingsValue('mdnsname', '#mdns-name');
   settings.loadNetworkInfo();
 }
 

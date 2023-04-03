@@ -18,6 +18,7 @@ public:
   static constexpr size_t DDNSS_DOAMIN_BUFFER_SIZE = 254;   //253 Znaků
   static constexpr size_t DDNSS_USERNAME_BUFFER_SIZE = 64;  //63 Znaků
   static constexpr size_t DDNSS_PASSWORD_BUFFER_SIZE = 64;  //63 Znaků
+  static constexpr size_t MDNS_HOSTNAME_BUFFER_SIZE = 16;  //15 Znaků
 
   static constexpr const char* KEY_SSID = "ssid";
   static constexpr const char* KEY_SECURITY_KEY = "skey";
@@ -31,6 +32,7 @@ public:
   static constexpr const char* KEY_DDNS_DOMAIN = "ddnsdomain";
   static constexpr const char* KEY_DDNS_USERNAME = "ddnsuname";
   static constexpr const char* KEY_DDNS_PASSWORD = "ddnspassword";
+  static constexpr const char* KEY_MDNS_HOSTNAME ="mdnsname";
 
   void clearAll();
   bool setWiFiOK();
@@ -42,13 +44,16 @@ public:
   bool setMode(Settings::DeviceMode mode);
   bool setMasterTimeoutSeconds(unsigned long timeoutSeconds);
   bool setUnderLimitTimeoutSeconds(unsigned long timeoutSeconds);
+  bool setMdnsHostname(const char* mdnsHostname);
   bool setDdnsDomain(const char* ddnsDomain);
   bool setDdnsUsername(const char* ddnsUsername);
   bool setDdnsPassword(const char* ddnsPassword);
   void getSSID(char* ssid);
   void getSecurityKey(char* securityKey);
+  void getMdnsHostname(char* mdnsHostname);
   void getDdnsDomain(char* ddnsDomain);
   void getDdnsUsername(char* ddnsUsername);
+  void getDdnsPassword(char* ddnsPassword);
   unsigned int getPulsePerLiterCount();
   Settings::DeviceMode getMode();
   unsigned long getMasterTimeoutSeconds();

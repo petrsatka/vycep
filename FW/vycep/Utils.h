@@ -30,6 +30,7 @@ public:
   static void test();
   static constexpr const char* TRUE_STR = "true";
   static constexpr const char* FALSE_STR = "false";
+  static constexpr const char *DEFAULT_HOST_NAME = "vycep";
 
 private:
   static constexpr const char* HMAC_KEY = "iR8sPr11YLDR1Ij7bw2ec70YvpJrt3gK";

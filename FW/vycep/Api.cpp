@@ -460,9 +460,15 @@ void Api::getSettingsValue(AsyncWebServerRequest* request) {
           } else if (strcmp(key, Settings::KEY_DDNS_DOMAIN) == 0) {
             char ddnsDomain[Settings::DDNSS_DOAMIN_BUFFER_SIZE] = { 0 };
             settings.getDdnsDomain(ddnsDomain);
+            res = String(ddnsDomain);
           } else if (strcmp(key, Settings::KEY_DDNS_USERNAME) == 0) {
             char ddnsUsername[Settings::DDNSS_USERNAME_BUFFER_SIZE] = { 0 };
             settings.getDdnsUsername(ddnsUsername);
+            res = String(ddnsUsername);
+          } else if (strcmp(key, Settings::KEY_MDNS_HOSTNAME) == 0) {
+            char mdnsHostname[Settings::MDNS_HOSTNAME_BUFFER_SIZE] = { 0 };
+            settings.getMdnsHostname(mdnsHostname);
+            res = String(mdnsHostname);
           } else {
             resultCode = INVALID_KEY_RESULT_CODE;
           }
@@ -555,6 +561,10 @@ void Api::setSettingsValue(AsyncWebServerRequest* request) {
             }
           } else if (strcmp(key, Settings::KEY_DDNS_PASSWORD) == 0) {
             if (!settings.setDdnsPassword(value)) {
+              resultCode = GENERAL_ERROR_RESULT_CODE;
+            }
+          } else if (strcmp(key, Settings::KEY_MDNS_HOSTNAME) == 0) {
+            if (!settings.setMdnsHostname(value)) {
               resultCode = GENERAL_ERROR_RESULT_CODE;
             }
           } else {
