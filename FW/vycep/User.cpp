@@ -372,7 +372,7 @@ User::CredentialsVerificationResult User::validatePassword(const char* password)
 }
 
 User::CredentialsVerificationResult User::registerUser(const char* username, const char* password, char* lCaseUsername) {
-  sprintln("!registerUser");
+  dprintln("registerUser");
   return createUser(username, password, User::PERMISSIONS_NO_PERMISSIONS, lCaseUsername);
 }
 
@@ -438,15 +438,18 @@ bool User::resetPassword(const char* lCaseUsername, char* newGenertedPassword, u
 }
 
 User::CredentialsVerificationResult User::verifyPassword(const char* username, const char* password, char* lCaseUsername) {
-  sprintln("!verifyPassword");
+  dprintln("verifyPassword");
 
-  if (!Utils::toLowerStr(username, lCaseUsername, USERNAME_BUFFER_SIZE)) {
+  if (username == NULL || password == NULL || lCaseUsername == NULL || !Utils::toLowerStr(username, lCaseUsername, USERNAME_BUFFER_SIZE)) {
     return User::CredentialsVerificationResult::UNKNOWN_ERROR;
   };
 
   unsigned char hash1[Utils::HASH_BUFFER_SIZE];
   unsigned char hash2[Utils::HASH_BUFFER_SIZE];
-  Utils::computeHmacHash(password, hash1);
+  if (Utils::computeHmacHash(password, hash1) != 0) {
+    return User::CredentialsVerificationResult::UNKNOWN_ERROR;
+  }
+
   if (hashesStorage->getBytes(lCaseUsername, hash2, Utils::HASH_BUFFER_SIZE) == 0) {
     return User::CredentialsVerificationResult::USERNAME_NOT_EXISTS;
   }
@@ -459,7 +462,7 @@ User::CredentialsVerificationResult User::verifyPassword(const char* username, c
 }
 
 User::CredentialsVerificationResult User::setPassword(const char* lCaseUsername, const char* password) {
-  sprintln("!setPassword");
+  dprintln("setPassword");
   if (!isUserSet(lCaseUsername)) {
     return User::CredentialsVerificationResult::USERNAME_NOT_EXISTS;
   }
@@ -467,7 +470,10 @@ User::CredentialsVerificationResult User::setPassword(const char* lCaseUsername,
   User::CredentialsVerificationResult res = validatePassword(password);
   if (res == User::CredentialsVerificationResult::OK) {
     unsigned char hash[Utils::HASH_BUFFER_SIZE];
-    Utils::computeHmacHash(password, hash);
+    if (Utils::computeHmacHash(password, hash) != 0) {
+      return User::CredentialsVerificationResult::UNKNOWN_ERROR;
+    }
+
     if (hashesStorage->putBytes(lCaseUsername, hash, Utils::HASH_BUFFER_SIZE) != 0) {
       res = User::CredentialsVerificationResult::OK;
     } else {
@@ -479,7 +485,7 @@ User::CredentialsVerificationResult User::setPassword(const char* lCaseUsername,
 }
 
 User::CredentialsVerificationResult User::changePassword(const char* username, const char* oldPassword, const char* newPassword) {
-  sprintln("!changePassword");
+  dprintln("changePassword");
   char lCaseUsername[User::USERNAME_BUFFER_SIZE] = { 0 };
   User::CredentialsVerificationResult res = verifyPassword(username, oldPassword, lCaseUsername);
   if (res == User::CredentialsVerificationResult::OK) {
@@ -613,7 +619,7 @@ uint32_t User::getPermissions(const char* lCaseUsername) {
 }
 
 bool User::setPermissions(const char* lCaseUsername, uint32_t permissions) {
-  sprintln("!setPermissions");
+  dprintln("setPermissions");
   return permissionsStorage->putUInt(lCaseUsername, permissions) > 0;
 }
 

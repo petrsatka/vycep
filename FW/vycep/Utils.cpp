@@ -106,6 +106,10 @@ size_t Utils::appendChar(char* str, char a) {
 
 int Utils::computeHmacHash(const char* message, unsigned char* hash) {
   dprintln("computeHmacHash");
+  if (message == NULL || hash == NULL) {
+    return MBEDTLS_ERR_MD_BAD_INPUT_DATA;
+  }
+
   return mbedtls_md_hmac(mbedtls_md_info_from_type(MBEDTLS_MD_SHA256), (unsigned char*)HMAC_KEY, strlen(HMAC_KEY), (unsigned char*)message, strlen(message), hash);
 }
 
@@ -159,7 +163,7 @@ const char* Utils::bToStr(bool val) {
 }
 
 bool Utils::StrTob(const char* val) {
-  sprintln("!StrTob");
+  dprintln("StrTob");
   return strcmp(val, Utils::TRUE_STR) == 0;
 }
 

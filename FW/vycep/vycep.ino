@@ -136,7 +136,7 @@ void wiFiInit() {
     if (connectWiFiClient()) {
       settings.setWiFiOK();
     } else {
-      //Nezdařilo se přopojení. Vytvoříme AP
+      //Nezdařilo se připojení. Vytvoříme AP
       createAP();
     }
   }
@@ -198,7 +198,7 @@ void serverInit() {
 
   //Rozdělení obsahu podle práv
   server.on("/rolespecific/menu-content.js", HTTP_GET, [](AsyncWebServerRequest *request) {
-    sprintln("!menu-content");
+    dprintln("menu-content");
     api.serveAuth(
       request, User::PERMISSIONS_NO_PERMISSIONS, false, [request](const char *lCaseUsername, uint32_t &permissions, const char *cookie, char *newCookie, bool &setCookie) {
         if (User::checkPermissions(permissions, User::PERMISSIONS_ACTIVE | User::PERMISSIONS_ADMIN | User::PERMISSIONS_PAYMENT)) {

@@ -111,7 +111,7 @@ void Settings::getSSID(char* ssid) {
 }
 
 void Settings::getMdnsHostname(char* mdnsHostname) {
-  sprintln("!getMdnsHostname");
+  dprintln("getMdnsHostname");
   if (mdnsHostname != NULL) {
     mdnsHostname[0] = 0;
     systemSettingsStorage->getString(Settings::KEY_MDNS_HOSTNAME, mdnsHostname, Settings::MDNS_HOSTNAME_BUFFER_SIZE);
@@ -122,7 +122,7 @@ void Settings::getMdnsHostname(char* mdnsHostname) {
 }
 
 void Settings::getDdnsDomain(char* ddnsDomain) {
-  sprintln("!getDdnsDomain");
+  dprintln("getDdnsDomain");
   if (ddnsDomain != NULL) {
     ddnsDomain[0] = 0;
     systemSettingsStorage->getString(Settings::KEY_DDNS_DOMAIN, ddnsDomain, Settings::DDNSS_DOAMIN_BUFFER_SIZE);
@@ -130,7 +130,7 @@ void Settings::getDdnsDomain(char* ddnsDomain) {
 }
 
 void Settings::getDdnsUsername(char* ddnsUsername) {
-  sprintln("!getDdnsUsername");
+  dprintln("getDdnsUsername");
   if (ddnsUsername != NULL) {
     ddnsUsername[0] = 0;
     systemSettingsStorage->getString(Settings::KEY_DDNS_USERNAME, ddnsUsername, Settings::DDNSS_USERNAME_BUFFER_SIZE);

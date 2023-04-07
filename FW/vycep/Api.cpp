@@ -10,7 +10,7 @@ Api::~Api() {
 constexpr const char Api::credentialsVerificationResultNames[CRED_VERIF_ERR_COUNT][CRED_VERIF_ERR_BUFFER_SIZE];
 
 const char* Api::getCredentialsVerificationResultName(User::CredentialsVerificationResult res) {
-  sprintln("!getCredentialsVerificationResultName");
+  dprintln("getCredentialsVerificationResultName");
   if (static_cast<int>(res) < 0 || static_cast<int>(res) >= CRED_VERIF_ERR_COUNT) {
     return Api::credentialsVerificationResultNames[static_cast<int>(User::CredentialsVerificationResult::UNKNOWN_ERROR)];
   }
@@ -155,7 +155,7 @@ bool Api::unsetCookies(AsyncWebServerResponse* response) {
 }
 
 bool Api::unsetCookie(AsyncWebServerResponse* response, const char* name) {
-  sprintln("!unsetCookie");
+  dprintln("unsetCookie");
   String cookieStr = String(name);
   bool res = cookieStr.concat(UNSET_COOKIE_ATTRIBUTES);
 
@@ -487,7 +487,7 @@ void Api::getSettingsValue(AsyncWebServerRequest* request) {
 }
 
 void Api::getUsers(AsyncWebServerRequest* request) {
-  sprintln("!getUsers");
+  dprintln("getUsers");
   serveDynamicAuth(
     request, [&](const char* lCaseUsername, uint32_t& permissions, const char* cookie, char* newCookie, bool& setCookie) {
       const char* resultCode = GENERAL_SUCCESS_RESULT_CODE;
@@ -585,7 +585,7 @@ void Api::setSettingsValue(AsyncWebServerRequest* request) {
 }
 
 void Api::setPermissionsValue(AsyncWebServerRequest* request) {
-  sprintln("!setPermissionsValue");
+  dprintln("setPermissionsValue");
   serveDynamicAuth(
     request, [&](const char* lCaseUsername, uint32_t& permissions, const char* cookie, char* newCookie, bool& setCookie) {
       if (request->hasParam("username", true) && request->hasParam("key", true) && request->hasParam("value", true)) {
@@ -638,7 +638,7 @@ void Api::setPermissionsValue(AsyncWebServerRequest* request) {
 }
 
 void Api::activateUser(AsyncWebServerRequest* request) {
-  sprintln("!setPermissionsValue");
+  dprintln("activateUser");
   serveDynamicAuth(
     request, [&](const char* lCaseUsername, uint32_t& permissions, const char* cookie, char* newCookie, bool& setCookie) {
       if (request->hasParam("username", true)) {
@@ -701,7 +701,7 @@ void Api::deleteUser(AsyncWebServerRequest* request) {
 }
 
 void Api::resetPassword(AsyncWebServerRequest* request) {
-  sprintln("!resetPassword");
+  dprintln("resetPassword");
   serveDynamicAuth(
     request, [&](const char* lCaseUsername, uint32_t& permissions, const char* cookie, char* newCookie, bool& setCookie) {
       if (request->hasParam("username", true)) {

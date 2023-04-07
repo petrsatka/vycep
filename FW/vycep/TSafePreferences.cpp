@@ -71,7 +71,7 @@ size_t TSafePreferences::putShort(const char* key, int16_t value) {
 }
 
 size_t TSafePreferences::putUShort(const char* key, uint16_t value) {
-  sprintln("!putUShort");
+  dprintln("putUShort");
   size_t res = 0;
   if (this->xMutex != NULL && xSemaphoreTake(this->xMutex, portMAX_DELAY)) {
     res = preferences.putUShort(key, value);
@@ -269,7 +269,7 @@ int16_t TSafePreferences::getShort(const char* key, int16_t defaultValue) {
 }
 
 uint16_t TSafePreferences::getUShort(const char* key, uint16_t defaultValue) {
-  sprintln("!getUShort");
+  dprintln("getUShort");
   uint16_t res = defaultValue;
   if (this->xMutex != NULL && xSemaphoreTake(this->xMutex, portMAX_DELAY)) {
     res = preferences.getUShort(key, defaultValue);
