@@ -1,4 +1,9 @@
-//Správa uživatelů
+/*
+By Petr Satka
+Licnese CC-BY
+*/
+
+//Správa uživatelů, cookies
 #ifndef User_h
 #define User_h
 #include <Arduino.h>

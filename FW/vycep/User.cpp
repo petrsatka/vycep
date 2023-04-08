@@ -1,3 +1,8 @@
+/*
+By Petr Satka
+Licnese CC-BY
+*/
+
 #include <stdint.h>
 #include "User.h"
 

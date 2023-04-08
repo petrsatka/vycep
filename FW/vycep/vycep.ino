@@ -1,3 +1,8 @@
+/*
+By Petr Satka
+Licnese CC-BY
+*/
+
 #include <Arduino.h>
 #include <ESPAsyncWebSrv.h>
 #include <LittleFS.h>

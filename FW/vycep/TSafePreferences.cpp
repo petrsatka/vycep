@@ -1,3 +1,8 @@
+/*
+By Petr Satka
+Licnese CC-BY
+*/
+
 #include "nvs.h"
 #include "TSafePreferences.h"
 TSafePreferences::TSafePreferences(SemaphoreHandle_t xMutex, const char* namespce, const char* partitionName) {

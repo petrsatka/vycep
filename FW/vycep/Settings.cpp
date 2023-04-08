@@ -1,3 +1,9 @@
+/*
+By Petr Satka
+Licnese CC-BY
+*/
+
+//Konfigurace zařízení
 #include "Settings.h"
 Settings::Settings(SemaphoreHandle_t xSemaphore, const char* nvsParttionName) {
   this->xSemaphore = xSemaphore;

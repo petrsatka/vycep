@@ -1,3 +1,8 @@
+/*
+By Petr Satka
+Licnese CC-BY
+*/
+
 #include "Utils.h"
 void Utils::test() {
   unsigned char tArr[256];

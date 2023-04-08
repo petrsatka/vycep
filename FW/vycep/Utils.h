@@ -1,10 +1,14 @@
+/*
+By Petr Satka
+Licnese CC-BY
+*/
+
 #ifndef Utils_h
 #define Utils_h
 #include <Arduino.h>
 #include <LittleFS.h>
 #include <ESPAsyncWebSrv.h>
 #include "mbedtls/md.h"
-//#include "User.h"
 #include "Debug.h"
 
 class Utils {

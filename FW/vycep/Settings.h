@@ -1,3 +1,8 @@
+/*
+By Petr Satka
+Licnese CC-BY
+*/
+
 #ifndef Settings_h
 #define Settings_h
 #include <Arduino.h>

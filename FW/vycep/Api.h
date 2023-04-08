@@ -1,3 +1,8 @@
+/*
+By Petr Satka
+Licnese CC-BY
+*/
+
 #ifndef Api_h
 #define Api_h
 #include <Arduino.h>

@@ -1,3 +1,8 @@
+/*
+By Petr Satka
+Licnese CC-BY
+*/
+
 //Thread safe ukládání do NVS
 
 #ifndef TSafePreferences_h

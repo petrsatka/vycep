@@ -1,3 +1,9 @@
+/*
+By Petr Satka
+Licnese CC-BY
+*/
+
+//Api rozhraní pro komunikace s web klientem.
 #include "Api.h"
 
 Api::Api(User& user, Settings& settings)
