@@ -9,6 +9,7 @@ Licnese CC-BY
 #include "TSafePreferences.h"
 #include "Utils.h"
 #include "Debug.h"
+
 class Settings {
 public:
   Settings(SemaphoreHandle_t xSemaphore, const char* nvsParttionName);

@@ -12,6 +12,26 @@ Otestovat zámky.
 Při přístupu k NVS hlídat délku klíče? NVS klíč ořezává, což může vést k tomu, že admin s 15ti znakovým jménem si bude moci sám sobě něco nastavit, pokud použej 15tznakové jméno + jeden libovolný znak.
 Pohlídat watchdog - po přidání mdns došlo k resetu.
 
+Objednávky
+Uložit +1 do počtu objednávek
+nastavit příznak ke otevření ventilu
+
+loop
+Pokud je příznak k otevření ventilu a zároveň uzavření ventilu
+nastavit příznak uzavření na false
+nastavit counter na 0,5l
+odečíst -1
+Otevřít ventil
+nastavit příznak otevření na false
+pokud něco zbýva, nastavit příznak k otevření ventilu na true
+
+pokud je příznak uzavření
+uzavřít
+
+counter event
+nastavit uzavření ventilu
+
+
 
 
 --Active user
