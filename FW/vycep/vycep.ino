@@ -15,8 +15,11 @@ Licnese CC-BY
 #include "Debug.h"
 #include "Utils.h"
 #include "Settings.h"
+#include "Valve.h"
 
 static constexpr const char *NVS_PARTTION = "nvs_ext";
+static constexpr int VALVE_PIN = 32;
+static constexpr int FLOW_METER_PIN = 25;
 
 unsigned long lastHeapPrintMillis = 0;
 const unsigned long heapPrintPeriod = 20000;
@@ -28,7 +31,8 @@ AsyncWebServer server(80);
 SemaphoreHandle_t xSemaphore = xSemaphoreCreateMutex();
 Settings settings(xSemaphore, NVS_PARTTION);
 User user(xSemaphore, NVS_PARTTION);
-Api api(user, settings);
+Valve valve(xSemaphore, NVS_PARTTION);
+Api api(user, valve, settings);
 
 //Callback handler registrace prvního admina. Po vytvořaní admina bude odstraněn.
 AsyncCallbackWebHandler *firstRegistrationRedirectHandler = NULL;
@@ -367,6 +371,10 @@ void serverInit() {
   server.begin();
 }
 
+void valveInit() {
+  valve.configure(settings.getPulsePerLiterCount() / 2, FLOW_METER_PIN, VALVE_PIN);
+}
+
 void setup() {
   Serial.begin(115200);
 
@@ -387,6 +395,8 @@ void setup() {
   }
 
   //user.clearAll();  //Debug - odstranit !!!!
+  //valve init volat také po změně nastavení pulzů na litr !!!! - vyřešit v api, stejně jako novu objednávku
+  //valveInit();
   serverInit();
   sprintln("Start");
   //test();  //Debug - odstranit !!!!!
@@ -403,6 +413,8 @@ void loop() {
     delay(200);
     ESP.restart();
   }
+
+  //valve.refresh();
 
   unsigned currentMillis = millis();
   if (currentMillis - lastHeapPrintMillis >= heapPrintPeriod) {

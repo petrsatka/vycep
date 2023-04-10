@@ -6,8 +6,8 @@ Licnese CC-BY
 //Api rozhraní pro komunikace s web klientem.
 #include "Api.h"
 
-Api::Api(User& user, Settings& settings)
-  : user(user), settings(settings) {
+Api::Api(User& user, Valve& valve, Settings& settings)
+  : user(user), valve(valve), settings(settings) {
 }
 
 Api::~Api() {
@@ -327,6 +327,7 @@ void Api::getCurrentUserBillCount(AsyncWebServerRequest* request) {
 
 void Api::makeOrder(AsyncWebServerRequest* request) {
   sprintln("!makeOrder");
+  //valve.makeOrder();
   //Username získat z cookies
   //Ověřit, zda je uživatel schválen
 }
@@ -551,6 +552,7 @@ void Api::setSettingsValue(AsyncWebServerRequest* request) {
             settings.setNewUserPaymentEnabled(Utils::StrTob(value));
           } else if (strcmp(key, Settings::KEY_PULSE_PER_LITER) == 0) {
             settings.setPulsePerLiterCount((unsigned int)strtoul(value, nullptr, 10));
+            //valve.configure(settings.getPulsePerLiterCount() / 2, FLOW_METER_PIN, VALVE_PIN);
           } else if (strcmp(key, Settings::KEY_MODE) == 0) {
             settings.setMode(getDeviceModeByName(value));
           } else if (strcmp(key, Settings::KEY_MASTER_TIMEOUT) == 0) {

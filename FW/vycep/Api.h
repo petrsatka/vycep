@@ -11,13 +11,14 @@ Licnese CC-BY
 #include "Utils.h"
 #include "Settings.h"
 #include "Debug.h"
+#include "Valve.h"
 
 typedef std::function<AsyncWebServerResponse*(const char* lCaseUsername, uint32_t& permissions, const char* cookie, char* newCookie, bool& setCookie)> ResponseGetterFunction;
 typedef std::function<AsyncWebServerResponse*()> ErrorResponseGetterFunction;
 
 class Api {
 public:
-  Api(User &user, Settings &settings);
+  Api(User &user, Valve &valve, Settings &settings);
   ~Api();
   static constexpr const char* AHUTH_COOKIE_NAME = "ESPAUTH=";
   static constexpr const char* USERNAME_COOKIE_NAME = "ESPUNAME=";
@@ -60,6 +61,7 @@ public:
 
 private:
   User& user;
+  Valve& valve;
   Settings& settings;
 
   static constexpr int CRED_VERIF_ERR_COUNT = 13;
