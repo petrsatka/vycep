@@ -28,9 +28,9 @@ void Valve::initPulseCounter(int16_t pulsesPerServing, int pinNumber) {
   pcnt_counter_pause(PCNT_UNIT);
   pcnt_counter_clear(PCNT_UNIT);
 
-  pcnt_event_enable(PCNT_UNIT, PCNT_EVT_H_LIM);   // nastavení události při dosažení horního limitu
+  pcnt_event_enable(PCNT_UNIT, PCNT_EVT_H_LIM);              // nastavení události při dosažení horního limitu
   pcnt_isr_register(onServingReachedStatic, this, 0, NULL);  // registrace handleru
-  pcnt_intr_enable(PCNT_UNIT);                    // zapnutí přerušení
+  pcnt_intr_enable(PCNT_UNIT);                               // zapnutí přerušení
 
   //Glitch filter - doladit s reálným průtokoměrem
   pcnt_set_filter_value(PCNT_UNIT, 1023);
@@ -92,10 +92,9 @@ void Valve::closeValve() {
 }
 
 //Dosažení porce
-void IRAM_ATTR Valve::onServingReachedStatic(void* valve)
-{
-    Valve* that = static_cast<Valve*>(valve);
-    that->onServingReached();
+void IRAM_ATTR Valve::onServingReachedStatic(void* valve) {
+  Valve* that = static_cast<Valve*>(valve);
+  that->onServingReached();
 }
 
 void IRAM_ATTR Valve::onServingReached() {

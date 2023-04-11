@@ -17,6 +17,8 @@ public:
   static constexpr size_t HASH_HEXSTRING_BUFFER_SIZE = 2 * HASH_BUFFER_SIZE + 1;
   static constexpr size_t SSID_BUFFER_SIZE = 33;          //32 Znaků
   static constexpr size_t SECURITY_KEY_BUFFER_SIZE = 64;  //63 Znaků
+  static constexpr int VALVE_PIN = 33;
+  static constexpr int FLOW_METER_PIN = 26;
 
   static void actTime(struct tm& timeInfo);
   static void hexStr(const unsigned char* data, int len, char* buffer);
@@ -28,13 +30,13 @@ public:
   static short getCookiePropsPosition(const char* cookie);
   static const char* bToStr(bool val);
   static bool StrTob(const char* val);
-  static void getRandomString(char *str, unsigned int bufferSize);
+  static void getRandomString(char* str, unsigned int bufferSize);
   //static void trimRight(char* str);
 
   static void test();
   static constexpr const char* TRUE_STR = "true";
   static constexpr const char* FALSE_STR = "false";
-  static constexpr const char *DEFAULT_HOST_NAME = "vycep";
+  static constexpr const char* DEFAULT_HOST_NAME = "vycep";
 
 private:
   static constexpr const char* HMAC_KEY = "iR8sPr11YLDR1Ij7bw2ec70YvpJrt3gK";

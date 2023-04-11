@@ -18,8 +18,6 @@ Licnese CC-BY
 #include "Valve.h"
 
 static constexpr const char *NVS_PARTTION = "nvs_ext";
-static constexpr int VALVE_PIN = 32;
-static constexpr int FLOW_METER_PIN = 25;
 
 unsigned long lastHeapPrintMillis = 0;
 const unsigned long heapPrintPeriod = 20000;
@@ -372,7 +370,7 @@ void serverInit() {
 }
 
 void valveInit() {
-  valve.configure(settings.getPulsePerLiterCount() / 2, FLOW_METER_PIN, VALVE_PIN);
+  valve.configure(settings.getPulsePerLiterCount() / 2, Utils::FLOW_METER_PIN, Utils::VALVE_PIN);
 }
 
 void setup() {
@@ -396,7 +394,7 @@ void setup() {
 
   //user.clearAll();  //Debug - odstranit !!!!
   //valve init volat také po změně nastavení pulzů na litr !!!! - vyřešit v api, stejně jako novu objednávku
-  //valveInit();
+  valveInit();
   serverInit();
   sprintln("Start");
   //test();  //Debug - odstranit !!!!!
@@ -414,7 +412,7 @@ void loop() {
     ESP.restart();
   }
 
-  //valve.refresh();
+  valve.refresh();
 
   unsigned currentMillis = millis();
   if (currentMillis - lastHeapPrintMillis >= heapPrintPeriod) {

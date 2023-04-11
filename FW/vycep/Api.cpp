@@ -327,9 +327,16 @@ void Api::getCurrentUserBillCount(AsyncWebServerRequest* request) {
 
 void Api::makeOrder(AsyncWebServerRequest* request) {
   sprintln("!makeOrder");
-  //valve.makeOrder();
-  //Username získat z cookies
-  //Ověřit, zda je uživatel schválen
+  serveDynamicAuth(
+    request, [&](const char* lCaseUsername, uint32_t& permissions, const char* cookie, char* newCookie, bool& setCookie) {
+      valve.makeOrder();
+      AsyncWebServerResponse* response = request->beginResponse(
+        200,
+        "text/plain",
+        String(GENERAL_SUCCESS_RESULT_CODE) + "&" + String("0") + "&" + String("0"));
+      return response;
+    },
+    User::PERMISSIONS_ACTIVE, false);
 }
 
 void Api::pay(AsyncWebServerRequest* request) {
@@ -552,7 +559,7 @@ void Api::setSettingsValue(AsyncWebServerRequest* request) {
             settings.setNewUserPaymentEnabled(Utils::StrTob(value));
           } else if (strcmp(key, Settings::KEY_PULSE_PER_LITER) == 0) {
             settings.setPulsePerLiterCount((unsigned int)strtoul(value, nullptr, 10));
-            //valve.configure(settings.getPulsePerLiterCount() / 2, FLOW_METER_PIN, VALVE_PIN);
+            valve.configure(settings.getPulsePerLiterCount() / 2, Utils::FLOW_METER_PIN, Utils::VALVE_PIN);
           } else if (strcmp(key, Settings::KEY_MODE) == 0) {
             settings.setMode(getDeviceModeByName(value));
           } else if (strcmp(key, Settings::KEY_MASTER_TIMEOUT) == 0) {

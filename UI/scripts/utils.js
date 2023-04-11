@@ -172,10 +172,13 @@ api.getUserBillCount = function(username, callback) {
   Vytvoří objednávků a vrátí aktuální počet nápojů ve frontě a na účtě přihlášeného uživatele
 */
 api.makeOrder = function(callback) {
-  setTimeout(() => callback({
-   queueCount: ++api.qCountDEBUG,
-   billCount: ++api.billCountDEBUG, 
-  },"OK", null), 1000);
+   api.post("/api/makeOrder", null, (resData, errorText) => {
+    let results = api.parseResponseData(resData, errorText);
+    callback({
+      queueCount: results[1],
+      billCount: results[2]
+    }, results[0], errorText);
+  });
 }
   
 /*
