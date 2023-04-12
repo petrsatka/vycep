@@ -16,9 +16,9 @@ public:
   ~Valve();
 
   void configure(uint16_t pulsesPerServing, int flowMeterPinNumber, int valvePinNumber);
-  void makeOrder();
+  bool makeOrder();
   void refresh();
-  uint16_t getOrderCount();
+  uint16_t getQueueCount();
 
 private:
   static constexpr const char* NAMESPACE_VALVE_STATE = "valve-state";

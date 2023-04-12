@@ -51,19 +51,21 @@ void Valve::configure(uint16_t pulsesPerServing, int flowMeterPinNumber, int val
     valveStateStorage->addUShort(KEY_ORDER_COUNT, -1, 0, orderCount);
   }
 
-  pcnt_counter_resume(PCNT_UNIT);  //Zapnutí čítače
   if (orderCount > 0) {
     //Něco zbylo i po odečtení roztočené objednávky
     shouldOpen = true;
   }
 }
 
-void Valve::makeOrder() {
+bool Valve::makeOrder() {
   uint16_t orderCount = 0;
   valveStateStorage->addUShort(KEY_ORDER_COUNT, 1, 0, orderCount);
   if (orderCount > 0) {
     shouldOpen = true;
+    return true;
   }
+
+  return false;
 }
 
 void Valve::refresh() {
@@ -83,12 +85,19 @@ void Valve::refresh() {
 }
 
 void Valve::openValve() {
-  digitalWrite(this->valvePinNumber, HIGH);
+  if (digitalRead(this->valvePinNumber) == LOW) {
+    pcnt_counter_clear(PCNT_UNIT);
+    pcnt_counter_resume(PCNT_UNIT);
+    digitalWrite(this->valvePinNumber, HIGH);
+  }
 }
 
 void Valve::closeValve() {
-  digitalWrite(this->valvePinNumber, LOW);
-  pcnt_counter_clear(PCNT_UNIT);
+  if (digitalRead(this->valvePinNumber) == HIGH) {
+    digitalWrite(this->valvePinNumber, LOW);
+    pcnt_counter_pause(PCNT_UNIT);
+    pcnt_counter_clear(PCNT_UNIT);
+  }
 }
 
 //Dosažení porce
@@ -103,6 +112,6 @@ void IRAM_ATTR Valve::onServingReached() {
   shouldClose = true;
 }
 
-uint16_t Valve::getOrderCount() {
+uint16_t Valve::getQueueCount() {
   return valveStateStorage->getUShort(KEY_ORDER_COUNT);
 }

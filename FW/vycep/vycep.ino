@@ -403,7 +403,7 @@ void setup() {
 
 void loop() {
   if (ddnsEnabled) {
-    EasyDDNS.update(/*1 * 60 **/ 60 * 1000, true);
+    EasyDDNS.update(24 * 60 * 60 * 1000, true);
   }
 
   if (shouldReboot) {
@@ -414,9 +414,9 @@ void loop() {
 
   valve.refresh();
 
-  unsigned currentMillis = millis();
-  if (currentMillis - lastHeapPrintMillis >= heapPrintPeriod) {
-    sprintln((int64_t)ESP.getFreeHeap() - (int64_t)heapAfterInit);
-    lastHeapPrintMillis = currentMillis;
-  }
+  // unsigned currentMillis = millis();
+  // if (currentMillis - lastHeapPrintMillis >= heapPrintPeriod) {
+  //   sprintln((int64_t)ESP.getFreeHeap() - (int64_t)heapAfterInit);
+  //   lastHeapPrintMillis = currentMillis;
+  // }
 }

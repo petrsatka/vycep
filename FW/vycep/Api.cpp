@@ -290,6 +290,15 @@ bool Api::login(AsyncWebServerRequest* request) {
 
 void Api::getQueueCount(AsyncWebServerRequest* request) {
   sprintln("!getQueueCount");
+    serveDynamicAuth(
+    request, [&](const char* lCaseUsername, uint32_t& permissions, const char* cookie, char* newCookie, bool& setCookie) {
+      AsyncWebServerResponse* response = request->beginResponse(
+        200,
+        "text/plain",
+        String(GENERAL_SUCCESS_RESULT_CODE) + "&" + String(valve.getQueueCount()));
+      return response;
+    },
+    User::PERMISSIONS_NO_PERMISSIONS, false);
 }
 
 void Api::getUserBillCount(AsyncWebServerRequest* request) {
@@ -329,11 +338,17 @@ void Api::makeOrder(AsyncWebServerRequest* request) {
   sprintln("!makeOrder");
   serveDynamicAuth(
     request, [&](const char* lCaseUsername, uint32_t& permissions, const char* cookie, char* newCookie, bool& setCookie) {
-      valve.makeOrder();
+      const char* resultCode = GENERAL_ERROR_RESULT_CODE;
+      uint16_t userBill = 0;
+      if (valve.makeOrder()) {
+        resultCode = GENERAL_SUCCESS_RESULT_CODE;
+        user.addUserBill(lCaseUsername, 1, userBill);
+      }
+
       AsyncWebServerResponse* response = request->beginResponse(
         200,
         "text/plain",
-        String(GENERAL_SUCCESS_RESULT_CODE) + "&" + String("0") + "&" + String("0"));
+        String(resultCode) + "&" + String(valve.getQueueCount()) + "&" + String(userBill));
       return response;
     },
     User::PERMISSIONS_ACTIVE, false);

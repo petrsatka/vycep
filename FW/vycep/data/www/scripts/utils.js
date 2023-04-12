@@ -139,13 +139,15 @@ api.login = function(username, password, callback) {
   });
 }
 
-api.qCountDEBUG = 5;
 api.billCountDEBUG = 20;
 /*
   Získá aktuální počet nápojů ve frontě zařízení
 */
 api.getQueueCount = function(callback) {
-  setTimeout(() => callback(api.qCountDEBUG,"OK", null), 1000); 
+  api.post("/api/getQueueCount", null, (resData, errorText) => {
+    let results = api.parseResponseData(resData, errorText);
+    callback(results[1], results[0], errorText);
+  });
 }
 
 /*
@@ -554,7 +556,9 @@ gui.handleError = function(resultCode, errorMessage, popupWindow = false) {
       notify.message(message, true);
     }
   } else {
-    notify.error(resultCode);
+    if (resultCode) {
+      notify.error(resultCode);
+    }
   }
   
   return false;
@@ -951,8 +955,8 @@ passwordChange.cancel = function() {
 }
 
 let orders = {};
-orders.loadQCount = function() {
-  gui.loadValue(api.getQueueCount, "#q-count");
+orders.loadQCount = function(callback) {
+  gui.loadValue(api.getQueueCount, "#q-count", callback);
 }
 
 orders.loadBCount = function() {
@@ -962,6 +966,15 @@ orders.loadBCount = function() {
 orders.loadValues = function() {
   orders.loadQCount();
   orders.loadBCount();
+}
+
+
+orders.runAutoLoad = function() {
+  setTimeout(() => {
+      orders.loadQCount(() => {
+        orders.runAutoLoad();  
+      });
+  }, 10 * 1000);
 }
 
 orders.makeOrder = function() {
@@ -974,6 +987,13 @@ orders.navigateToPayment = function() {
 
 orders.onPageShow = function() {
   orders.loadValues();
+  orders.runAutoLoad();
+}
+
+orders.onVisibilityChange = function() {
+  if (document.visibilityState === "visible") {
+    orders.loadValues();
+  }
 }
 
 let payment = {};
@@ -1262,8 +1282,3 @@ $(window).on("pageshow",function(){
   gui.removeTemporaryClasses();
   notify.message();
 });
-
-//DEBUG
-//Přihlášeného uživatele vždy místo login page směrovat na orders - vyřešit asi rovnou na serveru?
-//favicon
-//Neaktivním uživatelům nedovolit žádnou akci - ošetřit na serveru
