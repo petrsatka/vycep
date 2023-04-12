@@ -414,9 +414,9 @@ void loop() {
 
   valve.refresh();
 
-  // unsigned currentMillis = millis();
-  // if (currentMillis - lastHeapPrintMillis >= heapPrintPeriod) {
-  //   sprintln((int64_t)ESP.getFreeHeap() - (int64_t)heapAfterInit);
-  //   lastHeapPrintMillis = currentMillis;
-  // }
+  unsigned currentMillis = millis();
+  if (currentMillis - lastHeapPrintMillis >= heapPrintPeriod) {
+    sprintln((int64_t)ESP.getFreeHeap() - (int64_t)heapAfterInit);
+    lastHeapPrintMillis = currentMillis;
+  }
 }
