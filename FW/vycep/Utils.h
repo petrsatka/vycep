@@ -29,7 +29,7 @@ public:
   static int strLenUTF8(const char* str);
   static short getCookiePropsPosition(const char* cookie);
   static const char* bToStr(bool val);
-  static bool StrTob(const char* val);
+  static bool strTob(const char* val);
   static void getRandomString(char* str, unsigned int bufferSize);
   //static void trimRight(char* str);
 

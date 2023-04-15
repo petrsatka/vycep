@@ -167,8 +167,8 @@ const char* Utils::bToStr(bool val) {
   return val ? TRUE_STR : FALSE_STR;
 }
 
-bool Utils::StrTob(const char* val) {
-  dprintln("StrTob");
+bool Utils::strTob(const char* val) {
+  dprintln("strTob");
   return strcmp(val, Utils::TRUE_STR) == 0;
 }
 

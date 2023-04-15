@@ -397,7 +397,6 @@ void setup() {
   serverInit();
   sprintln("Start");
   //test();  //Debug - odstranit !!!!!
-  sprintln(ESP.getFreeHeap());
   heapAfterInit = ESP.getFreeHeap();
 }
 
@@ -416,7 +415,8 @@ void loop() {
 
   unsigned currentMillis = millis();
   if (currentMillis - lastHeapPrintMillis >= heapPrintPeriod) {
-    sprintln((int64_t)ESP.getFreeHeap() - (int64_t)heapAfterInit);
+    int64_t freeHeap = ESP.getFreeHeap();
+    sprintln(String("d:") + String(freeHeap - heapAfterInit) + String(" total:") + String(freeHeap));
     lastHeapPrintMillis = currentMillis;
   }
 }

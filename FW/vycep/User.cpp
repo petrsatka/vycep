@@ -602,7 +602,7 @@ User::CookieVerificationResult User::getCookieInfo(const char* cookie, bool reva
   return CookieVerificationResult::OK;
 }
 
-int16_t User::getUserBill(const char* lCaseUsername) {
+uint16_t User::getUserBill(const char* lCaseUsername) {
   dprintln("getUserBill");
   return billsStorage->getUShort(lCaseUsername);
 }
@@ -616,7 +616,6 @@ bool User::addUserBill(const char* lCaseUsername, uint16_t add, uint16_t& res) {
   sprintln("!addUserBill");
   return billsStorage->addUShort(lCaseUsername, add, 0, res);
 }
-
 
 uint32_t User::getPermissions(const char* lCaseUsername) {
   dprintln("getPermissions");

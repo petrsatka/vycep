@@ -12,31 +12,16 @@ Otestovat zámky.
 Při přístupu k NVS hlídat délku klíče? NVS klíč ořezává, což může vést k tomu, že admin s 15ti znakovým jménem si bude moci sám sobě něco nastavit, pokud použej 15tznakové jméno + jeden libovolný znak.
 Pohlídat watchdog - po přidání mdns došlo k resetu.
 
--- active, payment
-pay
-
--- admin
-payForUser
-
-
 --Active Admin
 startCalibration
 stopCalibration
 runTest
+režimy
 
 HW
 Průtokoměr - sklon max +-5 stupňů - Jak namontovat na Lindr?
 Relé - do krabice s řídící jednotkou, nebo k průtokoměru? Kov - rozladí anténu?
 Průtokoměr - změřit úrovně 1/0 při 12V
 Připojení kabelů - průchodka + příchytka + svorkovnice - je třeba nakrimpovat dutinky. Nebo pájené konektory?
-Log - UART - offline logger, nebo druhé ESP - vzájemné rušení? - lze řešit uspáním.
-
-21:46:36.467 -> E (518269) task_wdt: Task watchdog got triggered. The following tasks did not reset the watchdog in time:
-21:46:36.467 -> E (518269) task_wdt:  - async_tcp (CPU 0/1)
-21:46:36.467 -> E (518269) task_wdt: Tasks currently running:
-21:46:36.467 -> E (518269) task_wdt: CPU 0: IDLE
-21:46:36.467 -> E (518269) task_wdt: CPU 1: loopTask
-21:46:36.467 -> E (518269) task_wdt: Aborting.
-21:46:36.467 -> 
-21:46:36.467 -> abort() was called at PC 0x400f2185 on core 0
+Log - UART - offline logger
 	

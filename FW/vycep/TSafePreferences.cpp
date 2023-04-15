@@ -479,7 +479,7 @@ bool TSafePreferences::addShort(const char* key, int16_t add, int16_t defaultIni
 }
 
 bool TSafePreferences::addUShort(const char* key, uint16_t add, uint16_t defaultInitValue, uint16_t& result) {
-  sprintln("!addUShort");
+  dprintln("addUShort");
   bool res = false;
   if (this->xMutex != NULL && xSemaphoreTake(this->xMutex, portMAX_DELAY)) {
     uint16_t nm = preferences.getUShort(key, defaultInitValue);

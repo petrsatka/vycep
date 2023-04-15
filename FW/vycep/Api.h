@@ -26,6 +26,7 @@ public:
   static constexpr const char* GENERAL_ERROR_RESULT_CODE = "UNKNOWN_ERROR";
   static constexpr const char* INVALID_USERNAME_OR_PASSWORD_RESULT_CODE = "INVALID_USERNAME_OR_PASSWORD";
   static constexpr const char* INVALID_KEY_RESULT_CODE = "INVALID_KEY";
+  static constexpr const char* INVALID_AMOUNT_VALUE_RESULT_CODE = "INVALID_AMOUNT_VALUE";
   static constexpr const char* SSID_TOO_LONG_RESULT_CODE = "SSID_TOO_LONG";
   static constexpr const char* SESURITY_KEY_TOO_LONG_RESULT_CODE = "SKEY_TOO_LONG";
   static constexpr const char* VALUE_OUT_OF_RANGE_RESULT_CODE = "VALUE_OUT_OF_RANGE";

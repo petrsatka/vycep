@@ -289,8 +289,8 @@ bool Api::login(AsyncWebServerRequest* request) {
 }
 
 void Api::getQueueCount(AsyncWebServerRequest* request) {
-  sprintln("!getQueueCount");
-    serveDynamicAuth(
+  dprintln("getQueueCount");
+  serveDynamicAuth(
     request, [&](const char* lCaseUsername, uint32_t& permissions, const char* cookie, char* newCookie, bool& setCookie) {
       AsyncWebServerResponse* response = request->beginResponse(
         200,
@@ -307,12 +307,12 @@ void Api::getUserBillCount(AsyncWebServerRequest* request) {
     request, [&](const char* lCaseUsername, uint32_t& permissions, const char* cookie, char* newCookie, bool& setCookie) {
       if (request->hasParam("username", true)) {
         AsyncWebParameter* pUname = request->getParam("username", true);
-        char lCaseUsername[User::USERNAME_BUFFER_SIZE] = { 0 };
-        Utils::toLowerStr(pUname->value().c_str(), lCaseUsername, User::USERNAME_BUFFER_SIZE);
+        char lcUname[User::USERNAME_BUFFER_SIZE] = { 0 };
+        Utils::toLowerStr(pUname->value().c_str(), lcUname, User::USERNAME_BUFFER_SIZE);
         AsyncWebServerResponse* response = request->beginResponse(
           200,
           "text/plain",
-          String(GENERAL_SUCCESS_RESULT_CODE) + "&" + String(user.getUserBill(lCaseUsername)));
+          String(GENERAL_SUCCESS_RESULT_CODE) + "&" + String(user.getUserBill(lcUname)));
         return response;
       }
 
@@ -356,14 +356,65 @@ void Api::makeOrder(AsyncWebServerRequest* request) {
 
 void Api::pay(AsyncWebServerRequest* request) {
   sprintln("!pay");
-  //Username získat z cookies
-  //Ověřit, zda je uživatel schválen a má práva na placení
+  serveDynamicAuth(
+    request, [&](const char* lCaseUsername, uint32_t& permissions, const char* cookie, char* newCookie, bool& setCookie) {
+      if (request->hasParam("amount", true)) {
+        const char* resultCode = GENERAL_ERROR_RESULT_CODE;
+        AsyncWebParameter* pAmount = request->getParam("amount", true);
+        int32_t amountValue = strtol(pAmount->value().c_str(), nullptr, 10);
+        uint16_t userBill = user.getUserBill(lCaseUsername);
+        if (amountValue >= 0 && amountValue <= userBill) {
+          amountValue = min(userBill, static_cast<uint16_t>(amountValue));
+          resultCode = GENERAL_SUCCESS_RESULT_CODE;
+          user.addUserBill(lCaseUsername, -amountValue, userBill);
+        } else {
+          amountValue = 0;
+          resultCode = INVALID_AMOUNT_VALUE_RESULT_CODE;
+        }
+
+        AsyncWebServerResponse* response = request->beginResponse(
+          200,
+          "text/plain",
+          String(resultCode) + "&" + String(amountValue) + "&" + String(userBill));
+        return response;
+      }
+
+      return request->beginResponse(400);
+    },
+    User::PERMISSIONS_ACTIVE | User::PERMISSIONS_PAYMENT, false);
 }
 
 void Api::payForUser(AsyncWebServerRequest* request) {
   sprintln("!payForUser");
-  //username
-  //Ověřit, zda má práva admina
+  serveDynamicAuth(
+    request, [&](const char* lCaseUsername, uint32_t& permissions, const char* cookie, char* newCookie, bool& setCookie) {
+      if (request->hasParam("amount", true) && request->hasParam("username", true)) {
+        const char* resultCode = GENERAL_ERROR_RESULT_CODE;
+        AsyncWebParameter* pUname = request->getParam("username", true);
+        char lcUname[User::USERNAME_BUFFER_SIZE] = { 0 };
+        Utils::toLowerStr(pUname->value().c_str(), lcUname, User::USERNAME_BUFFER_SIZE);
+        AsyncWebParameter* pAmount = request->getParam("amount", true);
+        int32_t amountValue = strtol(pAmount->value().c_str(), nullptr, 10);
+        uint16_t userBill = user.getUserBill(lcUname);
+        if (amountValue >= 0 && amountValue <= userBill) {
+          amountValue = min(userBill, static_cast<uint16_t>(amountValue));
+          resultCode = GENERAL_SUCCESS_RESULT_CODE;
+          user.addUserBill(lcUname, -amountValue, userBill);
+        } else {
+          amountValue = 0;
+          resultCode = INVALID_AMOUNT_VALUE_RESULT_CODE;
+        }
+
+        AsyncWebServerResponse* response = request->beginResponse(
+          200,
+          "text/plain",
+          String(resultCode) + "&" + String(amountValue) + "&" + String(userBill));
+        return response;
+      }
+
+      return request->beginResponse(400);
+    },
+    User::PERMISSIONS_ACTIVE | User::PERMISSIONS_ADMIN | User::PERMISSIONS_PAYMENT, false);
 }
 
 void Api::getIP(AsyncWebServerRequest* request) {
@@ -571,7 +622,7 @@ void Api::setSettingsValue(AsyncWebServerRequest* request) {
         if (key != NULL && key[0] != 0 && value != NULL) {
           resultCode = GENERAL_SUCCESS_RESULT_CODE;
           if (strcmp(key, Settings::KEY_NEW_USER_PAYMNET) == 0) {
-            settings.setNewUserPaymentEnabled(Utils::StrTob(value));
+            settings.setNewUserPaymentEnabled(Utils::strTob(value));
           } else if (strcmp(key, Settings::KEY_PULSE_PER_LITER) == 0) {
             settings.setPulsePerLiterCount((unsigned int)strtoul(value, nullptr, 10));
             valve.configure(settings.getPulsePerLiterCount() / 2, Utils::FLOW_METER_PIN, Utils::VALVE_PIN);
@@ -630,7 +681,7 @@ void Api::setPermissionsValue(AsyncWebServerRequest* request) {
         if (key != NULL && key[0] != 0 && username != NULL && username[0] != 0 && value != NULL) {
           if (strcmp(username, lCaseUsername) != 0) {
             if (strcmp(key, Settings::KEY_ADMIN_PERMISSIONS) == 0) {
-              if (Utils::StrTob(value)) {
+              if (Utils::strTob(value)) {
                 if (user.addPermissions(username, User::PERMISSIONS_ADMIN)) {
                   resultCode = GENERAL_SUCCESS_RESULT_CODE;
                 }
@@ -640,7 +691,7 @@ void Api::setPermissionsValue(AsyncWebServerRequest* request) {
                 }
               }
             } else if (strcmp(key, Settings::KEY_PAYMENT_PERMISSIONS) == 0) {
-              if (Utils::StrTob(value)) {
+              if (Utils::strTob(value)) {
                 if (user.addPermissions(username, User::PERMISSIONS_PAYMENT)) {
                   resultCode = GENERAL_SUCCESS_RESULT_CODE;
                 }

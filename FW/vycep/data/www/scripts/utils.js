@@ -139,7 +139,6 @@ api.login = function(username, password, callback) {
   });
 }
 
-api.billCountDEBUG = 20;
 /*
   Získá aktuální počet nápojů ve frontě zařízení
 */
@@ -187,35 +186,23 @@ api.makeOrder = function(callback) {
   Provede platbu a vrátí zaplacený počet a počet nápojů na účtě zvoleného uživatele
 */
 api.payForUser = function(username, count, callback) {
-  if (count > api.billCountDEBUG || count < 0) {
-    setTimeout(() => callback({
-      paid: 0,
-      billCount: api.billCountDEBUG
-    },"invalid-payment-value", null), 1000);
-  } else { 
-    let paid = Math.min(api.billCountDEBUG, Math.max(0, count));
-    api.billCountDEBUG -= paid;
-    setTimeout(() => callback({
-      paid: paid,
-      billCount: api.billCountDEBUG
-    },"OK", null), 1000);
-  }   
+  api.post("/api/payForUser", {username: username, amount: count}, (resData, errorText) => {
+    let results = api.parseResponseData(resData, errorText);
+    callback({
+      paid: results[1],
+      billCount: results[2]
+    }, results[0], errorText);
+  });
 }
 
 api.pay = function( count, callback) {
-  if (count > api.billCountDEBUG || count < 0) {
-    setTimeout(() => callback({
-      paid: 0,
-      billCount: api.billCountDEBUG
-    },"invalid-payment-value", null), 1000);
-  } else { 
-    let paid = Math.min(api.billCountDEBUG, Math.max(0, count));
-    api.billCountDEBUG -= paid;
-    setTimeout(() => callback({
-      paid: paid,
-      billCount: api.billCountDEBUG
-    },"OK", null), 1000);
-  }   
+  api.post("/api/pay", {amount: count}, (resData, errorText) => {
+    let results = api.parseResponseData(resData, errorText);
+    callback({
+      paid: results[1],
+      billCount: results[2]
+    }, results[0], errorText);
+  });
 }
 
 api.parseGetUsersJSONData = function(jsonData) {
@@ -534,19 +521,9 @@ gui.handleError = function(resultCode, errorMessage, popupWindow = false) {
     case 'VALUE_OUT_OF_RANGE':
       message = 'Hodnota mimo rozsah';
       break
-       
-      
-    /*case 'bad_username_or_password':
-      message = 'Neplatné jméno nebo heslo.';
-      break;
-    case 'invalid_password':
-      message = 'Neplatné heslo';
-      break
-    case 'invalid-payment-value':
+    case 'INVALID_AMOUNT_VALUE':
       message = 'Nelze zaplatit neplatné množství.';
-    case 'unnable_to_connect':
-      message = 'Připojení se nezdařilo';
-      break;  */
+      break
   }
   
   if (message) {
