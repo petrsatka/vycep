@@ -75,12 +75,13 @@ void Valve::refresh() {
   }
 
   if (shouldClose) {
-    shouldClose = false;
     uint16_t orderCount = 0;
     valveStateStorage->addUShort(KEY_ORDER_COUNT, -1, 0, orderCount);
     if (orderCount == 0) {
       closeValve();
     }
+
+    shouldClose = false;
   }
 }
 

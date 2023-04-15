@@ -2,7 +2,6 @@
 By Petr Satka
 Licnese CC-BY
 */
-
 #include <Arduino.h>
 #include <ESPAsyncWebSrv.h>
 #include <LittleFS.h>
@@ -398,6 +397,7 @@ void setup() {
   serverInit();
   sprintln("Start");
   //test();  //Debug - odstranit !!!!!
+  sprintln(ESP.getFreeHeap());
   heapAfterInit = ESP.getFreeHeap();
 }
 
