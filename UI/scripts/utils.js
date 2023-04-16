@@ -945,9 +945,13 @@ orders.loadValues = function() {
   orders.loadBCount();
 }
 
-
+orders.autoLoadTimeout = null;
 orders.runAutoLoad = function() {
-  setTimeout(() => {
+  $("#q-count-label").removeClass("waiting");
+  $("#q-count-label").width(); //Trik pro vyvolání reflow
+  $("#q-count-label").addClass("waiting");
+  clearTimeout(orders.autoLoadTimeout);
+  orders.autoLoadTimeout = setTimeout(() => {
       orders.loadQCount(() => {
         orders.runAutoLoad();  
       });
