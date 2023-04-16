@@ -26,7 +26,8 @@ public:
 private:
   static constexpr const char* NAMESPACE_VALVE_STATE = "valve-state";
   static constexpr const char* KEY_ORDER_COUNT = "order-cnt";
-  static constexpr pcnt_unit_t PCNT_UNIT = PCNT_UNIT_0;
+  static constexpr pcnt_unit_t PCNT_MAIN_UNIT = PCNT_UNIT_0;
+  static constexpr pcnt_unit_t PCNT_CALIB_UNIT = PCNT_UNIT_1;
 
   SemaphoreHandle_t xSemaphore = NULL;
   TSafePreferences* valveStateStorage = NULL;
@@ -38,6 +39,7 @@ private:
   static void onServingReachedStatic(void* valve);
 
   void initPulseCounter(int16_t pulsesPerServing, int pinNumber);
+  void initCalibrationPulseCounter(int pinNumber);
   void openValve();
   void closeValve();
   void onServingReached();

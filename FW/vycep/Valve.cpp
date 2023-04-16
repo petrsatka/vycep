@@ -21,20 +21,36 @@ void Valve::initPulseCounter(int16_t pulsesPerServing, int pinNumber) {
   pcntFreqConfig.pulse_gpio_num = pinNumber;        // pin assignment for pulse counter
   pcntFreqConfig.pos_mode = PCNT_COUNT_INC;         //režim přičítání na náběžné hraně
   pcntFreqConfig.counter_h_lim = pulsesPerServing;  //horní limit počítání maximálně 32767
-  pcntFreqConfig.unit = PCNT_UNIT;
+  pcntFreqConfig.unit = PCNT_MAIN_UNIT;
   pcntFreqConfig.channel = PCNT_CHANNEL_0;
   pcnt_unit_config(&pcntFreqConfig);
 
-  pcnt_counter_pause(PCNT_UNIT);
-  pcnt_counter_clear(PCNT_UNIT);
+  pcnt_counter_pause(PCNT_MAIN_UNIT);
+  pcnt_counter_clear(PCNT_MAIN_UNIT);
 
-  pcnt_event_enable(PCNT_UNIT, PCNT_EVT_H_LIM);              // nastavení události při dosažení horního limitu
+  pcnt_event_enable(PCNT_MAIN_UNIT, PCNT_EVT_H_LIM);              // nastavení události při dosažení horního limitu
   pcnt_isr_register(onServingReachedStatic, this, 0, NULL);  // registrace handleru
-  pcnt_intr_enable(PCNT_UNIT);                               // zapnutí přerušení
+  pcnt_intr_enable(PCNT_MAIN_UNIT);                               // zapnutí přerušení
 
   //Glitch filter - doladit s reálným průtokoměrem
-  pcnt_set_filter_value(PCNT_UNIT, 1023);
-  pcnt_filter_enable(PCNT_UNIT);
+  pcnt_set_filter_value(PCNT_MAIN_UNIT, 1023);
+  pcnt_filter_enable(PCNT_MAIN_UNIT);
+}
+
+void Valve::initCalibrationPulseCounter(int pinNumber) {
+   pcnt_config_t pcntFreqConfig = {};
+  pcntFreqConfig.pulse_gpio_num = pinNumber;        // pin assignment for pulse counter
+  pcntFreqConfig.pos_mode = PCNT_COUNT_INC;         //režim přičítání na náběžné hraně
+  pcntFreqConfig.unit = PCNT_CALIB_UNIT;
+  pcntFreqConfig.channel = PCNT_CHANNEL_0;
+  pcnt_unit_config(&pcntFreqConfig);
+
+  pcnt_counter_pause(PCNT_CALIB_UNIT);
+  pcnt_counter_clear(PCNT_CALIB_UNIT);
+
+  //Glitch filter - doladit s reálným průtokoměrem
+  pcnt_set_filter_value(PCNT_CALIB_UNIT, 1023);
+  pcnt_filter_enable(PCNT_CALIB_UNIT);
 }
 
 void Valve::setMode(Settings::DeviceMode mode) {
@@ -150,8 +166,8 @@ void Valve::setAutoMode() {
 
 void Valve::openValve() {
   if (digitalRead(this->valvePinNumber) == LOW) {
-    pcnt_counter_clear(PCNT_UNIT);
-    pcnt_counter_resume(PCNT_UNIT);
+    pcnt_counter_clear(PCNT_MAIN_UNIT);
+    pcnt_counter_resume(PCNT_MAIN_UNIT);
     digitalWrite(this->valvePinNumber, HIGH);
   }
 }
@@ -159,8 +175,8 @@ void Valve::openValve() {
 void Valve::closeValve() {
   if (digitalRead(this->valvePinNumber) == HIGH) {
     digitalWrite(this->valvePinNumber, LOW);
-    pcnt_counter_pause(PCNT_UNIT);
-    pcnt_counter_clear(PCNT_UNIT);
+    pcnt_counter_pause(PCNT_MAIN_UNIT);
+    pcnt_counter_clear(PCNT_MAIN_UNIT);
   }
 }
 
@@ -171,8 +187,8 @@ void IRAM_ATTR Valve::onServingReachedStatic(void* valve) {
 }
 
 void IRAM_ATTR Valve::onServingReached() {
-  PCNT.int_clr.val = BIT(PCNT_UNIT);  // Vymazat příznak přerušení
-  pcnt_counter_clear(PCNT_UNIT);      //Vynulování čítače
+  PCNT.int_clr.val = BIT(PCNT_MAIN_UNIT);  // Vymazat příznak přerušení
+  pcnt_counter_clear(PCNT_MAIN_UNIT);      //Vynulování čítače
   shouldClose = true;
 }
 
