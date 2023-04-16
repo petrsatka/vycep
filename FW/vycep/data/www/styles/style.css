@@ -234,3 +234,20 @@ body {
 .page-content #confirmation-message {
   padding-top:2mm;
 }
+
+.auto-load::after {
+    content: "";
+    display: block;
+    margin-top: 10px;
+    margin-left: auto;
+    margin-right: auto;
+    height: 2px;
+    width: 0px;
+    background-color: DarkMagenta;
+    width: 25mm;
+}
+
+.auto-load.waiting::after {
+  width: 0mm;
+  transition: all 10.5s linear;
+}
