@@ -529,8 +529,8 @@ void Api::getSettingsValue(AsyncWebServerRequest* request) {
             char secKey[Utils::SECURITY_KEY_BUFFER_SIZE] = { 0 };
             settings.getSecurityKey(secKey);
             res = String(secKey);
-          } else if (strcmp(key, Settings::KEY_PULSE_PER_LITER) == 0) {
-            res = String(settings.getPulsePerLiterCount());
+          } else if (strcmp(key, Settings::KEY_PULSE_PER_SERVING) == 0) {
+            res = String(settings.getPulsePerServingCount());
           } else if (strcmp(key, Settings::KEY_MODE) == 0) {
             res = String(getDeviceModeName(static_cast<Settings::DeviceMode>(settings.getMode())));
           } else if (strcmp(key, Settings::KEY_MASTER_TIMEOUT) == 0) {
@@ -623,9 +623,9 @@ void Api::setSettingsValue(AsyncWebServerRequest* request) {
           resultCode = GENERAL_SUCCESS_RESULT_CODE;
           if (strcmp(key, Settings::KEY_NEW_USER_PAYMNET) == 0) {
             settings.setNewUserPaymentEnabled(Utils::strTob(value));
-          } else if (strcmp(key, Settings::KEY_PULSE_PER_LITER) == 0) {
-            settings.setPulsePerLiterCount((unsigned int)strtoul(value, nullptr, 10));
-            valve.configure(settings.getPulsePerLiterCount() / 2, Utils::FLOW_METER_PIN, Utils::VALVE_PIN);
+          } else if (strcmp(key, Settings::KEY_PULSE_PER_SERVING) == 0) {
+            settings.setPulsePerServingCount((unsigned int)strtoul(value, nullptr, 10));
+            valve.configure(settings.getPulsePerServingCount(), Utils::FLOW_METER_PIN, Utils::VALVE_PIN);
           } else if (strcmp(key, Settings::KEY_MODE) == 0) {
             Settings::DeviceMode mode = getDeviceModeByName(value);
             settings.setMode(mode);

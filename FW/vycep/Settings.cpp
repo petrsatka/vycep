@@ -83,9 +83,9 @@ bool Settings::setDdnsPassword(const char* ddnsPassword) {
   return false;
 }
 
-bool Settings::setPulsePerLiterCount(unsigned int pulseCount) {
+bool Settings::setPulsePerServingCount(unsigned int pulseCount) {
   dprintln("setPulsePerLiterCount");
-  return systemSettingsStorage->putUInt(Settings::KEY_PULSE_PER_LITER, pulseCount) > 0;
+  return systemSettingsStorage->putUInt(Settings::KEY_PULSE_PER_SERVING, pulseCount) > 0;
 }
 
 bool Settings::setMode(Settings::DeviceMode mode) {
@@ -159,9 +159,9 @@ void Settings::getSecurityKey(char* securityKey) {
   }
 }
 
-unsigned int Settings::getPulsePerLiterCount() {
-  dprintln("getPulsePerLiterCount");
-  return systemSettingsStorage->getUInt(Settings::KEY_PULSE_PER_LITER, Settings::DEFAULT_PULSE_PER_LITER);
+unsigned int Settings::getPulsePerServingCount() {
+  dprintln("getPulsePerServingCount");
+  return systemSettingsStorage->getUInt(Settings::KEY_PULSE_PER_SERVING, Settings::DEFAULT_PULSE_PER_SERVING);
 }
 
 Settings::DeviceMode Settings::getMode() {

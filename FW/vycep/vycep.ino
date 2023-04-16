@@ -369,7 +369,8 @@ void serverInit() {
 }
 
 void valveInit() {
-  valve.configure(settings.getPulsePerLiterCount() / 2, Utils::FLOW_METER_PIN, Utils::VALVE_PIN);
+  valve.configure(settings.getPulsePerServingCount(), Utils::FLOW_METER_PIN, Utils::VALVE_PIN);
+  valve.setMode(settings.getMode());
 }
 
 void setup() {

@@ -56,17 +56,19 @@ void Valve::configure(uint16_t pulsesPerServing, int flowMeterPinNumber, int val
   initPulseCounter(pulsesPerServing, flowMeterPinNumber);
   shouldClose = false;
   shouldOpen = false;
-  closeValve();
-  //Jsou nějaké objednávky ve frontě?
-  //Pokud ano musíme původní roztočenou zrušit, aby nedocházelo k šizení vypnutím těsně před dočepování objednávky
-  uint16_t orderCount = valveStateStorage->getUShort(KEY_ORDER_COUNT);
-  if (orderCount > 0) {
-    valveStateStorage->addUShort(KEY_ORDER_COUNT, -1, 0, orderCount);
-  }
+  if (mode == Settings::DeviceMode::AUTO) {
+    closeValve();
+    //Jsou nějaké objednávky ve frontě?
+    //Pokud ano musíme původní roztočenou zrušit, aby nedocházelo k šizení vypnutím těsně před dočepování objednávky
+    uint16_t orderCount = valveStateStorage->getUShort(KEY_ORDER_COUNT);
+    if (orderCount > 0) {
+      valveStateStorage->addUShort(KEY_ORDER_COUNT, -1, 0, orderCount);
+    }
 
-  if (orderCount > 0) {
-    //Něco zbylo i po odečtení roztočené objednávky
-    shouldOpen = true;
+    if (orderCount > 0) {
+      //Něco zbylo i po odečtení roztočené objednávky
+      shouldOpen = true;
+    }
   }
 }
 

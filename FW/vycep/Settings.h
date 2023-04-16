@@ -28,7 +28,7 @@ public:
 
   static constexpr const char* KEY_SSID = "ssid";
   static constexpr const char* KEY_SECURITY_KEY = "skey";
-  static constexpr const char* KEY_PULSE_PER_LITER = "pulseplitter";
+  static constexpr const char* KEY_PULSE_PER_SERVING = "pulsepserv";
   static constexpr const char* KEY_MODE = "mode";
   static constexpr const char* KEY_MASTER_TIMEOUT = "mastertimeout";
   static constexpr const char* KEY_UNDER_LIMIT_TIMEOUT = "ulimtimeout";
@@ -46,7 +46,7 @@ public:
   bool setSSID(const char* ssid);
   bool setSecurityKey(const char* securityKey);
   bool setNewUserPaymentEnabled(bool enabled);
-  bool setPulsePerLiterCount(unsigned int pulseCount);
+  bool setPulsePerServingCount(unsigned int pulseCount);
   bool setMode(Settings::DeviceMode mode);
   bool setMasterTimeoutSeconds(unsigned long timeoutSeconds);
   bool setUnderLimitTimeoutSeconds(unsigned long timeoutSeconds);
@@ -60,7 +60,7 @@ public:
   void getDdnsDomain(char* ddnsDomain);
   void getDdnsUsername(char* ddnsUsername);
   void getDdnsPassword(char* ddnsPassword);
-  unsigned int getPulsePerLiterCount();
+  unsigned int getPulsePerServingCount();
   Settings::DeviceMode getMode();
   unsigned long getMasterTimeoutSeconds();
   unsigned long getUnderLimitTimeoutSeconds();
@@ -70,7 +70,7 @@ public:
 private:
   static constexpr const char* NAMESPACE_SYSTEM_SETTINGS = "setts-system";
   static constexpr const char* KEY_WIFI_OK = "wifiok";
-  static constexpr unsigned int DEFAULT_PULSE_PER_LITER = 5880;
+  static constexpr unsigned int DEFAULT_PULSE_PER_SERVING = 5880;
   static constexpr unsigned long DEFAULT_MASTER_TIMEOUT_SECONDS = 20 * 60;
   static constexpr unsigned long DEFAULT_UNDER_LIMIT_TIMEOUT_SECONDS = 10 * 60;
 

@@ -1177,7 +1177,7 @@ settings.loadNetworkInfo = function() {
 }
 
 settings.registerChange = function() {
-  gui.onInputChange('#pcount', function(element, val) {gui.setSettingsValue('pulseplitter',val);});
+  gui.onInputChange('#pcount', function(element, val) {gui.setSettingsValue('pulsepserv',val);});
   gui.onInputChange('[name="mode"]', function(element, val) {gui.setSettingsValue('mode',val);});
   gui.onInputChange('#inactivity-timeout', function(element, val) {gui.setSettingsValue('mastertimeout',val);});
   gui.onInputChange('#under-limit-timeout', function(element, val) {gui.setSettingsValue('ulimtimeout',val);});
@@ -1190,7 +1190,7 @@ settings.registerChange = function() {
 settings.loadValues = function() {
   gui.loadSettingsValue('ssid', '#ssid');
   gui.loadSettingsValue('skey', '#skey');
-  gui.loadSettingsValue('pulseplitter', '#pcount');
+  gui.loadSettingsValue('pulsepserv', '#pcount');
   gui.loadSettingsValue('mode', '[name="mode"]');
   gui.loadSettingsValue('mastertimeout', '#inactivity-timeout');
   gui.loadSettingsValue('ulimtimeout', '#under-limit-timeout');
