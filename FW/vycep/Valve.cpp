@@ -45,9 +45,16 @@ void Valve::setMode(Settings::DeviceMode mode) {
     case Settings::DeviceMode::CLOSED:
       permanentlyCloseValve();
       return;
+    case Settings::DeviceMode::TEST:
+      setTestMode();
+      return;
   }
 
   setAutoMode();
+}
+
+Settings::DeviceMode Valve::getMode() {
+  return mode;
 }
 
 void Valve::configure(uint16_t pulsesPerServing, int flowMeterPinNumber, int valvePinNumber) {
@@ -72,16 +79,24 @@ void Valve::configure(uint16_t pulsesPerServing, int flowMeterPinNumber, int val
   }
 }
 
-bool Valve::makeOrder() {
-  if (mode != Settings::DeviceMode::AUTO) {
-    return false;
+void Valve::setTestMode() {
+  if (mode != Settings::DeviceMode::TEST) {
+    mode = Settings::DeviceMode::TEST;  //Od teď nepřijde žádná nová objednávka
+    shouldOpen = false;
+    closeValve();  //Od teď nepřijde žádné přerušení z čítače
+    shouldClose = false;
+    valveStateStorage->putUShort(KEY_ORDER_COUNT, 0);  //Reset objednávek
   }
+}
 
-  uint16_t orderCount = 0;
-  valveStateStorage->addUShort(KEY_ORDER_COUNT, 1, 0, orderCount);
-  if (orderCount > 0) {
-    shouldOpen = true;
-    return true;
+bool Valve::makeOrder() {
+  if (mode == Settings::DeviceMode::AUTO || mode == Settings::DeviceMode::TEST) {
+    uint16_t orderCount = 0;
+    valveStateStorage->addUShort(KEY_ORDER_COUNT, 1, 0, orderCount);
+    if (orderCount > 0) {
+      shouldOpen = true;
+      return true;
+    }
   }
 
   return false;

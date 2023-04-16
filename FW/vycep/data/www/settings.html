@@ -53,17 +53,22 @@
         <input class="button-large" type="button" value="Restart" onclick="settings.restart()">      
         <span class="label header">Kalibrace</span>
         <label for="pcount">Počet pulsů na porci</label>
+        <span class="description">Změna nastavení ukončí probíhající objednávku.</span>
         <input type="text" id="pcount" name="pcount">
+        <span class="description">Při použití funkcí kalibrace dojde k vynulování aktuální fronty objednávek.</span>
         <span class="description">Stiskněte kalibrovat. Poté nechte odtéct jednu porci a stiskněte hotovo.</span>
         <input id="button-calibrate" class="button-large" type="button" onclick="settings.toggleCalibration()" value="Kalibrovat" data-defval="Kalibrovat">  
-        <input class="button-large" type="button" value="Test 0,5 l" onclick="settings.runTest()">
         <span class="label header">Režim</span>
+        <span class="description">Při změně režimu dojde k vynulování aktuální fronty objednávek.</span>
         <input type="radio" id="auto" name="mode" value="AUTO">
         <label class="inline" for="auto">Auto</label><br>
         <input type="radio" id="open" name="mode" value="OPEN">
         <label class="inline" for="open">Trvale otevřeno</label><br>
         <input type="radio" id="closed" name="mode" value="CLOSED">
-        <label class="inline" for="closed">Trvale uzavřeno</label>
+        <label class="inline" for="closed">Trvale uzavřeno</label><br>
+        <input type="radio" id="test" name="mode" value="TEST">
+        <label class="inline" for="test">Test</label>
+        <span class="description">V režimu test nebudou účtovány objednávky.</span>
         <span class="label header">Výdej</span>
         <label for="inactivity-timeout">Automaticky uzavřít při nečinnosti (minuty)</label>                                 
         <input type="number" id="inactivity-timeout" name="inactivity-timeout" min="0" step="1">

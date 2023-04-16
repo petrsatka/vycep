@@ -18,7 +18,7 @@ typedef std::function<AsyncWebServerResponse*()> ErrorResponseGetterFunction;
 
 class Api {
 public:
-  Api(User &user, Valve &valve, Settings &settings);
+  Api(User& user, Valve& valve, Settings& settings);
   ~Api();
   static constexpr const char* AHUTH_COOKIE_NAME = "ESPAUTH=";
   static constexpr const char* USERNAME_COOKIE_NAME = "ESPUNAME=";
@@ -68,8 +68,8 @@ private:
 
   static constexpr int CRED_VERIF_ERR_COUNT = 13;
   static constexpr int CRED_VERIF_ERR_BUFFER_SIZE = 32;
-  static constexpr int DEV_MODE_COUNT = 3;
-  static constexpr int DEV_MODE_BUFFER_SIZE = 7;
+  static constexpr int DEV_MODE_COUNT = 5;
+  static constexpr int DEV_MODE_BUFFER_SIZE = 12;
   static constexpr const char* HTTPONLY_COOKIE_ATTRIBUTE = "; HttpOnly";
   static constexpr const char* COMMON_COOKIE_ATTRIBUTES = "; Max-Age=1707109200; Path=/";
   static constexpr const char* UNSET_COOKIE_ATTRIBUTES = "; Max-Age=-1; Path=/";
@@ -94,6 +94,8 @@ private:
     "AUTO",
     "OPEN",
     "CLOSED",
+    "TEST",
+    "CALIBRATION",
   };
 
   static const char* getCredentialsVerificationResultName(User::CredentialsVerificationResult res);

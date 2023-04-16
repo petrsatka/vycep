@@ -342,7 +342,7 @@ void Api::makeOrder(AsyncWebServerRequest* request) {
       uint16_t userBill = 0;
       if (valve.makeOrder()) {
         resultCode = GENERAL_SUCCESS_RESULT_CODE;
-        user.addUserBill(lCaseUsername, 1, userBill);
+        user.addUserBill(lCaseUsername, valve.getMode() == Settings::DeviceMode::AUTO ? 1 : 0, userBill);
       } else {
         resultCode = UNABLE_TO_PLACE_ORDER_RESULT_CODE;
       }

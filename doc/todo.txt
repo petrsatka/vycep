@@ -17,6 +17,8 @@ startCalibration
 stopCalibration
 runTest
 
+Timeouty
+
 HW
 Průtokoměr - sklon max +-5 stupňů - Jak namontovat na Lindr?
 Relé - do krabice s řídící jednotkou, nebo k průtokoměru? Kov - rozladí anténu?

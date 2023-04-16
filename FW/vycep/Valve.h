@@ -21,6 +21,7 @@ public:
   void refresh();
   uint16_t getQueueCount();
   void setMode(Settings::DeviceMode mode);
+  Settings::DeviceMode getMode();
 
 private:
   static constexpr const char* NAMESPACE_VALVE_STATE = "valve-state";
@@ -43,6 +44,7 @@ private:
   void permanentlyCloseValve();
   void permanentlyOpenValve();
   void setAutoMode();
+  void setTestMode();
 };
 
 #endif

@@ -19,6 +19,8 @@ public:
     AUTO = 0,
     OPEN = 1,
     CLOSED = 2,
+    TEST = 3,
+    CALIBRATION = 4,
   };
 
   static constexpr size_t DDNSS_DOAMIN_BUFFER_SIZE = 254;   //253 Znaků
