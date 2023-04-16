@@ -103,5 +103,7 @@ private:
   static bool unsetCookies(AsyncWebServerResponse* response);
   static bool setCookie(AsyncWebServerResponse* response, const char* name, const char* content, bool httpOnly);
   static bool unsetCookie(AsyncWebServerResponse* response, const char* name);
+
+  const char* doPayment(const char* lCaseUsername, const char* amount, uint16_t& userBill, int32_t& amountValue);
 };
 #endif

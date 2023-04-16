@@ -354,24 +354,31 @@ void Api::makeOrder(AsyncWebServerRequest* request) {
     User::PERMISSIONS_ACTIVE, false);
 }
 
+const char* Api::doPayment(const char* lCaseUsername, const char* amount, uint16_t& userBill, int32_t& amountValue) {
+  const char* resultCode = GENERAL_ERROR_RESULT_CODE;
+  amountValue = strtol(amount, nullptr, 10);
+  userBill = user.getUserBill(lCaseUsername);
+  if (amountValue > 0 && amountValue <= userBill) {
+    amountValue = min(userBill, static_cast<uint16_t>(amountValue));
+    resultCode = GENERAL_SUCCESS_RESULT_CODE;
+    user.addUserBill(lCaseUsername, -amountValue, userBill);
+  } else {
+    amountValue = 0;
+    resultCode = INVALID_AMOUNT_VALUE_RESULT_CODE;
+  }
+
+  return resultCode;
+}
+
 void Api::pay(AsyncWebServerRequest* request) {
   sprintln("!pay");
   serveDynamicAuth(
     request, [&](const char* lCaseUsername, uint32_t& permissions, const char* cookie, char* newCookie, bool& setCookie) {
       if (request->hasParam("amount", true)) {
-        const char* resultCode = GENERAL_ERROR_RESULT_CODE;
         AsyncWebParameter* pAmount = request->getParam("amount", true);
-        int32_t amountValue = strtol(pAmount->value().c_str(), nullptr, 10);
-        uint16_t userBill = user.getUserBill(lCaseUsername);
-        if (amountValue >= 0 && amountValue <= userBill) {
-          amountValue = min(userBill, static_cast<uint16_t>(amountValue));
-          resultCode = GENERAL_SUCCESS_RESULT_CODE;
-          user.addUserBill(lCaseUsername, -amountValue, userBill);
-        } else {
-          amountValue = 0;
-          resultCode = INVALID_AMOUNT_VALUE_RESULT_CODE;
-        }
-
+        int32_t amountValue = 0;
+        uint16_t userBill = 0;
+        const char* resultCode = doPayment(lCaseUsername, pAmount->value().c_str(), userBill, amountValue);
         AsyncWebServerResponse* response = request->beginResponse(
           200,
           "text/plain",
@@ -389,22 +396,13 @@ void Api::payForUser(AsyncWebServerRequest* request) {
   serveDynamicAuth(
     request, [&](const char* lCaseUsername, uint32_t& permissions, const char* cookie, char* newCookie, bool& setCookie) {
       if (request->hasParam("amount", true) && request->hasParam("username", true)) {
-        const char* resultCode = GENERAL_ERROR_RESULT_CODE;
         AsyncWebParameter* pUname = request->getParam("username", true);
         char lcUname[User::USERNAME_BUFFER_SIZE] = { 0 };
         Utils::toLowerStr(pUname->value().c_str(), lcUname, User::USERNAME_BUFFER_SIZE);
         AsyncWebParameter* pAmount = request->getParam("amount", true);
-        int32_t amountValue = strtol(pAmount->value().c_str(), nullptr, 10);
-        uint16_t userBill = user.getUserBill(lcUname);
-        if (amountValue >= 0 && amountValue <= userBill) {
-          amountValue = min(userBill, static_cast<uint16_t>(amountValue));
-          resultCode = GENERAL_SUCCESS_RESULT_CODE;
-          user.addUserBill(lcUname, -amountValue, userBill);
-        } else {
-          amountValue = 0;
-          resultCode = INVALID_AMOUNT_VALUE_RESULT_CODE;
-        }
-
+        int32_t amountValue = 0;
+        uint16_t userBill = 0;
+        const char* resultCode = doPayment(lcUname, pAmount->value().c_str(), userBill, amountValue);
         AsyncWebServerResponse* response = request->beginResponse(
           200,
           "text/plain",

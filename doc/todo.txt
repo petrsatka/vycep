@@ -7,7 +7,7 @@ Nějaká počitadla - kolik bylo natočeno od posledního resetu. Dlužníci.
 Aktualizace frimware z internetu
 při kalibarci přepnout do trvale otevřeno
 V trvale otevřeno a trvale uzavřeno nedovolit nové objednávky
-
+--Zašedit objednávku v jiném režimu, než auto
 Otestovat zámky.
 Při přístupu k NVS hlídat délku klíče? NVS klíč ořezává, což může vést k tomu, že admin s 15ti znakovým jménem si bude moci sám sobě něco nastavit, pokud použej 15tznakové jméno + jeden libovolný znak.
 Pohlídat watchdog - po přidání mdns došlo k resetu.
@@ -24,4 +24,4 @@ Relé - do krabice s řídící jednotkou, nebo k průtokoměru? Kov - rozladí 
 Průtokoměr - změřit úrovně 1/0 při 12V
 Připojení kabelů - průchodka + příchytka + svorkovnice - je třeba nakrimpovat dutinky. Nebo pájené konektory?
 Log - UART - offline logger
-	
+
