@@ -343,6 +343,8 @@ void Api::makeOrder(AsyncWebServerRequest* request) {
       if (valve.makeOrder()) {
         resultCode = GENERAL_SUCCESS_RESULT_CODE;
         user.addUserBill(lCaseUsername, 1, userBill);
+      } else {
+        resultCode = UNABLE_TO_PLACE_ORDER_RESULT_CODE;
       }
 
       AsyncWebServerResponse* response = request->beginResponse(
@@ -625,7 +627,9 @@ void Api::setSettingsValue(AsyncWebServerRequest* request) {
             settings.setPulsePerLiterCount((unsigned int)strtoul(value, nullptr, 10));
             valve.configure(settings.getPulsePerLiterCount() / 2, Utils::FLOW_METER_PIN, Utils::VALVE_PIN);
           } else if (strcmp(key, Settings::KEY_MODE) == 0) {
-            settings.setMode(getDeviceModeByName(value));
+            Settings::DeviceMode mode = getDeviceModeByName(value);
+            settings.setMode(mode);
+            valve.setMode(mode);
           } else if (strcmp(key, Settings::KEY_MASTER_TIMEOUT) == 0) {
             settings.setMasterTimeoutSeconds(strtoul(value, nullptr, 10) * 60);
           } else if (strcmp(key, Settings::KEY_UNDER_LIMIT_TIMEOUT) == 0) {

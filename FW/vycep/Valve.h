@@ -7,6 +7,7 @@ Licnese CC-BY
 #define Valve_h
 #include <Arduino.h>
 #include "TSafePreferences.h"
+#include "Settings.h"
 #include "driver/pcnt.h"
 #include "soc/pcnt_struct.h"
 
@@ -19,17 +20,19 @@ public:
   bool makeOrder();
   void refresh();
   uint16_t getQueueCount();
+  void setMode(Settings::DeviceMode mode);
 
 private:
   static constexpr const char* NAMESPACE_VALVE_STATE = "valve-state";
   static constexpr const char* KEY_ORDER_COUNT = "order-cnt";
-  static const pcnt_unit_t PCNT_UNIT = PCNT_UNIT_0;
+  static constexpr pcnt_unit_t PCNT_UNIT = PCNT_UNIT_0;
 
   SemaphoreHandle_t xSemaphore = NULL;
   TSafePreferences* valveStateStorage = NULL;
   int valvePinNumber = 0;
   bool volatile shouldOpen = false;
   bool volatile shouldClose = false;
+  Settings::DeviceMode mode = Settings::DeviceMode::AUTO;
 
   static void onServingReachedStatic(void* valve);
 
@@ -37,6 +40,9 @@ private:
   void openValve();
   void closeValve();
   void onServingReached();
+  void permanentlyCloseValve();
+  void permanentlyOpenValve();
+  void setAutoMode();
 };
 
 #endif

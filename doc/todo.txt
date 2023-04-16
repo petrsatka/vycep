@@ -6,8 +6,8 @@ Factory reset HW
 Nějaká počitadla - kolik bylo natočeno od posledního resetu. Dlužníci.
 Aktualizace frimware z internetu
 při kalibarci přepnout do trvale otevřeno
-V trvale otevřeno a trvale uzavřeno nedovolit nové objednávky
---Zašedit objednávku v jiném režimu, než auto
+
+Zohlednit mód po restartu zařízení
 Otestovat zámky.
 Při přístupu k NVS hlídat délku klíče? NVS klíč ořezává, což může vést k tomu, že admin s 15ti znakovým jménem si bude moci sám sobě něco nastavit, pokud použej 15tznakové jméno + jeden libovolný znak.
 Pohlídat watchdog - po přidání mdns došlo k resetu.
@@ -16,7 +16,6 @@ Pohlídat watchdog - po přidání mdns došlo k resetu.
 startCalibration
 stopCalibration
 runTest
-režimy
 
 HW
 Průtokoměr - sklon max +-5 stupňů - Jak namontovat na Lindr?

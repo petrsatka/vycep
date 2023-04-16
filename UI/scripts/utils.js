@@ -524,6 +524,9 @@ gui.handleError = function(resultCode, errorMessage, popupWindow = false) {
     case 'INVALID_AMOUNT_VALUE':
       message = 'Nelze zaplatit neplatné množství.';
       break
+    case 'UNABLE_TO_PLACE_ORDER':
+      message = 'Nyní nelze objednat.';
+      break
   }
   
   if (message) {
