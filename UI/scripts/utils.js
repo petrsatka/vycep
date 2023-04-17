@@ -339,21 +339,20 @@ api.activateUser = function(username, callback) {
   Spustí kalibraci
 */
 api.startCalibration = function(callback) {
-  //api.settings['pcount'] = 330;
-  console.log("calibration start");
-  setTimeout(() => callback(true,"OK", null), 1000);
-  //setTimeout(() => callback(false, "unable_to_start_calibration", null), 1000);
-  //setTimeout(() => callback(null, null, "500 - bad request"), 1000);
+  api.post("/api/startCalibration", null, (resData, errorText) => {
+    let results = api.parseResponseData(resData, errorText);
+    callback(null, results[0], errorText);
+  });
 }
 
 /*
   Ukončí kalibraci
 */
 api.stopCalibration = function(callback) {
-  console.log("calibration stop");
-  setTimeout(() => callback(true,"OK", null), 1000);
-  //setTimeout(() => callback(false, "unable_to_stop_calibration", null), 1000);
-  //setTimeout(() => callback(null, null, "500 - bad request"), 1000);
+  api.post("/api/stopCalibration", null, (resData, errorText) => {
+    let results = api.parseResponseData(resData, errorText);
+    callback(null, results[0], errorText);
+  });
 }
 
 /*
@@ -1218,7 +1217,7 @@ settings.startCalibration = function() {
 settings.stopCalibration = function() {
   gui.setInProgress(true);
   gui.stopCalibration(() => {   
-    gui.loadSettingsValue('pcount', '#pcount', () => {
+    gui.loadSettingsValue('pulsepserv', '#pcount', () => {
       settings.toggleCalibration = settings.startCalibration;
       $("#button-calibrate").val($("#button-calibrate").data('defval'));
       gui.setInProgress(false); 

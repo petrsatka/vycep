@@ -357,6 +357,7 @@ void Api::makeOrder(AsyncWebServerRequest* request) {
 }
 
 const char* Api::doPayment(const char* lCaseUsername, const char* amount, uint16_t& userBill, int32_t& amountValue) {
+  sprintln("!doPayment");
   const char* resultCode = GENERAL_ERROR_RESULT_CODE;
   amountValue = strtol(amount, nullptr, 10);
   userBill = user.getUserBill(lCaseUsername);
@@ -471,6 +472,39 @@ bool Api::restart(AsyncWebServerRequest* request) {
     User::PERMISSIONS_ACTIVE | User::PERMISSIONS_ADMIN, true);
 
   return res;
+}
+
+void Api::startCalibration(AsyncWebServerRequest* request) {
+  sprintln("!startCalibration");
+  serveDynamicAuth(
+    request, [&](const char* lCaseUsername, uint32_t& permissions, const char* cookie, char* newCookie, bool& setCookie) {
+      valve.startCalibration();
+      AsyncWebServerResponse* response = request->beginResponse(
+        200,
+        "text/plain",
+        String(GENERAL_SUCCESS_RESULT_CODE));
+      return response;
+    },
+    User::PERMISSIONS_ACTIVE | User::PERMISSIONS_ADMIN, true);
+}
+
+void Api::stopCalibration(AsyncWebServerRequest* request) {
+  sprintln("!stopCalibration");
+  serveDynamicAuth(
+    request, [&](const char* lCaseUsername, uint32_t& permissions, const char* cookie, char* newCookie, bool& setCookie) {
+      int16_t pulseCount = valve.stopCalibration(settings.getMode());
+      if (pulseCount > 0) {
+        settings.setPulsePerServingCount(pulseCount);
+         valve.configure(settings.getPulsePerServingCount(), Utils::FLOW_METER_PIN, Utils::VALVE_PIN);
+      }
+
+      AsyncWebServerResponse* response = request->beginResponse(
+        200,
+        "text/plain",
+        String(GENERAL_SUCCESS_RESULT_CODE));
+      return response;
+    },
+    User::PERMISSIONS_ACTIVE | User::PERMISSIONS_ADMIN, true);
 }
 
 bool Api::setWifiConnection(AsyncWebServerRequest* request) {

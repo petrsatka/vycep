@@ -58,6 +58,8 @@ public:
   void activateUser(AsyncWebServerRequest* request);
   void deleteUser(AsyncWebServerRequest* request);
   void resetPassword(AsyncWebServerRequest* request);
+  void startCalibration(AsyncWebServerRequest* request);
+  void stopCalibration(AsyncWebServerRequest* request);
 
   static void onNotFound(AsyncWebServerRequest* request);
 

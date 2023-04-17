@@ -10,6 +10,7 @@ Licnese CC-BY
 #include "Settings.h"
 #include "driver/pcnt.h"
 #include "soc/pcnt_struct.h"
+#include "Debug.h"
 
 class Valve {
 public:
@@ -22,6 +23,8 @@ public:
   uint16_t getQueueCount();
   void setMode(Settings::DeviceMode mode);
   Settings::DeviceMode getMode();
+  void startCalibration();
+  int16_t stopCalibration(Settings::DeviceMode mode);
 
 private:
   static constexpr const char* NAMESPACE_VALVE_STATE = "valve-state";
@@ -32,9 +35,10 @@ private:
   SemaphoreHandle_t xSemaphore = NULL;
   TSafePreferences* valveStateStorage = NULL;
   int valvePinNumber = 0;
+  int flowMeterPinNumber = 0;
   bool volatile shouldOpen = false;
   bool volatile shouldClose = false;
-  Settings::DeviceMode mode = Settings::DeviceMode::AUTO;
+  Settings::DeviceMode actualMode = Settings::DeviceMode::AUTO;
 
   static void onServingReachedStatic(void* valve);
 

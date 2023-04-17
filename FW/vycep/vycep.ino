@@ -331,6 +331,14 @@ void serverInit() {
     api.getGatewayIP(request);
   });
 
+  server.on("/api/startCalibration", HTTP_POST, [](AsyncWebServerRequest *request) {
+    api.startCalibration(request);
+  });
+
+  server.on("/api/stopCalibration", HTTP_POST, [](AsyncWebServerRequest *request) {
+    api.stopCalibration(request);
+  });
+
   server.on("/api/restart", HTTP_POST, [](AsyncWebServerRequest *request) {
     shouldReboot = api.restart(request);
   });
