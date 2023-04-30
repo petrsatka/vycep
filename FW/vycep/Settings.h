@@ -73,8 +73,8 @@ private:
   static constexpr const char* NAMESPACE_SYSTEM_SETTINGS = "setts-system";
   static constexpr const char* KEY_WIFI_OK = "wifiok";
   static constexpr unsigned int DEFAULT_PULSE_PER_SERVING = 5880;
-  static constexpr unsigned long DEFAULT_MASTER_TIMEOUT_SECONDS = 20 * 60;
-  static constexpr unsigned long DEFAULT_UNDER_LIMIT_TIMEOUT_SECONDS = 10 * 60;
+  static constexpr unsigned long DEFAULT_MASTER_TIMEOUT_SECONDS = 30 * 60;
+  static constexpr unsigned long DEFAULT_UNDER_LIMIT_TIMEOUT_SECONDS = 20 * 60;
 
   SemaphoreHandle_t xSemaphore = NULL;
   TSafePreferences* systemSettingsStorage = NULL;

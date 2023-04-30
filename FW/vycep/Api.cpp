@@ -495,7 +495,7 @@ void Api::stopCalibration(AsyncWebServerRequest* request) {
       int16_t pulseCount = valve.stopCalibration(settings.getMode());
       if (pulseCount > 0) {
         settings.setPulsePerServingCount(pulseCount);
-         valve.configure(settings.getPulsePerServingCount(), Utils::FLOW_METER_PIN, Utils::VALVE_PIN);
+         valve.configure(settings.getPulsePerServingCount(), Utils::FLOW_METER_PIN, Utils::VALVE_PIN, settings.getMasterTimeoutSeconds());
       }
 
       AsyncWebServerResponse* response = request->beginResponse(
@@ -659,13 +659,14 @@ void Api::setSettingsValue(AsyncWebServerRequest* request) {
             settings.setNewUserPaymentEnabled(Utils::strTob(value));
           } else if (strcmp(key, Settings::KEY_PULSE_PER_SERVING) == 0) {
             settings.setPulsePerServingCount((unsigned int)strtoul(value, nullptr, 10));
-            valve.configure(settings.getPulsePerServingCount(), Utils::FLOW_METER_PIN, Utils::VALVE_PIN);
+            valve.configure(settings.getPulsePerServingCount(), Utils::FLOW_METER_PIN, Utils::VALVE_PIN, settings.getMasterTimeoutSeconds());
           } else if (strcmp(key, Settings::KEY_MODE) == 0) {
             Settings::DeviceMode mode = getDeviceModeByName(value);
             settings.setMode(mode);
             valve.setMode(mode);
           } else if (strcmp(key, Settings::KEY_MASTER_TIMEOUT) == 0) {
             settings.setMasterTimeoutSeconds(strtoul(value, nullptr, 10) * 60);
+            valve.setMasterTimeout(settings.getMasterTimeoutSeconds());
           } else if (strcmp(key, Settings::KEY_UNDER_LIMIT_TIMEOUT) == 0) {
             settings.setUnderLimitTimeoutSeconds(strtoul(value, nullptr, 10) * 60);
           } else if (strcmp(key, Settings::KEY_DDNS_DOMAIN) == 0) {

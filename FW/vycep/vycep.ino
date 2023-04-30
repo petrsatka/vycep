@@ -135,7 +135,14 @@ void wiFiInit() {
     dprintln("wifiOK");
     //WIFI byla již úspěšně připojena - budeme se zkoušet znovu připojit k nastavené wifi
     //Pokud wifi již neexistuje. Je možný pouze HW reset wifi.
-    while (!connectWiFiClient()) {};
+    while (!connectWiFiClient()) {
+      delay(1000);
+      if (digitalRead(Utils::STATUS_LED_PIN) == LOW) {
+        digitalWrite(Utils::STATUS_LED_PIN, HIGH);
+      } else {
+        digitalWrite(Utils::STATUS_LED_PIN, LOW);
+      }
+    };
   } else {
     dprintln("wifiNotOK");
     //Může se jednat o nenastavenou wifi, nebo pokus o první připojení
@@ -146,6 +153,8 @@ void wiFiInit() {
       createAP();
     }
   }
+
+  digitalWrite(Utils::STATUS_LED_PIN, LOW);
 }
 
 //Inicalizace serveru
@@ -377,12 +386,13 @@ void serverInit() {
 }
 
 void valveInit() {
-  valve.configure(settings.getPulsePerServingCount(), Utils::FLOW_METER_PIN, Utils::VALVE_PIN);
+  valve.configure(settings.getPulsePerServingCount(), Utils::FLOW_METER_PIN, Utils::VALVE_PIN, settings.getMasterTimeoutSeconds());
   valve.setMode(settings.getMode());
 }
 
 void setup() {
   Serial.begin(115200);
+  pinMode(Utils::STATUS_LED_PIN, OUTPUT);
 
   //NTP
   configTime(3600, 3600, "pool.ntp.org");
@@ -407,6 +417,7 @@ void setup() {
   sprintln("Start");
   //test();  //Debug - odstranit !!!!!
   heapAfterInit = ESP.getFreeHeap();
+  digitalWrite(Utils::STATUS_LED_PIN, HIGH);
 }
 
 void loop() {

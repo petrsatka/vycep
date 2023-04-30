@@ -102,11 +102,12 @@ Settings::DeviceMode Valve::getMode() {
   return actualMode;
 }
 
-void Valve::configure(uint16_t pulsesPerServing, int flowMeterPinNumber, int valvePinNumber) {
+void Valve::configure(uint16_t pulsesPerServing, int flowMeterPinNumber, int valvePinNumber, unsigned long masterTimeoutCesonds) {
   sprintln("!configure");
   pinMode(valvePinNumber, OUTPUT);
   this->valvePinNumber = valvePinNumber;
   this->flowMeterPinNumber = flowMeterPinNumber;
+  setMasterTimeout(masterTimeoutCesonds);
   initPulseCounter(pulsesPerServing, flowMeterPinNumber);
   shouldClose = false;
   shouldOpen = false;
@@ -124,6 +125,10 @@ void Valve::configure(uint16_t pulsesPerServing, int flowMeterPinNumber, int val
       shouldOpen = true;
     }
   }
+}
+
+void Valve::setMasterTimeout(unsigned long masterTimeoutCesonds) {
+  this->masterTimeoutMillis = masterTimeoutCesonds * 1000;
 }
 
 void Valve::setTestMode() {
@@ -151,9 +156,17 @@ bool Valve::makeOrder() {
   return false;
 }
 
+void Valve::checkTimeout() {
+  if (masterTimeoutMillis > 0  && actualMode == Settings::DeviceMode::AUTO && digitalRead(this->valvePinNumber) == HIGH && millis() - lastActivityMillis > masterTimeoutMillis) {
+    permanentlyCloseValve();
+    setAutoMode();
+  }
+}
+
 void Valve::refresh() {
   if (shouldOpen) {
     shouldOpen = false;
+    lastActivityMillis = millis();
     openValve();
   }
 
@@ -163,9 +176,12 @@ void Valve::refresh() {
     if (orderCount == 0) {
       closeValve();
     }
-
+    
+    lastActivityMillis = millis();
     shouldClose = false;
   }
+
+  checkTimeout();
 }
 
 void Valve::permanentlyCloseValve() {

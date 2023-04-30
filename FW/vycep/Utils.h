@@ -19,6 +19,7 @@ public:
   static constexpr size_t SECURITY_KEY_BUFFER_SIZE = 64;  //63 Znaků
   static constexpr int VALVE_PIN = 33;
   static constexpr int FLOW_METER_PIN = 26;
+  static constexpr int STATUS_LED_PIN = 32;
 
   static void actTime(struct tm& timeInfo);
   static void hexStr(const unsigned char* data, int len, char* buffer);

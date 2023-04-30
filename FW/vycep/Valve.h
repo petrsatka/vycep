@@ -17,7 +17,8 @@ public:
   Valve(SemaphoreHandle_t xSemaphore, const char* nvsParttionName);
   ~Valve();
 
-  void configure(uint16_t pulsesPerServing, int flowMeterPinNumber, int valvePinNumber);
+  void configure(uint16_t pulsesPerServing, int flowMeterPinNumber, int valvePinNumber, unsigned long masterTimeoutCesonds);
+  void setMasterTimeout(unsigned long masterTimeoutCesonds);
   bool makeOrder();
   void refresh();
   uint16_t getQueueCount();
@@ -36,6 +37,8 @@ private:
   TSafePreferences* valveStateStorage = NULL;
   int valvePinNumber = 0;
   int flowMeterPinNumber = 0;
+  unsigned long lastActivityMillis = 0;
+  unsigned long masterTimeoutMillis = 0;
   bool volatile shouldOpen = false;
   bool volatile shouldClose = false;
   Settings::DeviceMode actualMode = Settings::DeviceMode::AUTO;
@@ -51,6 +54,7 @@ private:
   void permanentlyOpenValve();
   void setAutoMode();
   void setTestMode();
+  void checkTimeout(); 
 };
 
 #endif
