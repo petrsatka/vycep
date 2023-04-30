@@ -390,10 +390,20 @@ void valveInit() {
   valve.setMode(settings.getMode());
 }
 
+void clearWiFiSettings() {
+  settings.setSSID("");
+  settings.setSecurityKey("");
+  settings.clearWiFiOK();
+}
+
 void setup() {
   Serial.begin(115200);
   pinMode(Utils::STATUS_LED_PIN, OUTPUT);
-
+  digitalWrite(Utils::STATUS_LED_PIN, LOW);
+  pinMode(Utils::RESET_BUTTON_PIN, INPUT_PULLUP);
+  if (digitalRead(Utils::RESET_BUTTON_PIN) == LOW) {
+    clearWiFiSettings();
+  }
   //NTP
   configTime(3600, 3600, "pool.ntp.org");
 

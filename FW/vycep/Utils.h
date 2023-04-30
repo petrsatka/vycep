@@ -20,6 +20,7 @@ public:
   static constexpr int VALVE_PIN = 33;
   static constexpr int FLOW_METER_PIN = 26;
   static constexpr int STATUS_LED_PIN = 32;
+  static constexpr int RESET_BUTTON_PIN = 25;
 
   static void actTime(struct tm& timeInfo);
   static void hexStr(const unsigned char* data, int len, char* buffer);
